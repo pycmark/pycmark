@@ -27,6 +27,7 @@ setup(
     ],
     extras_require={
         'test': [
+            'tox',
             'flake8',
             'pytest',
             'mypy',

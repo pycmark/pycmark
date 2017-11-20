@@ -17,40 +17,49 @@ def test_empty_text():
 
 
 def test_thematic_breaks():
-    result = publish("***")
+    # Example 13
+    text = ("***\n"
+            "---\n"
+            "___\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.transition,
+                                          nodes.transition,
+                                          nodes.transition)])
+
+    # TODO: add test for wrong characters (Example 14 and 15)
+
+    # TODO: add test for not enough characters (Example 16)
+
+    # Example 17
+    text = (" ***\n"
+            "  ***\n"
+            "   ***\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.transition,
+                                          nodes.transition,
+                                          nodes.transition)])
+
+    # TODO: add test for four indented thematic break (Example 18)
+
+    # Example 20
+    result = publish("_____________________________________")
     assert_node(result, [nodes.document, nodes.transition])
 
-    result = publish("----")
+    # Example 21
+    result = publish(" - - -")
     assert_node(result, [nodes.document, nodes.transition])
 
-    result = publish("_____")
+    # Example 22
+    result = publish(" **  * ** * ** * **")
     assert_node(result, [nodes.document, nodes.transition])
 
-    # TODO: add test for short thematic break
-
-
-def test_indented_thematic_breaks():
-    result = publish(" ***")
+    # Example 24
+    result = publish("- - - -    ")
     assert_node(result, [nodes.document, nodes.transition])
 
-    result = publish("  ---")
-    assert_node(result, [nodes.document, nodes.transition])
+    # TODO: add test for no other characters (Example 25)
 
-    result = publish("   ___")
-    assert_node(result, [nodes.document, nodes.transition])
-
-    # TODO: add test for four indented thematic break
-
-
-def test_spanned_thematic_breaks():
-    result = publish("* * *")
-    assert_node(result, [nodes.document, nodes.transition])
-
-    result = publish("-  -  -")
-    assert_node(result, [nodes.document, nodes.transition])
-
-    result = publish("_   _   _")
-    assert_node(result, [nodes.document, nodes.transition])
+    # TODO: add test for combination with other notations (Example 29, 30, 31)
 
 
 def test_atx_headings():

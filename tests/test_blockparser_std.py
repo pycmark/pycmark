@@ -77,6 +77,15 @@ def test_thematic_breaks():
                                           [nodes.paragraph, "a------\n"],
                                           [nodes.paragraph, "---a---\n"])])
 
+    # Example 28
+    text = ("Foo\n"
+            "***\n"
+            "bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo\n"],
+                                          nodes.transition,
+                                          [nodes.paragraph, "bar\n"])])
+
     # TODO: add test for combination with other notations (Example 29, 30, 31)
 
 
@@ -157,6 +166,7 @@ def test_atx_headings():
     # Example 45
     result = publish("# foo#")
     assert_node(result, [nodes.document, nodes.section, nodes.title, "foo#"])
+
     # Example 46
     text = ("### foo \\###\n"
             "## foo #\\##\n"
@@ -165,6 +175,15 @@ def test_atx_headings():
     assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo \\###"],
                                           [nodes.section, nodes.title, "foo #\\##"],
                                           [nodes.section, nodes.title, "foo \\#"])])
+
+    # Example 48
+    text = ("Foo bar\n"
+            "# baz\n"
+            "Bar foo\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo bar\n"],
+                                          [nodes.section, nodes.title, "baz"],
+                                          [nodes.paragraph, "Bar foo\n"])])
 
     # Example 49
     text = ("## \n"
@@ -280,7 +299,14 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "\n```\naaa\n"])
 
-    # TODO: add test for combination with block_quotes (Example 97)
+    # Example 97
+    text = ("> ```\n"
+            "> aaa\n"
+            "\n"
+            "bbb\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.block_quote, nodes.literal_block, "aaa\n"],
+                                          [nodes.paragraph, "bbb\n"])])
 
     # Example 100
     text = (" ```\n"
@@ -314,6 +340,17 @@ def test_fenced_code_blocks():
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n    ```\n"])
 
     # TODO: add test for inline code spans (Example 107)
+
+    # Example 109
+    text = ("foo\n"
+            "```\n"
+            "bar\n"
+            "```\n"
+            "baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "foo\n"],
+                                          [nodes.literal_block, "bar\n"],
+                                          [nodes.paragraph, "baz\n"])])
 
     # Example 111
     text = ("```ruby\n"

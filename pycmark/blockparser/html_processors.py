@@ -26,6 +26,7 @@ STANDARD_HTML_TAGS = (
 
 
 class BaseHTMLBlockProcessor(PatternBlockProcessor):
+    paragraph_interruptable = True
     closing_pattern = re.compile('^$')
 
     def run(self, document, reader):
@@ -36,6 +37,7 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
             if self.closing_pattern.search(line):
                 break
 
+        content = re.sub('\n+$', '\n', content)  # strip multiple CRs on tail
         document += nodes.raw(content, content, format='html')
         document[-1].source = source
         document[-1].line = lineno + 1  # lineno points previous line
@@ -80,5 +82,6 @@ class StandardTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
 
 # 4.6 HTML blocks; complete tags
 class CompleteTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
+    paragraph_interruptable = False
     pattern = re.compile('^ {0,3}</?\w+(\s+\S+)*\s*>')
     closing_pattern = re.compile('^\s*$')

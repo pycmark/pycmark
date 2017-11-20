@@ -13,7 +13,8 @@ from docutils.parsers import Parser
 from pycmark.readers import LineReader
 from pycmark.blockparser import BlockParser
 from pycmark.blockparser.std_processors import (
-    ThematicBreakProcessor
+    ThematicBreakProcessor,
+    ATXHeadingProcessor,
 )
 
 
@@ -26,6 +27,7 @@ class CommonMarkParser(Parser):
         """Returns block processors. Overrided by subclasses."""
         return [
             ThematicBreakProcessor,
+            ATXHeadingProcessor,
         ]
 
     def create_parser(self):
@@ -41,6 +43,6 @@ class CommonMarkParser(Parser):
 
     def parse(self, inputtext, document):
         """Parses a text and build document."""
-        reader = LineReader(inputtext.splitlines(True))
+        reader = LineReader(inputtext.splitlines(True), source=document['source'])
         parser = self.create_parser()
         parser.parse(reader, document)

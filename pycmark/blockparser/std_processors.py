@@ -22,3 +22,17 @@ class ThematicBreakProcessor(PatternBlockProcessor):
         reader.readline()
         document += nodes.transition()
         return True
+
+
+# 4.2 ATX headings
+class ATXHeadingProcessor(PatternBlockProcessor):
+    pattern = re.compile('^ {0,3}(#{1,6})\s(.*)$')
+    trailing_hashes = re.compile('\s+#+\s*$')
+
+    def run(self, document, reader):
+        marker, title = self.pattern.match(reader.readline()).groups()
+        title = self.trailing_hashes.sub('', title.strip())
+        title_node = nodes.title(title, title)
+        title_node.source, title_node.line = reader.get_source_and_line()
+        document += nodes.section('', title_node, depth=len(marker))
+        return True

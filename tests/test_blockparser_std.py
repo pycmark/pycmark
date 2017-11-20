@@ -168,3 +168,113 @@ def test_indented_blocks():
             "    \n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "foo\n"])
+
+
+def test_fenced_code_blocks():
+    # Example 88
+    text = ("```\n"
+            "<\n"
+            " >\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "<\n >\n"])
+
+    # Example 89
+    text = ("~~~\n"
+            "<\n"
+            " >\n"
+            "~~~\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "<\n >\n"])
+
+    # TODO: add test for lesser backtics (Example 90)
+
+    # Example 91
+    text = ("```\n"
+            "aaa\n"
+            "~~~\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "aaa\n~~~\n"])
+
+    # Example 92
+    text = ("~~~\n"
+            "aaa\n"
+            "```\n"
+            "~~~\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "aaa\n```\n"])
+
+    # Example 93
+    text = ("````\n"
+            "aaa\n"
+            "```\n"
+            "``````\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "aaa\n```\n"])
+
+    # Example 95
+    result = publish("```")
+    assert_node(result, [nodes.document, nodes.literal_block])
+
+    # Example 96
+    text = ("`````\n"
+            "\n"
+            "```\n"
+            "aaa\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "\n```\naaa\n"])
+
+    # TODO: add test for combination with block_quotes (Example 97)
+
+    # Example 100
+    text = (" ```\n"
+            " aaa\n"
+            "aaa\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "aaa\naaa\n"])
+
+    # Example 102
+    text = ("   ```\n"
+            "   aaa\n"
+            "    aaa\n"
+            "  aaa\n"
+            "   ```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "aaa\n aaa\naaa\n"])
+
+    # Example 103
+    text = ("    ```\n"
+            "    aaa\n"
+            "    ```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "```\naaa\n```\n"])
+
+    # Example 106
+    text = ("```\n"
+            "aaa\n"
+            "    ```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "aaa\n    ```\n"])
+
+    # TODO: add test for inline code spans (Example 107)
+
+    # Example 111
+    text = ("```ruby\n"
+            "def foo(x)\n"
+            "  return 3\n"
+            "end\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "def foo(x)\n  return 3\nend\n"])
+    assert_node(result[0], nodes.literal_block, classes=["language-ruby"])
+
+    # TODO: add test for inline code spans (Example 114)
+
+    # Example 115
+    text = ("```\n"
+            "``` aaa\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "``` aaa\n"])

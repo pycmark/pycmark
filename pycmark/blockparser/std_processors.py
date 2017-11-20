@@ -44,8 +44,9 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
     followings = re.compile('^((?:    | {0,3}\t)(.*\n?)|\s*)$')
 
     def run(self, document, reader):
-        code = ''
         source, lineno = reader.get_source_and_line()
+
+        code = ''
         for line in reader:
             matched = self.followings.match(line)
             if matched:
@@ -61,6 +62,36 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
         document += nodes.literal_block(code, code)
         document[-1].source = source
         document[-1].line = lineno + 1  # lineno points previous line
+        return True
+
+
+# 4.5 Fenced code blocks
+class FencedCodeBlockProcessor(PatternBlockProcessor):
+    pattern = re.compile('^( {0,3})(`{3,}|~{3,})([^`]*)$')
+
+    def run(self, document, reader):
+        def unindent(text, length):
+            return re.sub('^ {0,%d}' % length, '', text)
+
+        source, lineno = reader.get_source_and_line()
+
+        code = ''
+        indent, marker, language = self.pattern.match(reader.readline()).groups()
+        closing_pattern = re.compile('^ {0,3}%s+\s*$' % marker)
+        for line in reader:
+            if closing_pattern.match(line):
+                break
+            else:
+                code += unindent(line, len(indent))
+
+        document += nodes.literal_block(code, code)
+        document[-1].source = source
+        document[-1].line = lineno + 1  # lineno points previous line
+        if language and language.strip():
+            language = language.strip()
+            document[-1]['language'] = language
+            document[-1]['classes'].append('language-%s' % language.split()[0])
+
         return True
 
 

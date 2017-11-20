@@ -135,3 +135,35 @@ def test_atx_headings():
     assert_node(result, [nodes.document, ([nodes.section, nodes.title],
                                           [nodes.section, nodes.title],
                                           [nodes.section, nodes.title])])
+
+
+def test_indented_blocks():
+    # Example 76
+    text = ("    a simple\n"
+            "      indented code block\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "a simple\n  indented code block\n"])
+
+    # Example 79
+    text = ("    <a/>\n"
+            "    *hi*\n"
+            "\n"
+            "    - one\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "<a/>\n*hi*\n\n- one\n"])
+
+    # Example 81
+    text = ("    chunk1\n"
+            "      \n"
+            "      chunk2\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "chunk1\n  \n  chunk2\n"])
+
+    # TODO: add test for combination with paragraph (Example 82 and 83)
+
+    # Example 86
+    text = ("    \n"
+            "    foo\n"
+            "    \n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "foo\n"])

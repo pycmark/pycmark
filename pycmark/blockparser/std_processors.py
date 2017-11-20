@@ -36,3 +36,29 @@ class ATXHeadingProcessor(PatternBlockProcessor):
         title_node.source, title_node.line = reader.get_source_and_line()
         document += nodes.section('', title_node, depth=len(marker))
         return True
+
+
+# 4.4 Indented code blocks
+class IndentedCodeBlockProcessor(PatternBlockProcessor):
+    pattern = re.compile('^(    | {0,3}\t)(.*\n?)$')
+    followings = re.compile('^((?:    | {0,3}\t)(.*\n?)|\s*)$')
+
+    def run(self, document, reader):
+        code = ''
+        source, lineno = reader.get_source_and_line()
+        for line in reader:
+            matched = self.followings.match(line)
+            if matched:
+                if matched.group(2):
+                    code += matched.group(2)
+                else:
+                    code += "\n"
+            else:
+                reader.step(-1)
+                break
+
+        code = re.sub('^\n*(.*\n)\n*$', '\\1', code)  # strip blank lines
+        document += nodes.literal_block(code, code)
+        document[-1].source = source
+        document[-1].line = lineno + 1  # lineno points previous line
+        return True

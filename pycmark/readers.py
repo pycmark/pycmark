@@ -30,6 +30,19 @@ class LineReader(object):
         """Returns arbitrary line or lines."""
         return self.lines[key]
 
+    def __iter__(self):
+        # type: () -> LineReader
+        """Returns itself as a iterator."""
+        return self
+
+    def __next__(self):
+        # type: () -> str
+        """Returns a next line from buffer. same as :meth:`readline()`."""
+        try:
+            return self.readline()
+        except IOError:
+            raise StopIteration
+
     def get_source_and_line(self, lineno=None):
         # type: (int) -> Tuple[str, int]
         """Returns source filename and current line number."""

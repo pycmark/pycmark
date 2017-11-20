@@ -20,8 +20,9 @@ text = ("Lorem ipsum dolor sit amet, \n"
 
 
 def test_LineReader():
-    reader = LineReader(text.splitlines())
+    reader = LineReader(text.splitlines(), source='dummy.md')
     assert reader.eof() is False
+    assert reader.get_source_and_line() == ('dummy.md', 0)
 
     # read first line
     assert reader.readline() == "Lorem ipsum dolor sit amet, "
@@ -30,16 +31,19 @@ def test_LineReader():
     assert reader.fetch(1) == "consectetur adipiscing elit, "
     assert reader.next_line == "consectetur adipiscing elit, "
     assert reader.fetch(2) == ""
+    assert reader.get_source_and_line() == ('dummy.md', 1)
 
     # read second line
     assert reader.readline() == "consectetur adipiscing elit, "
     assert reader.current_line == "consectetur adipiscing elit, "
     assert reader.fetch() == "consectetur adipiscing elit, "
     assert reader.fetch(1) == ""
+    assert reader.get_source_and_line() == ('dummy.md', 2)
 
     # rollback a line
     reader.step(-1)
     assert reader.current_line == "Lorem ipsum dolor sit amet, "
+    assert reader.get_source_and_line() == ('dummy.md', 1)
 
     # step a line again
     reader.step()

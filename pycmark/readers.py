@@ -13,21 +13,30 @@ import typing
 
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Union  # NOQA
+    from typing import Any, List, Tuple, Union  # NOQA
 
 
 class LineReader(object):
     """A line based reader for text."""
 
-    def __init__(self, lines, lineno=0):
-        # type: (List[str], int) -> None
+    def __init__(self, lines, source=None, lineno=0):
+        # type: (List[str], str, int) -> None
         self.lines = lines
+        self.source = source
         self.lineno = lineno  # lineno is 1 origin
 
     def __getitem__(self, key):
         # type: (Union[int, slice]) -> str
         """Returns arbitrary line or lines."""
         return self.lines[key]
+
+    def get_source_and_line(self, lineno=None):
+        # type: (int) -> Tuple[str, int]
+        """Returns source filename and current line number."""
+        if lineno is not None:
+            return self.source, lineno
+        else:
+            return self.source, self.lineno
 
     def fetch(self, relative=0, **kwargs):
         # type: (int, Any) -> str

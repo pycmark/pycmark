@@ -12,6 +12,7 @@
 import re
 from docutils import nodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
+from pycmark.readers import LazyLineReader
 
 
 # 4.1 Thematic breaks
@@ -105,6 +106,10 @@ class ParagraphProcessor(BlockProcessor):
         return True
 
     def run(self, document, reader):
+        def unindent(text):
+            return re.sub('^ {0,3}', '', text)
+
+        reader = LazyLineReader(reader)
         source, lineno = reader.get_source_and_line()
 
         text = ''

@@ -7,7 +7,7 @@
     :license: BSD, see LICENSE for details.
 """
 
-from pycmark.readers import LineReader
+from pycmark.readers import LineReader, BlockQuoteReader, LazyLineReader
 
 
 text = ("Lorem ipsum dolor sit amet, \n"
@@ -17,6 +17,12 @@ text = ("Lorem ipsum dolor sit amet, \n"
         "    ut labore et dolore magna aliqua.\n"
         "\n"
         "Ut enim ad minim veniam, quis nostrud")
+
+quoted_text = ("> Lorem ipsum dolor sit amet, \n"
+               " consectetur adipiscing elit, \n"
+               "\n"
+               "sed do eiusmod tempor incididunt \n"
+               "ut labore et dolore magna aliqua.")
 
 
 def test_LineReader():
@@ -62,3 +68,71 @@ def test_LineReader():
         assert False, "reader does not raise IOError on EOF"
     except IOError:
         pass
+
+
+def test_BlockQuoteReader():
+    reader = LineReader(quoted_text.splitlines(True), source='dummy.md')
+    quoted_reader = BlockQuoteReader(reader)
+    assert quoted_reader.eof() is False
+    assert quoted_reader.get_source_and_line() == ('dummy.md', 0)
+
+    # read first line
+    assert quoted_reader.readline() == "Lorem ipsum dolor sit amet, \n"
+    assert quoted_reader.current_line == "Lorem ipsum dolor sit amet, \n"
+    assert quoted_reader.fetch() == "Lorem ipsum dolor sit amet, \n"
+    assert quoted_reader.get_source_and_line() == ('dummy.md', 1)
+
+    # laziness: off
+    try:
+        quoted_reader.readline()
+        assert False
+    except IOError:
+        pass
+
+    # lazyness allows texts hanging on quoted block
+    assert quoted_reader.readline(lazy=True) == " consectetur adipiscing elit, \n"
+
+    # empty line causes IOError
+    try:
+        quoted_reader.readline()
+        assert False
+    except IOError:
+        pass
+
+    # empty line causes IOError even if lazy
+    try:
+        quoted_reader.readline(lazy=True)
+        assert False
+    except IOError:
+        pass
+
+    assert reader.readline() == '\n'
+    assert reader.readline() == "sed do eiusmod tempor incididunt \n"
+    assert reader.readline() == "ut labore et dolore magna aliqua."
+
+
+def test_LazyLineReader():
+    reader = LineReader(quoted_text.splitlines(True), source='dummy.md')
+    lazy_reader = LazyLineReader(BlockQuoteReader(reader))
+    assert lazy_reader.eof() is False
+    assert lazy_reader.get_source_and_line() == ('dummy.md', 0)
+
+    # read first line
+    assert lazy_reader.readline() == "Lorem ipsum dolor sit amet, \n"
+    assert lazy_reader.current_line == "Lorem ipsum dolor sit amet, \n"
+    assert lazy_reader.fetch() == "Lorem ipsum dolor sit amet, \n"
+    assert lazy_reader.get_source_and_line() == ('dummy.md', 1)
+
+    # read second line
+    assert lazy_reader.readline() == " consectetur adipiscing elit, \n"
+
+    # empty line causes IOError
+    try:
+        lazy_reader.readline()
+        assert False
+    except IOError:
+        pass
+
+    assert reader.readline() == '\n'
+    assert reader.readline() == "sed do eiusmod tempor incididunt \n"
+    assert reader.readline() == "ut labore et dolore magna aliqua."

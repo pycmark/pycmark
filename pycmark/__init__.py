@@ -29,6 +29,9 @@ from pycmark.blockparser.html_processors import (
     StandardTagsHTMLBlockProcessor,
     CompleteTagsHTMLBlockProcessor,
 )
+from pycmark.blockparser.container_processors import (
+    BlockQuoteProcessor,
+)
 
 
 class CommonMarkParser(Parser):
@@ -51,6 +54,7 @@ class CommonMarkParser(Parser):
             CdataHTMLBlockProcessor,
             StandardTagsHTMLBlockProcessor,
             CompleteTagsHTMLBlockProcessor,
+            BlockQuoteProcessor,
             ParagraphProcessor,
         ]
 

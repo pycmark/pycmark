@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for details.
 """
 
+import re
 import typing
 
 
@@ -90,3 +91,70 @@ class LineReader(object):
         # type: (int) -> None
         """Steps the current line to next."""
         self.lineno += n
+
+
+class LineReaderDecorator(LineReader):
+    """A base class of LineReader decorators."""
+
+    def __init__(self, reader):
+        # type: (LineReader) -> None
+        self.reader = reader
+
+    def __getitem__(self, key):
+        # type: (Union[int, slice]) -> str
+        return self.reader[key]
+
+    @property
+    def lineno(self):  # type: ignore
+        # type: () -> int
+        return self.reader.lineno
+
+    def get_source_and_line(self, lineno=None):
+        # type: (int) -> Tuple[str, int]
+        return self.reader.get_source_and_line(lineno)
+
+    def fetch(self, relative=0, **kwargs):
+        # type: (int, Any) -> str
+        raise NotImplementedError
+
+    def eof(self, **kwargs):
+        # type: (Any) -> bool
+        if self.reader.eof(**kwargs):
+            return True
+        else:
+            try:
+                self.fetch(1, **kwargs)
+                return False
+            except IOError:
+                return True
+
+    def step(self, n=1):
+        # type: (int) -> None
+        self.reader.step(n)
+
+
+class BlockQuoteReader(LineReaderDecorator):
+    """A reader for block quotes."""
+    pattern = re.compile('^ {0,3}> ?')
+
+    def fetch(self, relative=0, **kwargs):
+        # type: (int, Any) -> str
+        """Returns a line without quote markers."""
+        line = self.reader.fetch(relative, lazy=kwargs.get('lazy'))
+        if self.pattern.match(line):
+            return self.pattern.sub('', line)
+        elif kwargs.get('lazy') and line.strip():
+            return line
+        else:
+            raise IOError
+
+
+class LazyLineReader(LineReaderDecorator):
+    """A reader supports laziness paragraphs."""
+
+    def fetch(self, relative=0):
+        return self.reader.fetch(relative, lazy=True)
+
+    def eof(self, **kwargs):
+        # type: (Any) -> bool
+        return self.reader.eof(lazy=True)

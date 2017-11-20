@@ -32,8 +32,18 @@ class BlockParser(object):
             else:
                 raise RuntimeError('Failed to parse')
 
+    def is_interrupted(self, reader):
+        for processor in self.processors:
+            if processor.paragraph_interruptable and processor.match(reader):
+                return True
+
+        return False
+
 
 class BlockProcessor(object):
+    #: This processor can interrupt a paragraph
+    paragraph_interruptable = False
+
     def __init__(self, parser):
         self.parser = parser
 

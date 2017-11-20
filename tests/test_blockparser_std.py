@@ -26,9 +26,16 @@ def test_thematic_breaks():
                                           nodes.transition,
                                           nodes.transition)])
 
-    # TODO: add test for wrong characters (Example 14 and 15)
+    # Example 14
+    result = publish("+++")
+    assert_node(result, [nodes.document, nodes.paragraph, "+++"])
 
-    # TODO: add test for not enough characters (Example 16)
+    # Example 16
+    text = ("--\n"
+            "**\n"
+            "__\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
 
     # Example 17
     text = (" ***\n"
@@ -39,7 +46,9 @@ def test_thematic_breaks():
                                           nodes.transition,
                                           nodes.transition)])
 
-    # TODO: add test for four indented thematic break (Example 18)
+    # Example 18
+    result = publish("    ***")
+    assert_node(result, [nodes.document, nodes.literal_block, "***"])
 
     # Example 20
     result = publish("_____________________________________")
@@ -57,7 +66,16 @@ def test_thematic_breaks():
     result = publish("- - - -    ")
     assert_node(result, [nodes.document, nodes.transition])
 
-    # TODO: add test for no other characters (Example 25)
+    # Example 25
+    text = ("_ _ _ _ a\n"
+            "\n"
+            "a------\n"
+            "\n"
+            "---a---\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "_ _ _ _ a\n"],
+                                          [nodes.paragraph, "a------\n"],
+                                          [nodes.paragraph, "---a---\n"])])
 
     # TODO: add test for combination with other notations (Example 29, 30, 31)
 
@@ -84,11 +102,23 @@ def test_atx_headings():
     assert_node(result[4], nodes.section, depth=5)
     assert_node(result[5], nodes.section, depth=6)
 
-    # TODO: add test for 7th leveled headings (Example 33)
+    # Example 33
+    result = publish("####### foo")
+    assert_node(result, [nodes.document, nodes.paragraph, "####### foo"])
 
-    # TODO: add test for no spaces after # (Example 34)
+    # Example 34
+    text = ("#5 bolt\n"
+            "\n"
+            "#hashtag\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "#5 bolt\n"],
+                                          [nodes.paragraph, "#hashtag\n"])])
 
     # TODO: add test for inlines in title (Example 36)
+
+    # Example 37
+    result = publish("#                  foo                     ")
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "foo"])
 
     # Example 38
     text = (" ### foo\n"
@@ -168,7 +198,18 @@ def test_indented_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "chunk1\n  \n  chunk2\n"])
 
-    # TODO: add test for combination with paragraph (Example 82 and 83)
+    # Example 82
+    text = ("Foo\n"
+            "    bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, "Foo\nbar\n"])
+
+    # Example 83
+    text = ("    foo\n"
+            "bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.literal_block, "foo\n"],
+                                          [nodes.paragraph, "bar\n"])])
 
     # Example 86
     text = ("\n"
@@ -196,7 +237,12 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "<\n >\n"])
 
-    # TODO: add test for lesser backtics (Example 90)
+    # Example 90
+    text = ("``\n"
+            "foo\n"
+            "``\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
 
     # Example 91
     text = ("```\n"

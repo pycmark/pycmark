@@ -11,11 +11,12 @@
 
 import re
 from docutils import nodes
-from pycmark.blockparser import PatternBlockProcessor
+from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 
 
 # 4.1 Thematic breaks
 class ThematicBreakProcessor(PatternBlockProcessor):
+    paragraph_interruptable = True
     pattern = re.compile('^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})\s*$')
 
     def run(self, document, reader):
@@ -26,6 +27,7 @@ class ThematicBreakProcessor(PatternBlockProcessor):
 
 # 4.2 ATX headings
 class ATXHeadingProcessor(PatternBlockProcessor):
+    paragraph_interruptable = True
     pattern = re.compile('^ {0,3}(#{1,6})\s(.*)$')
     trailing_hashes = re.compile('\s+#+\s*$')
 
@@ -40,6 +42,7 @@ class ATXHeadingProcessor(PatternBlockProcessor):
 
 # 4.4 Indented code blocks
 class IndentedCodeBlockProcessor(PatternBlockProcessor):
+    paragraph_interruptable = False
     pattern = re.compile('^(    | {0,3}\t)(.*\n?)$')
     followings = re.compile('^((?:    | {0,3}\t)(.*\n?)|\s*)$')
 
@@ -67,6 +70,7 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
 
 # 4.5 Fenced code blocks
 class FencedCodeBlockProcessor(PatternBlockProcessor):
+    paragraph_interruptable = True
     pattern = re.compile('^( {0,3})(`{3,}|~{3,})([^`]*)$')
 
     def run(self, document, reader):
@@ -92,6 +96,34 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
             document[-1]['language'] = language
             document[-1]['classes'].append('language-%s' % language.split()[0])
 
+        return True
+
+
+# 4.8 Paragraphs
+class ParagraphProcessor(BlockProcessor):
+    def match(self, reader, **kwargs):
+        return True
+
+    def run(self, document, reader):
+        source, lineno = reader.get_source_and_line()
+
+        text = ''
+        while not reader.eof():
+            try:
+                if self.parser.is_interrupted(reader):
+                    break
+
+                line = reader.readline()
+                if line.strip():
+                    text += line.lstrip()
+                else:
+                    break
+            except IOError:
+                break
+
+        document += nodes.paragraph(text, text)
+        document[-1].source = source
+        document[-1].line = lineno + 1  # lineno points previous line
         return True
 
 

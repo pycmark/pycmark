@@ -18,6 +18,7 @@ from pycmark.blockparser.std_processors import (
     IndentedCodeBlockProcessor,
     BlankLineProcessor,
     FencedCodeBlockProcessor,
+    ParagraphProcessor,
 )
 from pycmark.blockparser.html_processors import (
     ScriptHTMLBlockProcessor,
@@ -50,6 +51,7 @@ class CommonMarkParser(Parser):
             CdataHTMLBlockProcessor,
             StandardTagsHTMLBlockProcessor,
             CompleteTagsHTMLBlockProcessor,
+            ParagraphProcessor,
         ]
 
     def create_parser(self):

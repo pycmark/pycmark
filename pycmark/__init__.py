@@ -16,6 +16,7 @@ from pycmark.blockparser.std_processors import (
     ThematicBreakProcessor,
     ATXHeadingProcessor,
     IndentedCodeBlockProcessor,
+    BlankLineProcessor,
 )
 
 
@@ -30,6 +31,7 @@ class CommonMarkParser(Parser):
             ThematicBreakProcessor,
             ATXHeadingProcessor,
             IndentedCodeBlockProcessor,
+            BlankLineProcessor,
         ]
 
     def create_parser(self):

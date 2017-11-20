@@ -62,3 +62,12 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
         document[-1].source = source
         document[-1].line = lineno + 1  # lineno points previous line
         return True
+
+
+# 4.9 Blank lines
+class BlankLineProcessor(PatternBlockProcessor):
+    pattern = re.compile('^\s+$')
+
+    def run(self, document, reader):
+        reader.readline()  # skip the line
+        return True

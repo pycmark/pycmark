@@ -162,7 +162,8 @@ def test_indented_blocks():
     # TODO: add test for combination with paragraph (Example 82 and 83)
 
     # Example 86
-    text = ("    \n"
+    text = ("\n"
+            "    \n"
             "    foo\n"
             "    \n")
     result = publish(text)

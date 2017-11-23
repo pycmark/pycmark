@@ -169,7 +169,7 @@ def test_example_218():
             "\n"
             " two\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, nodes.paragraph, "one\n"],
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "one\n"],
                                           [nodes.paragraph, "two\n"])])
 
 
@@ -187,7 +187,7 @@ def test_example_220():
             "\n"
             "     two\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, nodes.paragraph, "one\n"],
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "one\n"],
                                           [nodes.literal_block, " two\n"])])
 
 
@@ -216,7 +216,7 @@ def test_example_223():
             "  >  > two\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.block_quote, nodes.block_quote,
-                         ([nodes.bullet_list, nodes.list_item, nodes.paragraph, "one\n"],
+                         ([nodes.bullet_list, nodes.list_item, "one\n"],
                           [nodes.paragraph, "two\n"])])
 
 
@@ -259,7 +259,7 @@ def test_example_226():
 
 def test_example_228():
     result = publish("123456789. ok")
-    assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item, nodes.paragraph, "ok"])
+    assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item, "ok"])
     assert_node(result[0], nodes.enumerated_list, start=123456789)
 
 
@@ -271,13 +271,13 @@ def test_example_229():
 
 def test_example_230():
     result = publish("0. ok")
-    assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item, nodes.paragraph, "ok"])
+    assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item, "ok"])
     assert_node(result[0], nodes.enumerated_list, start=0)
 
 
 def test_example_231():
     result = publish("003. ok")
-    assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item, nodes.paragraph, "ok"])
+    assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item, "ok"])
     assert_node(result[0], nodes.enumerated_list, start=3)
 
 
@@ -323,7 +323,7 @@ def test_example_239():
             "\n"
             "  bar\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, nodes.paragraph, "foo\n"],
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "foo\n"],
                                           [nodes.paragraph, "bar\n"])])
 
 
@@ -418,7 +418,7 @@ def test_example_254():
             "    with two lines.\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item,
-                         nodes.paragraph, "A paragraph\nwith two lines.\n"])
+                         "A paragraph\nwith two lines.\n"])
 
 
 def test_example_255():
@@ -435,13 +435,12 @@ def test_example_257():
             "    - baz\n"
             "      - boo\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, ([nodes.paragraph, "foo\n"],
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, ("foo\n",
                                                                               [nodes.bullet_list, nodes.list_item])])
-    assert_node(result[0][0][1][0], [nodes.list_item, ([nodes.paragraph, "bar\n"],
+    assert_node(result[0][0][1][0], [nodes.list_item, ("bar\n",
                                                        [nodes.bullet_list, nodes.list_item])])
-    assert_node(result[0][0][1][0][1][0], [nodes.list_item, ([nodes.paragraph, "baz\n"],
-                                                             [nodes.bullet_list, nodes.list_item])])
-    assert_node(result[0][0][1][0][1][0][1][0], [nodes.list_item, nodes.paragraph, "boo\n"])
+    assert_node(result[0][0][1][0][1][0], [nodes.list_item, ("baz\n",
+                                                             [nodes.bullet_list, nodes.list_item, "boo\n"])])
 
 
 def test_example_258():
@@ -450,23 +449,22 @@ def test_example_258():
             "  - baz\n"
             "   - boo\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "foo\n"],
-                                                             [nodes.list_item, nodes.paragraph, "bar\n"],
-                                                             [nodes.list_item, nodes.paragraph, "baz\n"],
-                                                             [nodes.list_item, nodes.paragraph, "boo\n"])])
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "foo\n"],
+                                                             [nodes.list_item, "bar\n"],
+                                                             [nodes.list_item, "baz\n"],
+                                                             [nodes.list_item, "boo\n"])])
 
 
 def test_example_261():
     result = publish("- - foo")
     assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item,
-                         nodes.bullet_list, nodes.list_item, nodes.paragraph, "foo"])
+                         nodes.bullet_list, nodes.list_item, "foo"])
 
 
 def test_example_262():
     result = publish("1. - 2. foo")
     assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item,
-                         nodes.bullet_list, nodes.list_item, nodes.enumerated_list, nodes.list_item,
-                         nodes.paragraph, "foo"])
+                         nodes.bullet_list, nodes.list_item, nodes.enumerated_list, nodes.list_item, "foo"])
 
 # TODO: Add test for combination with heading (Example 263)
 
@@ -476,19 +474,19 @@ def test_example_264():
             "- bar\n"
             "+ baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "foo\n"],
-                                                               [nodes.list_item, nodes.paragraph, "bar\n"])],
-                                          [nodes.bullet_list, nodes.list_item, nodes.paragraph, "baz\n"])])
+    assert_node(result, [nodes.document, ([nodes.bullet_list, ([nodes.list_item, "foo\n"],
+                                                               [nodes.list_item, "bar\n"])],
+                                          [nodes.bullet_list, nodes.list_item, "baz\n"])])
 
 
-def test_example_263():
+def test_example_265():
     text = ("1. foo\n"
             "2. bar\n"
             "3) baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.enumerated_list, ([nodes.list_item, nodes.paragraph, "foo\n"],
-                                                                   [nodes.list_item, nodes.paragraph, "bar\n"])],
-                                          [nodes.enumerated_list, nodes.list_item, nodes.paragraph, "baz\n"])])
+    assert_node(result, [nodes.document, ([nodes.enumerated_list, ([nodes.list_item, "foo\n"],
+                                                                   [nodes.list_item, "bar\n"])],
+                                          [nodes.enumerated_list, nodes.list_item, "baz\n"])])
 
 
 def test_example_266():
@@ -497,8 +495,8 @@ def test_example_266():
             "- baz\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, "Foo\n"],
-                                          [nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "bar\n"],
-                                                               [nodes.list_item, nodes.paragraph, "baz\n"])])])
+                                          [nodes.bullet_list, ([nodes.list_item, "bar\n"],
+                                                               [nodes.list_item, "baz\n"])])])
 
 
 def test_example_267():
@@ -513,8 +511,7 @@ def test_example_268():
             "1.  The number of doors is 6.\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, "The number of windows in my house is\n"],
-                                          [nodes.enumerated_list, nodes.list_item, nodes.paragraph,
-                                           "The number of doors is 6.\n"])])
+                                          [nodes.enumerated_list, nodes.list_item, "The number of doors is 6.\n"])])
 
 
 def test_example_269():
@@ -539,9 +536,9 @@ def test_example_270():
             "      bim\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item,
-                         ([nodes.paragraph, "foo\n"],
+                         ("foo\n",
                           [nodes.bullet_list, nodes.list_item,
-                           ([nodes.paragraph, "bar\n"],
+                           ("bar\n",
                             [nodes.bullet_list, nodes.list_item, ([nodes.paragraph, "baz\n"],
                                                                   [nodes.paragraph, "bim\n"])])])])
 
@@ -557,18 +554,18 @@ def test_example_271():
             " - h\n"
             "- i\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "a\n"],
-                                                             [nodes.list_item, nodes.paragraph, "b\n"],
-                                                             [nodes.list_item, nodes.paragraph, "c\n"],
-                                                             [nodes.list_item, nodes.paragraph, "d\n"],
-                                                             [nodes.list_item, nodes.paragraph, "e\n"],
-                                                             [nodes.list_item, nodes.paragraph, "f\n"],
-                                                             [nodes.list_item, nodes.paragraph, "g\n"],
-                                                             [nodes.list_item, nodes.paragraph, "h\n"],
-                                                             [nodes.list_item, nodes.paragraph, "i\n"])])
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "a\n"],
+                                                             [nodes.list_item, "b\n"],
+                                                             [nodes.list_item, "c\n"],
+                                                             [nodes.list_item, "d\n"],
+                                                             [nodes.list_item, "e\n"],
+                                                             [nodes.list_item, "f\n"],
+                                                             [nodes.list_item, "g\n"],
+                                                             [nodes.list_item, "h\n"],
+                                                             [nodes.list_item, "i\n"])])
 
 
-def test_example_272():
+def test_example_274():
     text = ("1. a\n"
             "\n"
             "  2. b\n"
@@ -578,3 +575,83 @@ def test_example_272():
     assert_node(result, [nodes.document, nodes.enumerated_list, ([nodes.list_item, nodes.paragraph, "a\n"],
                                                                  [nodes.list_item, nodes.paragraph, "b\n"],
                                                                  [nodes.list_item, nodes.paragraph, "c\n"])])
+
+
+def test_example_275():
+    text = ("- a\n"
+            "- b\n"
+            "\n"
+            "- c\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "a\n"],
+                                                             [nodes.list_item, nodes.paragraph, "b\n"],
+                                                             [nodes.list_item, nodes.paragraph, "c\n"])])
+
+
+def test_example_276():
+    text = ("* a\n"
+            "*\n"
+            "\n"
+            "* c\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "a\n"],
+                                                             [nodes.list_item],
+                                                             [nodes.list_item, nodes.paragraph, "c\n"])])
+
+
+def test_example_279():
+    text = ("- a\n"
+            "- ```\n"
+            "  b\n"
+            "\n"
+            "\n"
+            "  ```\n"
+            "- c\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "a\n"],
+                                                             [nodes.list_item, nodes.literal_block, "b\n\n\n"],
+                                                             [nodes.list_item, "c\n"])])
+
+
+def test_example_280():
+    text = ("- a\n"
+            "  - b\n"
+            "\n"
+            "    c\n"
+            "- d\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, ("a\n",
+                                                                                [nodes.bullet_list, nodes.list_item])],
+                                                             [nodes.list_item, "d\n"])])
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, ("a\n",
+                                                                                [nodes.bullet_list, nodes.list_item])],
+                                                             [nodes.list_item, "d\n"])])
+    assert_node(result[0][0][1][0], [nodes.list_item, ([nodes.paragraph, "b\n"],
+                                                       [nodes.paragraph, "c\n"])])
+
+
+def test_example_282():
+    text = ("- a\n"
+            "  > b\n"
+            "  ```\n"
+            "  c\n"
+            "  ```\n"
+            "- d\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list,
+                         ([nodes.list_item, ("a\n",
+                                             [nodes.block_quote, nodes.paragraph, "b\n"],
+                                             [nodes.literal_block, "c\n"])],
+                          [nodes.list_item, "d\n"])])
+
+
+def test_example_286():
+    text = ("* foo\n"
+            "  * bar\n"
+            "\n"
+            "  baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item,
+                         ([nodes.paragraph, "foo\n"],
+                          [nodes.bullet_list, nodes.list_item, "bar\n"],
+                          [nodes.paragraph, "baz\n"])])

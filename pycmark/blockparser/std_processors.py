@@ -11,6 +11,7 @@
 
 import re
 from docutils import nodes
+from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import LazyLineReader
 
@@ -119,10 +120,7 @@ class ParagraphProcessor(BlockProcessor):
                     break
 
                 line = reader.readline()
-                if line.strip():
-                    text += line.lstrip()
-                else:
-                    break
+                text += line.lstrip()
             except IOError:
                 break
 
@@ -134,8 +132,10 @@ class ParagraphProcessor(BlockProcessor):
 
 # 4.9 Blank lines
 class BlankLineProcessor(PatternBlockProcessor):
+    paragraph_interruptable = True
     pattern = re.compile('^\s*$')
 
     def run(self, document, reader):
         reader.readline()  # skip the line
+        document += addnodes.blankline()
         return True

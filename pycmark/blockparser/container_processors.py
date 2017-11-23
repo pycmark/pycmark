@@ -12,6 +12,7 @@
 import re
 import typing
 from docutils import nodes
+from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import BlockQuoteReader, ListItemReader
 
@@ -58,6 +59,13 @@ class ListProcessor(BlockProcessor):
             if not self.is_next_list_item(reader, marker):
                 break
 
+        # blank lines at tail of last list_item should be recognized as a part of outside of list
+        for node in reversed(list_node[-1]):
+            if isinstance(node, addnodes.blankline):
+                list_node[-1].remove(node)
+                document += node
+            else:
+                break
         document += list_node
         return True
 

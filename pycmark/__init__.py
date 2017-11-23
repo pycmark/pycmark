@@ -36,6 +36,11 @@ from pycmark.blockparser.container_processors import (
     OrderedListProcessor,
     OneBasedOrderedListProcessor,
 )
+from pycmark.transforms import (
+    TightListsDetector,
+    TightListsCompactor,
+    BlanklineFilter,
+)
 
 
 class CommonMarkParser(Parser):
@@ -64,6 +69,13 @@ class CommonMarkParser(Parser):
             OrderedListProcessor,
             OneBasedOrderedListProcessor,
             ParagraphProcessor,
+        ]
+
+    def get_transforms(self):
+        return [
+            TightListsDetector,
+            TightListsCompactor,
+            BlanklineFilter,
         ]
 
     def create_parser(self):

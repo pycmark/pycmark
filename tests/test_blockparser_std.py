@@ -190,9 +190,9 @@ def test_example_46():
             "## foo #\\##\n"
             "# foo \\#\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo \\###"],
-                                          [nodes.section, nodes.title, "foo #\\##"],
-                                          [nodes.section, nodes.title, "foo \\#"])])
+    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo ###"],
+                                          [nodes.section, nodes.title, "foo ###"],
+                                          [nodes.section, nodes.title, "foo #"])])
 
 
 def test_example_48():

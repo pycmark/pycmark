@@ -8,7 +8,9 @@
 """
 
 from pycmark.blockparser import BlockProcessor
-from pycmark.readers import LineReader, BlockQuoteReader, ListItemReader, LazyLineReader
+from pycmark.readers import (
+    LineReader, BlockQuoteReader, ListItemReader, LazyLineReader, TextReader
+)
 
 
 text = ("Lorem ipsum dolor sit amet, \n"
@@ -184,3 +186,21 @@ def test_nested_line_readers():
     assert reader.eof() is False
     assert reader.next_line == 'continued here.\n'
     assert reader.readline() == 'continued here.\n'
+
+
+def test_TextReader():
+    text = "hello world"
+    reader = TextReader(text)
+    assert reader.remain == 'hello world'
+
+    reader.step()
+    assert reader.remain == 'ello world'
+
+    reader.step(5)
+    assert reader.remain == 'world'
+
+    reader.step(5)
+    assert reader.remain == ''
+
+    reader.step(1)
+    assert reader.remain == ''

@@ -194,3 +194,25 @@ class ListItemReader(LineReaderDecorator):
             return line
         else:
             raise IOError
+
+
+class TextReader(object):
+    """A character based reader."""
+
+    def __init__(self, text, position=0):
+        # type: (str, int) -> None
+        self.subject = text
+        self.position = position
+
+    def __getitem__(self, key):
+        # type: (int) -> str
+        return self.subject[key]
+
+    @property
+    def remain(self):
+        # type: () -> str
+        return self.subject[self.position:]
+
+    def step(self, n=1):
+        # type: (int) -> None
+        self.position += n

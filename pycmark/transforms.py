@@ -68,3 +68,33 @@ class TightListsCompactor(Transform):
                             para.remove(text)
                             list_item.insert(pos + i + 1, text)
                         list_item.remove(para)
+
+
+class SparseTextConverter(Transform):
+    default_priority = 900
+
+    def apply(self):
+        for node in self.document.traverse(addnodes.SparseText):
+            start = node['start']
+            end = node['end']
+            text = node['text'][start:end]
+
+            pos = node.parent.index(node)
+            node.parent.remove(node)
+            node.parent.insert(pos, nodes.Text(text))
+
+
+class TextNodeConnector(Transform):
+    default_priority = 950  # must be executed after SparseTextConverter
+
+    def apply(self):
+        for node in self.document.traverse(nodes.TextElement):
+            pos = 0
+            while len(node) > pos + 1:
+                if isinstance(node[pos], nodes.Text) and isinstance(node[pos + 1], nodes.Text):
+                    text = node[pos] + node[pos + 1]
+                    node.remove(node[pos + 1])
+                    node.remove(node[pos])
+                    node.insert(pos, nodes.Text(text, text))
+                else:
+                    pos += 1

@@ -9,6 +9,7 @@
     :license: BSD, see LICENSE for details.
 """
 
+from docutils import nodes
 from docutils.parsers import Parser
 from pycmark.readers import LineReader
 from pycmark.blockparser import BlockParser
@@ -36,10 +37,16 @@ from pycmark.blockparser.container_processors import (
     OrderedListProcessor,
     OneBasedOrderedListProcessor,
 )
+from pycmark.inlineparser import InlineParser
+from pycmark.inlineparser.std_processors import (
+    BackslashEscapeProcessor,
+)
 from pycmark.transforms import (
     TightListsDetector,
     TightListsCompactor,
     BlanklineFilter,
+    SparseTextConverter,
+    TextNodeConnector,
 )
 
 
@@ -71,14 +78,22 @@ class CommonMarkParser(Parser):
             ParagraphProcessor,
         ]
 
+    def get_inline_processors(self):
+        """Returns inline processors. Overrided by subclasses."""
+        return [
+            BackslashEscapeProcessor,
+        ]
+
     def get_transforms(self):
         return [
             TightListsDetector,
             TightListsCompactor,
             BlanklineFilter,
+            SparseTextConverter,
+            TextNodeConnector,
         ]
 
-    def create_parser(self):
+    def create_block_parser(self):
         """Creates a block parser and returns it.
 
         Internally, ``get_block_processors()`` is called to create a parser.
@@ -89,8 +104,22 @@ class CommonMarkParser(Parser):
             parser.add_processor(processor(parser))
         return parser
 
+    def create_inline_parser(self):
+        """Creates a inline parser and returns it.
+
+        Internally, ``get_inline_processors()`` is called to create a parser.
+        So you can change the processors by subclassing."""
+        parser = InlineParser()
+        for processor in self.get_inline_processors():
+            parser.add_processor(processor(parser))
+        return parser
+
     def parse(self, inputtext, document):
         """Parses a text and build document."""
         reader = LineReader(inputtext.splitlines(True), source=document['source'])
-        parser = self.create_parser()
-        parser.parse(reader, document)
+        block_parser = self.create_block_parser()
+        block_parser.parse(reader, document)
+
+        inline_parser = self.create_inline_parser()
+        for node in document.traverse(nodes.TextElement):
+            inline_parser.parse(node)

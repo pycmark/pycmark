@@ -31,6 +31,10 @@ from pycmark.blockparser.html_processors import (
 )
 from pycmark.blockparser.container_processors import (
     BlockQuoteProcessor,
+    BulletListProcessor,
+    NonEmptyBulletListProcessor,
+    OrderedListProcessor,
+    OneBasedOrderedListProcessor,
 )
 
 
@@ -55,6 +59,10 @@ class CommonMarkParser(Parser):
             StandardTagsHTMLBlockProcessor,
             CompleteTagsHTMLBlockProcessor,
             BlockQuoteProcessor,
+            BulletListProcessor,
+            NonEmptyBulletListProcessor,
+            OrderedListProcessor,
+            OneBasedOrderedListProcessor,
             ParagraphProcessor,
         ]
 

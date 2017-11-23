@@ -134,7 +134,7 @@ class ParagraphProcessor(BlockProcessor):
 
 # 4.9 Blank lines
 class BlankLineProcessor(PatternBlockProcessor):
-    pattern = re.compile('^\s+$')
+    pattern = re.compile('^\s*$')
 
     def run(self, document, reader):
         reader.readline()  # skip the line

@@ -7,7 +7,8 @@
     :license: BSD, see LICENSE for details.
 """
 
-from pycmark.readers import LineReader, BlockQuoteReader, LazyLineReader
+from pycmark.blockparser import BlockProcessor
+from pycmark.readers import LineReader, BlockQuoteReader, ListItemReader, LazyLineReader
 
 
 text = ("Lorem ipsum dolor sit amet, \n"
@@ -136,3 +137,50 @@ def test_LazyLineReader():
     assert reader.readline() == '\n'
     assert reader.readline() == "sed do eiusmod tempor incididunt \n"
     assert reader.readline() == "ut labore et dolore magna aliqua."
+
+
+def test_ListItemReader():
+    text = ("- Lorem ipsum dolor sit amet, \n"
+            "- consectetur adipiscing elit, \n"
+            "\n"
+            "  sed do eiusmod tempor incididunt \n"
+            "ut labore et dolore magna aliqua.")
+    reader = LineReader(text.splitlines(True))
+    list_reader = ListItemReader(reader, 2, BlockProcessor(None))
+    assert list_reader.readline() == "Lorem ipsum dolor sit amet, \n"
+
+    # reached next item
+    try:
+        list_reader.readline()
+        assert False
+    except IOError:
+        pass
+
+    list_reader = ListItemReader(reader, 2, BlockProcessor(None))
+    assert list_reader.readline() == "consectetur adipiscing elit, \n"
+    assert list_reader.readline() == "\n"
+    assert list_reader.readline() == "sed do eiusmod tempor incididunt \n"
+
+    # reached the end of list
+    try:
+        list_reader.readline()
+        assert False
+    except IOError:
+        pass
+
+    # can read the next line with laziness
+    assert list_reader.readline(lazy=True) == "ut labore et dolore magna aliqua."
+
+
+def test_ListItemReader2():
+    text = ("> 1. > Blockquote\n"
+            "continued here.\n")
+    reader = LineReader(text.splitlines(True))
+    reader = BlockQuoteReader(reader)
+    reader = ListItemReader(reader, 3, BlockProcessor(None))
+    reader = BlockQuoteReader(reader)
+    reader = LazyLineReader(reader)
+    assert reader.readline() == 'Blockquote\n'
+    assert reader.eof() is False
+    assert reader.next_line == 'continued here.\n'
+    assert reader.readline() == 'continued here.\n'

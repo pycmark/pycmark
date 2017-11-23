@@ -15,6 +15,7 @@ import typing
 
 if typing.TYPE_CHECKING:
     from typing import Any, List, Tuple, Union  # NOQA
+    from pycmark.blockparser.list_processors import ListProcessor  # NOQA
 
 
 class LineReader(object):
@@ -158,3 +159,38 @@ class LazyLineReader(LineReaderDecorator):
     def eof(self, **kwargs):
         # type: (Any) -> bool
         return self.reader.eof(lazy=True)
+
+
+class ListItemReader(LineReaderDecorator):
+    """A reader for list items."""
+
+    def __init__(self, reader, indent, processor):
+        # type: (LineReader, int, ListProcessor) -> None
+        self.indent = indent
+        self.pattern = re.compile('^ {%d}' % indent)
+        self.begining_lineno = reader.lineno + 1
+        self.processor = processor
+        super(ListItemReader, self).__init__(reader)
+
+    def fetch(self, relative=0, **kwargs):
+        # type: (int, Any) -> str
+        if kwargs.get('lazy'):
+            reader = LazyLineReader(self.reader)  # type: LineReader
+        else:
+            reader = self.reader
+
+        line = self.reader.fetch(relative, **kwargs)
+        if self.lineno + relative == self.begining_lineno:
+            # remove a list marker and indents when the beginning line
+            return line[self.indent:]
+        elif self.pattern.match(line):
+            return self.pattern.sub('', line)
+        elif self.processor.match(reader, in_list=True):
+            # next list item found
+            raise IOError
+        elif line.strip() == '':
+            return '\n'
+        elif kwargs.get('lazy') and line.strip():
+            return line
+        else:
+            raise IOError

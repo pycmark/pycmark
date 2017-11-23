@@ -16,8 +16,7 @@ def test_empty_text():
     assert_node(result, [nodes.document, ()])
 
 
-def test_thematic_breaks():
-    # Example 13
+def test_example_13():
     text = ("***\n"
             "---\n"
             "___\n")
@@ -26,18 +25,21 @@ def test_thematic_breaks():
                                           nodes.transition,
                                           nodes.transition)])
 
-    # Example 14
+
+def test_example_14():
     result = publish("+++")
     assert_node(result, [nodes.document, nodes.paragraph, "+++"])
 
-    # Example 16
+
+def test_example_16():
     text = ("--\n"
             "**\n"
             "__\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.paragraph, text])
 
-    # Example 17
+
+def test_example_17():
     text = (" ***\n"
             "  ***\n"
             "   ***\n")
@@ -46,27 +48,33 @@ def test_thematic_breaks():
                                           nodes.transition,
                                           nodes.transition)])
 
-    # Example 18
+
+def test_example_18():
     result = publish("    ***")
     assert_node(result, [nodes.document, nodes.literal_block, "***"])
 
-    # Example 20
+
+def test_example_20():
     result = publish("_____________________________________")
     assert_node(result, [nodes.document, nodes.transition])
 
-    # Example 21
+
+def test_example_21():
     result = publish(" - - -")
     assert_node(result, [nodes.document, nodes.transition])
 
-    # Example 22
+
+def test_example_22():
     result = publish(" **  * ** * ** * **")
     assert_node(result, [nodes.document, nodes.transition])
 
-    # Example 24
+
+def test_example_24():
     result = publish("- - - -    ")
     assert_node(result, [nodes.document, nodes.transition])
 
-    # Example 25
+
+def test_example_25():
     text = ("_ _ _ _ a\n"
             "\n"
             "a------\n"
@@ -77,7 +85,8 @@ def test_thematic_breaks():
                                           [nodes.paragraph, "a------\n"],
                                           [nodes.paragraph, "---a---\n"])])
 
-    # Example 28
+
+def test_example_28():
     text = ("Foo\n"
             "***\n"
             "bar\n")
@@ -86,11 +95,10 @@ def test_thematic_breaks():
                                           nodes.transition,
                                           [nodes.paragraph, "bar\n"])])
 
-    # TODO: add test for combination with other notations (Example 29, 30, 31)
+# TODO: add test for combination with other notations (Example 29, 30, 31)
 
 
-def test_atx_headings():
-    # Example 32
+def test_example_32():
     text = ("# foo\n"
             "## foo\n"
             "### foo\n"
@@ -111,11 +119,13 @@ def test_atx_headings():
     assert_node(result[4], nodes.section, depth=5)
     assert_node(result[5], nodes.section, depth=6)
 
-    # Example 33
+
+def test_example_33():
     result = publish("####### foo")
     assert_node(result, [nodes.document, nodes.paragraph, "####### foo"])
 
-    # Example 34
+
+def test_example_34():
     text = ("#5 bolt\n"
             "\n"
             "#hashtag\n")
@@ -123,13 +133,15 @@ def test_atx_headings():
     assert_node(result, [nodes.document, ([nodes.paragraph, "#5 bolt\n"],
                                           [nodes.paragraph, "#hashtag\n"])])
 
-    # TODO: add test for inlines in title (Example 36)
+# TODO: add test for inlines in title (Example 36)
 
-    # Example 37
+
+def test_example_37():
     result = publish("#                  foo                     ")
     assert_node(result, [nodes.document, nodes.section, nodes.title, "foo"])
 
-    # Example 38
+
+def test_example_38():
     text = (" ### foo\n"
             "  ## foo\n"
             "   # foo\n")
@@ -141,33 +153,39 @@ def test_atx_headings():
     assert_node(result[1], nodes.section, depth=2)
     assert_node(result[2], nodes.section, depth=1)
 
-    # Example 41
+
+def test_example_41():
     text = ("## foo ##\n"
             "  ###   bar    ###\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo"],
                                           [nodes.section, nodes.title, "bar"])])
 
-    # Example 42
+
+def test_example_42():
     text = ("# foo ##################################\n"
             "##### foo ##\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo"],
                                           [nodes.section, nodes.title, "foo"])])
 
-    # Example 43
+
+def test_example_43():
     result = publish("### foo ###     ")
     assert_node(result, [nodes.document, nodes.section, nodes.title, "foo"])
 
-    # Example 44
+
+def test_example_44():
     result = publish("### foo ### b")
     assert_node(result, [nodes.document, nodes.section, nodes.title, "foo ### b"])
 
-    # Example 45
+
+def test_example_45():
     result = publish("# foo#")
     assert_node(result, [nodes.document, nodes.section, nodes.title, "foo#"])
 
-    # Example 46
+
+def test_example_46():
     text = ("### foo \\###\n"
             "## foo #\\##\n"
             "# foo \\#\n")
@@ -176,7 +194,8 @@ def test_atx_headings():
                                           [nodes.section, nodes.title, "foo #\\##"],
                                           [nodes.section, nodes.title, "foo \\#"])])
 
-    # Example 48
+
+def test_example_48():
     text = ("Foo bar\n"
             "# baz\n"
             "Bar foo\n")
@@ -185,7 +204,8 @@ def test_atx_headings():
                                           [nodes.section, nodes.title, "baz"],
                                           [nodes.paragraph, "Bar foo\n"])])
 
-    # Example 49
+
+def test_example_49():
     text = ("## \n"
             "#\n"
             "### ###\n")
@@ -195,14 +215,14 @@ def test_atx_headings():
                                           [nodes.section, nodes.title])])
 
 
-def test_indented_blocks():
-    # Example 76
+def test_example_76():
     text = ("    a simple\n"
             "      indented code block\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "a simple\n  indented code block\n"])
 
-    # Example 79
+
+def test_example_79():
     text = ("    <a/>\n"
             "    *hi*\n"
             "\n"
@@ -210,27 +230,31 @@ def test_indented_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "<a/>\n*hi*\n\n- one\n"])
 
-    # Example 81
+
+def test_example_81():
     text = ("    chunk1\n"
             "      \n"
             "      chunk2\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "chunk1\n  \n  chunk2\n"])
 
-    # Example 82
+
+def test_example_82():
     text = ("Foo\n"
             "    bar\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.paragraph, "Foo\nbar\n"])
 
-    # Example 83
+
+def test_example_83():
     text = ("    foo\n"
             "bar\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.literal_block, "foo\n"],
                                           [nodes.paragraph, "bar\n"])])
 
-    # Example 86
+
+def test_example_86():
     text = ("\n"
             "    \n"
             "    foo\n"
@@ -239,8 +263,7 @@ def test_indented_blocks():
     assert_node(result, [nodes.document, nodes.literal_block, "foo\n"])
 
 
-def test_fenced_code_blocks():
-    # Example 88
+def test_example_88():
     text = ("```\n"
             "<\n"
             " >\n"
@@ -248,7 +271,8 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "<\n >\n"])
 
-    # Example 89
+
+def test_example_89():
     text = ("~~~\n"
             "<\n"
             " >\n"
@@ -256,14 +280,16 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "<\n >\n"])
 
-    # Example 90
+
+def test_example_90():
     text = ("``\n"
             "foo\n"
             "``\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.paragraph, text])
 
-    # Example 91
+
+def test_example_91():
     text = ("```\n"
             "aaa\n"
             "~~~\n"
@@ -271,7 +297,8 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n~~~\n"])
 
-    # Example 92
+
+def test_example_92():
     text = ("~~~\n"
             "aaa\n"
             "```\n"
@@ -279,7 +306,8 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n```\n"])
 
-    # Example 93
+
+def test_example_93():
     text = ("````\n"
             "aaa\n"
             "```\n"
@@ -287,11 +315,13 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n```\n"])
 
-    # Example 95
+
+def test_example_95():
     result = publish("```")
     assert_node(result, [nodes.document, nodes.literal_block])
 
-    # Example 96
+
+def test_example_96():
     text = ("`````\n"
             "\n"
             "```\n"
@@ -299,7 +329,8 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "\n```\naaa\n"])
 
-    # Example 97
+
+def test_example_97():
     text = ("> ```\n"
             "> aaa\n"
             "\n"
@@ -308,7 +339,8 @@ def test_fenced_code_blocks():
     assert_node(result, [nodes.document, ([nodes.block_quote, nodes.literal_block, "aaa\n"],
                                           [nodes.paragraph, "bbb\n"])])
 
-    # Example 100
+
+def test_example_100():
     text = (" ```\n"
             " aaa\n"
             "aaa\n"
@@ -316,7 +348,8 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\naaa\n"])
 
-    # Example 102
+
+def test_example_102():
     text = ("   ```\n"
             "   aaa\n"
             "    aaa\n"
@@ -325,23 +358,26 @@ def test_fenced_code_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n aaa\naaa\n"])
 
-    # Example 103
+
+def test_example_103():
     text = ("    ```\n"
             "    aaa\n"
             "    ```\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "```\naaa\n```\n"])
 
-    # Example 106
+
+def test_example_106():
     text = ("```\n"
             "aaa\n"
             "    ```\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n    ```\n"])
 
-    # TODO: add test for inline code spans (Example 107)
+# TODO: add test for inline code spans (Example 107)
 
-    # Example 109
+
+def test_example_109():
     text = ("foo\n"
             "```\n"
             "bar\n"
@@ -352,7 +388,8 @@ def test_fenced_code_blocks():
                                           [nodes.literal_block, "bar\n"],
                                           [nodes.paragraph, "baz\n"])])
 
-    # Example 111
+
+def test_example_111():
     text = ("```ruby\n"
             "def foo(x)\n"
             "  return 3\n"
@@ -362,9 +399,10 @@ def test_fenced_code_blocks():
     assert_node(result, [nodes.document, nodes.literal_block, "def foo(x)\n  return 3\nend\n"])
     assert_node(result[0], nodes.literal_block, classes=["language-ruby"])
 
-    # TODO: add test for inline code spans (Example 114)
+# TODO: add test for inline code spans (Example 114)
 
-    # Example 115
+
+def test_example_115():
     text = ("```\n"
             "``` aaa\n"
             "```\n")

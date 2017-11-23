@@ -11,10 +11,10 @@ from docutils import nodes
 from utils import publish, assert_node
 
 
-def test_html_blocks():
-    # TODO: add test for breaking by a blank line (Example 116)
+# TODO: add test for breaking by a blank line (Example 116)
 
-    # Example 117
+
+def test_example_117():
     text = ("<table>\n"
             "  <tr>\n"
             "    <td>\n"
@@ -35,7 +35,8 @@ def test_html_blocks():
                             "  </tr>\n"
                             "</table>\n")
 
-    # Example 118
+
+def test_example_118():
     text = (" <div>\n"
             "  *hello*\n"
             "         <foo><a>\n")
@@ -43,26 +44,30 @@ def test_html_blocks():
     assert_node(result, [nodes.document, nodes.raw, text])
     assert_node(result[0], nodes.raw, format='html')
 
-    # Example 119
+
+def test_example_119():
     text = ("</div>\n"
             "*foo*\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 121
+
+def test_example_121():
     text = ("""<div id="foo"\n"""
             """  class="bar">\n"""
             """</div>\n""")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 124
+
+def test_example_124():
     text = ("""<div id="foo"\n"""
             """*hi*\n""")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 129
+
+def test_example_129():
     text = ("""<div></div>\n"""
             """``` c\n"""
             """int x = 33;\n"""
@@ -70,16 +75,18 @@ def test_html_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 131
+
+def test_example_131():
     text = ("""<Warning>\n"""
             """*bar*\n"""
             """</Warning>\n""")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # TODO: add test for standard tags and inline notation (Example 136)
+# TODO: add test for standard tags and inline notation (Example 136)
 
-    # Example 137
+
+def test_example_137():
     text = ("""<pre language="haskell"><code>\n"""
             """import Text.HTML.TagSoup\n"""
             """\n"""
@@ -91,7 +98,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, (nodes.raw,
                                           [nodes.paragraph, "okay\n"])])
 
-    # Example 139
+
+def test_example_139():
     text = ("""<style\n"""
             """  type="text/css">\n"""
             """h1 {color:red;}\n"""
@@ -103,7 +111,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, (nodes.raw,
                                           [nodes.paragraph, "okay\n"])])
 
-    # Example 138
+
+def test_example_138():
     text = ("""<script type="text/javascript">\n"""
             """// JavaScript example\n"""
             """\n"""
@@ -114,7 +123,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, (nodes.raw,
                                           [nodes.paragraph, "okay\n"])])
 
-    # Example 141
+
+def test_example_141():
     text = ("""> <div>\n"""
             """> foo\n"""
             """\n"""
@@ -123,18 +133,20 @@ def test_html_blocks():
     assert_node(result, [nodes.document, ([nodes.block_quote, nodes.raw, "<div>\nfoo\n"],
                                           [nodes.paragraph, "bar\n"])])
 
-    # TODO: add test for bullet_list containing HTML tags (Example 142)
+# TODO: add test for bullet_list containing HTML tags (Example 142)
 
-    # TODO: add test for HTML tags containing paragraph (Example 143)
+# TODO: add test for HTML tags containing paragraph (Example 143)
 
-    # Example 145
+
+def test_example_145():
     text = ("""<script>\n"""
             """foo\n"""
             """</script>1. *bar*\n""")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 146
+
+def test_example_146():
     text = ("""<!-- Foo\n"""
             """\n"""
             """bar\n"""
@@ -144,7 +156,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, (nodes.raw,
                                           [nodes.paragraph, "okay\n"])])
 
-    # Example 147
+
+def test_example_147():
     text = ("""<?php\n"""
             """\n"""
             """  echo '>';\n"""
@@ -155,12 +168,14 @@ def test_html_blocks():
     assert_node(result, [nodes.document, (nodes.raw,
                                           [nodes.paragraph, "okay\n"])])
 
-    # Example 148
+
+def test_example_148():
     text = "<!DOCTYPE html>"
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 149
+
+def test_example_149():
     text = ("""<![CDATA[\n"""
             """function matchwo(a,b)\n"""
             """{\n"""
@@ -178,7 +193,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, (nodes.raw,
                                           [nodes.paragraph, "okay\n"])])
 
-    # Example 150
+
+def test_example_150():
     text = ("""  <!-- foo -->\n"""
             """\n"""
             """    <!-- foo -->\n""")
@@ -186,7 +202,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, ([nodes.raw, "  <!-- foo -->\n"],
                                           [nodes.literal_block, "<!-- foo -->\n"])])
 
-    # Example 152
+
+def test_example_152():
     text = ("""Foo\n"""
             """<div>\n"""
             """bar\n"""
@@ -195,7 +212,8 @@ def test_html_blocks():
     assert_node(result, [nodes.document, ([nodes.paragraph, "Foo\n"],
                                           nodes.raw)])
 
-    # Example 153
+
+def test_example_153():
     text = ("""<div>\n"""
             """bar\n"""
             """</div>\n"""
@@ -203,14 +221,16 @@ def test_html_blocks():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-    # Example 154
+
+def test_example_154():
     text = ("""Foo\n"""
             """<a href="bar">\n"""
             """baz\n""")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.paragraph, text])
 
-    # Example 157
+
+def test_example_157():
     text = ("<table>\n"
             "\n"
             "<tr>\n"

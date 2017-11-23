@@ -107,9 +107,6 @@ class ParagraphProcessor(BlockProcessor):
         return True
 
     def run(self, document, reader):
-        def unindent(text):
-            return re.sub('^ {0,3}', '', text)
-
         reader = LazyLineReader(reader)
         source, lineno = reader.get_source_and_line()
 

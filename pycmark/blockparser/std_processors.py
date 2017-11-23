@@ -116,7 +116,8 @@ class ParagraphProcessor(BlockProcessor):
             node[0].source = source
             node[0].line = lineno + 1  # lineno points previous line
         else:
-            node = self.read(LazyLineReader(reader), node.rawsource)
+            text = self.read(LazyLineReader(reader), node.rawsource).rawsource.strip()
+            node = nodes.paragraph(text, text)
             node.source = source
             node.line = lineno + 1  # lineno points previous line
 

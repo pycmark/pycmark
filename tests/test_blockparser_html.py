@@ -26,7 +26,7 @@ def test_example_117():
             "okay.\n")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay.\n"])])
+                                          [nodes.paragraph, "okay."])])
     assert result[0][0] == ("<table>\n"
                             "  <tr>\n"
                             "    <td>\n"
@@ -96,7 +96,7 @@ def test_example_137():
             """okay\n""")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay\n"])])
+                                          [nodes.paragraph, "okay"])])
 
 
 def test_example_139():
@@ -109,7 +109,7 @@ def test_example_139():
             """okay\n""")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay\n"])])
+                                          [nodes.paragraph, "okay"])])
 
 
 def test_example_138():
@@ -121,7 +121,7 @@ def test_example_138():
             """okay\n""")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay\n"])])
+                                          [nodes.paragraph, "okay"])])
 
 
 def test_example_141():
@@ -131,7 +131,7 @@ def test_example_141():
             """bar\n""")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.block_quote, nodes.raw, "<div>\nfoo\n"],
-                                          [nodes.paragraph, "bar\n"])])
+                                          [nodes.paragraph, "bar"])])
 
 # TODO: add test for bullet_list containing HTML tags (Example 142)
 
@@ -154,7 +154,7 @@ def test_example_146():
             """okay\n""")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay\n"])])
+                                          [nodes.paragraph, "okay"])])
 
 
 def test_example_147():
@@ -166,7 +166,7 @@ def test_example_147():
             """okay\n""")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay\n"])])
+                                          [nodes.paragraph, "okay"])])
 
 
 def test_example_148():
@@ -191,7 +191,7 @@ def test_example_149():
             """okay\n""")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.raw,
-                                          [nodes.paragraph, "okay\n"])])
+                                          [nodes.paragraph, "okay"])])
 
 
 def test_example_150():
@@ -209,7 +209,7 @@ def test_example_152():
             """bar\n"""
             """</div>\n""")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo\n"],
+    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo"],
                                           nodes.raw)])
 
 
@@ -227,7 +227,7 @@ def test_example_154():
             """<a href="bar">\n"""
             """baz\n""")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text])
+    assert_node(result, [nodes.document, nodes.paragraph, text.strip()])
 
 
 def test_example_157():

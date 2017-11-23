@@ -36,7 +36,7 @@ def test_example_16():
             "**\n"
             "__\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text])
+    assert_node(result, [nodes.document, nodes.paragraph, "--\n**\n__"])
 
 
 def test_example_17():
@@ -81,9 +81,9 @@ def test_example_25():
             "\n"
             "---a---\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, "_ _ _ _ a\n"],
-                                          [nodes.paragraph, "a------\n"],
-                                          [nodes.paragraph, "---a---\n"])])
+    assert_node(result, [nodes.document, ([nodes.paragraph, "_ _ _ _ a"],
+                                          [nodes.paragraph, "a------"],
+                                          [nodes.paragraph, "---a---"])])
 
 
 def test_example_28():
@@ -91,9 +91,9 @@ def test_example_28():
             "***\n"
             "bar\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo\n"],
+    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo"],
                                           nodes.transition,
-                                          [nodes.paragraph, "bar\n"])])
+                                          [nodes.paragraph, "bar"])])
 
 # TODO: add test for combination with other notations (Example 29, 30, 31)
 
@@ -130,8 +130,8 @@ def test_example_34():
             "\n"
             "#hashtag\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, "#5 bolt\n"],
-                                          [nodes.paragraph, "#hashtag\n"])])
+    assert_node(result, [nodes.document, ([nodes.paragraph, "#5 bolt"],
+                                          [nodes.paragraph, "#hashtag"])])
 
 # TODO: add test for inlines in title (Example 36)
 
@@ -200,9 +200,9 @@ def test_example_48():
             "# baz\n"
             "Bar foo\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo bar\n"],
+    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo bar"],
                                           [nodes.section, nodes.title, "baz"],
-                                          [nodes.paragraph, "Bar foo\n"])])
+                                          [nodes.paragraph, "Bar foo"])])
 
 
 def test_example_49():
@@ -277,7 +277,7 @@ def test_example_56():
     text = ("Foo\n"
             "    ---\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, "Foo\n---\n"])
+    assert_node(result, [nodes.document, nodes.paragraph, "Foo\n---"])
 
 
 def test_example_58():
@@ -304,16 +304,16 @@ def test_example_60():
             """of dashes"/>\n""")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.section, nodes.title, "`Foo"],
-                                          [nodes.paragraph, "`\n"],
+                                          [nodes.paragraph, "`"],
                                           [nodes.section, nodes.title, """<a title="a lot"""],
-                                          [nodes.paragraph, """of dashes"/>\n"""])])
+                                          [nodes.paragraph, """of dashes"/>"""])])
 
 
 def test_example_61():
     text = ("> Foo\n"
             "---\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.block_quote, nodes.paragraph, "Foo\n"],
+    assert_node(result, [nodes.document, ([nodes.block_quote, nodes.paragraph, "Foo"],
                                           nodes.transition)])
 
 
@@ -322,14 +322,14 @@ def test_example_62():
             "bar\n"
             "===\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.block_quote, nodes.paragraph, "foo\nbar\n===\n"])
+    assert_node(result, [nodes.document, nodes.block_quote, nodes.paragraph, "foo\nbar\n==="])
 
 
 def test_example_63():
     text = ("- Foo\n"
             "---\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "Foo\n"],
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "Foo"],
                                           nodes.transition)])
 
 
@@ -344,14 +344,14 @@ def test_example_65():
     assert_node(result, [nodes.document, (nodes.transition,
                                           [nodes.section, nodes.title, "Foo"],
                                           [nodes.section, nodes.title, "Bar"],
-                                          [nodes.paragraph, "Baz\n"])])
+                                          [nodes.paragraph, "Baz"])])
 
 
 def test_example_66():
     text = ("\n"
             "====\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, "====\n"])
+    assert_node(result, [nodes.document, nodes.paragraph, "===="])
 
 
 def test_example_67():
@@ -390,7 +390,7 @@ def test_example_82():
     text = ("Foo\n"
             "    bar\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, "Foo\nbar\n"])
+    assert_node(result, [nodes.document, nodes.paragraph, "Foo\nbar"])
 
 
 def test_example_83():
@@ -398,7 +398,7 @@ def test_example_83():
             "bar\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.literal_block, "foo\n"],
-                                          [nodes.paragraph, "bar\n"])])
+                                          [nodes.paragraph, "bar"])])
 
 
 def test_example_86():
@@ -433,7 +433,7 @@ def test_example_90():
             "foo\n"
             "``\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text])
+    assert_node(result, [nodes.document, nodes.paragraph, "``\nfoo\n``"])
 
 
 def test_example_91():
@@ -484,7 +484,7 @@ def test_example_97():
             "bbb\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.block_quote, nodes.literal_block, "aaa\n"],
-                                          [nodes.paragraph, "bbb\n"])])
+                                          [nodes.paragraph, "bbb"])])
 
 
 def test_example_100():
@@ -531,9 +531,9 @@ def test_example_109():
             "```\n"
             "baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, "foo\n"],
+    assert_node(result, [nodes.document, ([nodes.paragraph, "foo"],
                                           [nodes.literal_block, "bar\n"],
-                                          [nodes.paragraph, "baz\n"])])
+                                          [nodes.paragraph, "baz"])])
 
 
 def test_example_111():

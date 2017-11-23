@@ -101,19 +101,43 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
         return True
 
 
+# 4.3 Setext headings
 # 4.8 Paragraphs
 class ParagraphProcessor(BlockProcessor):
+    setext_heading_underline = re.compile('^ {0,3}(=+|-+)\s*$')
+
     def match(self, reader, **kwargs):
         return True
 
     def run(self, document, reader):
-        reader = LazyLineReader(reader)
         source, lineno = reader.get_source_and_line()
+        node = self.read(reader, setext_heading_allowed=True)
+        if isinstance(node, nodes.section):
+            node[0].source = source
+            node[0].line = lineno + 1  # lineno points previous line
+        else:
+            node = self.read(LazyLineReader(reader), node.rawsource)
+            node.source = source
+            node.line = lineno + 1  # lineno points previous line
 
-        text = ''
+        document += node
+        return True
+
+    def read(self, reader, text='', setext_heading_allowed=False):
+        def get_depth(line):
+            if line.strip()[0] == '=':
+                return 1
+            else:
+                return 2
+
         while not reader.eof():
             try:
-                if self.parser.is_interrupted(reader):
+                if text and setext_heading_allowed and self.setext_heading_underline.match(reader.next_line):
+                    line = reader.readline()
+                    section = nodes.section(depth=get_depth(line))
+                    section += nodes.title(text.strip(), text.strip())
+                    return section
+                elif self.parser.is_interrupted(reader):
                     break
 
                 line = reader.readline()
@@ -121,10 +145,7 @@ class ParagraphProcessor(BlockProcessor):
             except IOError:
                 break
 
-        document += nodes.paragraph(text, text)
-        document[-1].source = source
-        document[-1].line = lineno + 1  # lineno points previous line
-        return True
+        return nodes.paragraph(text, text)
 
 
 # 4.9 Blank lines

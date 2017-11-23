@@ -215,6 +215,153 @@ def test_example_49():
                                           [nodes.section, nodes.title])])
 
 
+# TODO: add test for inline heading (Example 50)
+
+def test_example_51():
+    # TODO: should updated for inlines
+    text = ("Foo *bar\n"
+            "baz*\n"
+            "====\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "Foo *bar\nbaz*"])
+    assert_node(result[0], depth=1)
+
+
+def test_example_52():
+    text = ("Foo\n"
+            "-------------------------\n"
+            "\n"
+            "Foo\n"
+            "=\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "Foo"],
+                                          [nodes.section, nodes.title, "Foo"])])
+    assert_node(result[0], depth=2)
+    assert_node(result[1], depth=1)
+
+
+def test_example_53():
+    text = ("   Foo\n"
+            "---\n"
+            "\n"
+            "  Foo\n"
+            "-----\n"
+            "\n"
+            "  Foo\n"
+            "  ===\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "Foo"],
+                                          [nodes.section, nodes.title, "Foo"],
+                                          [nodes.section, nodes.title, "Foo"])])
+
+
+def test_example_54():
+    text = ("    Foo\n"
+            "    ---\n"
+            "\n"
+            "    Foo\n"
+            "---\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.literal_block, "Foo\n---\n\nFoo\n"],
+                                          nodes.transition)])
+
+
+def test_example_55():
+    text = ("Foo\n"
+            "   ----      \n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "Foo"])
+
+
+def test_example_56():
+    text = ("Foo\n"
+            "    ---\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, "Foo\n---\n"])
+
+
+def test_example_58():
+    text = ("Foo  \n"
+            "-----\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "Foo"])
+
+
+def test_example_59():
+    text = ("Foo\\\n"
+            "----\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "Foo\\"])
+
+
+def test_example_60():
+    text = ("""`Foo\n"""
+            """----\n"""
+            """`\n"""
+            """\n"""
+            """<a title="a lot\n"""
+            """---\n"""
+            """of dashes"/>\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "`Foo"],
+                                          [nodes.paragraph, "`\n"],
+                                          [nodes.section, nodes.title, """<a title="a lot"""],
+                                          [nodes.paragraph, """of dashes"/>\n"""])])
+
+
+def test_example_61():
+    text = ("> Foo\n"
+            "---\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.block_quote, nodes.paragraph, "Foo\n"],
+                                          nodes.transition)])
+
+
+def test_example_62():
+    text = ("> foo\n"
+            "bar\n"
+            "===\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.block_quote, nodes.paragraph, "foo\nbar\n===\n"])
+
+
+def test_example_63():
+    text = ("- Foo\n"
+            "---\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "Foo\n"],
+                                          nodes.transition)])
+
+
+def test_example_65():
+    text = ("---\n"
+            "Foo\n"
+            "---\n"
+            "Bar\n"
+            "---\n"
+            "Baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.transition,
+                                          [nodes.section, nodes.title, "Foo"],
+                                          [nodes.section, nodes.title, "Bar"],
+                                          [nodes.paragraph, "Baz\n"])])
+
+
+def test_example_66():
+    text = ("\n"
+            "====\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, "====\n"])
+
+
+def test_example_67():
+    text = ("---\n"
+            "---\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.transition,
+                                          nodes.transition)])
+
+
 def test_example_76():
     text = ("    a simple\n"
             "      indented code block\n")

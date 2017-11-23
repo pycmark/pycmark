@@ -172,7 +172,7 @@ def test_ListItemReader():
     assert list_reader.readline(lazy=True) == "ut labore et dolore magna aliqua."
 
 
-def test_ListItemReader2():
+def test_nested_line_readers():
     text = ("> 1. > Blockquote\n"
             "continued here.\n")
     reader = LineReader(text.splitlines(True))

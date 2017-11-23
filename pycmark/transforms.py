@@ -80,6 +80,64 @@ class SparseTextConverter(Transform):
             node.parent.insert(pos, nodes.Text(node))
 
 
+class EmphasisConverter(Transform):
+    default_priority = 900
+
+    def apply(self):
+        for node in self.document.traverse(nodes.TextElement):
+            while True:
+                delimiters = list(n for n in node.children if isinstance(n, addnodes.delimiter))
+                closers = list(d for d in delimiters if d['can_close'])
+                if len(closers) == 0:
+                    break
+                closer = closers[0]
+                opener = self.find_opener(delimiters, closer)
+                if opener is None:
+                    closer['can_close'] = False
+                    continue
+
+                if opener['curr_length'] >= 2 and closer['curr_length'] >= 2:
+                    length = 2
+                    emph_node = nodes.strong()
+                else:
+                    length = 1
+                    emph_node = nodes.emphasis()
+
+                opener_pos = node.index(opener)
+                closer_pos = node.index(closer)
+                for subnode in node[opener_pos + 1:closer_pos]:
+                    node.remove(subnode)
+                    emph_node += subnode
+                self.deactivate_delimiters(emph_node)
+
+                node.insert(opener_pos + 1, emph_node)
+                opener.shrink(length)
+                closer.shrink(length)
+
+            self.deactivate_delimiters(node)
+
+    def find_opener(self, delimiters, closer):
+        pos = delimiters.index(closer)
+        for opener in reversed(delimiters[:pos]):
+            if opener['can_open'] is False:
+                continue
+            elif opener['marker'][0] != closer['marker'][0]:
+                continue
+            else:
+                odd_match = ((closer['can_open'] or opener['can_close']) and
+                             (opener['orig_length'] + closer['orig_length']) % 3 == 0)
+                if not odd_match:
+                    return opener
+
+        return None
+
+    def deactivate_delimiters(self, node):
+        delimiters = list(n for n in node.children if isinstance(n, addnodes.delimiter))
+        for delim in delimiters:
+            marker = str(delim)
+            delim.replace_self(nodes.Text(marker, marker))
+
+
 class TextNodeConnector(Transform):
     default_priority = 950  # must be executed after SparseTextConverter
 

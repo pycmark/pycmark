@@ -218,12 +218,12 @@ def test_example_49():
 # TODO: add test for inline heading (Example 50)
 
 def test_example_51():
-    # TODO: should updated for inlines
     text = ("Foo *bar\n"
             "baz*\n"
             "====\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.section, nodes.title, "Foo *bar\nbaz*"])
+    assert_node(result, [nodes.document, nodes.section, nodes.title, ("Foo ",
+                                                                      [nodes.emphasis, "bar\nbaz"])])
     assert_node(result[0], depth=1)
 
 

@@ -17,6 +17,20 @@ class blankline(nodes.Element, nodes.Invisible):
     pass
 
 
+class delimiter(nodes.Element):
+    """A node reprents a delimiter for emphasis and strong."""
+
+    def __str__(self):
+        length = self['curr_length']
+        return self['marker'][:length]
+
+    def shrink(self, n):
+        if self['curr_length'] == n:
+            self.parent.remove(self)
+        else:
+            self['curr_length'] -= n
+
+
 class SparseText(nodes.Element):
     """A node represents a text."""
 

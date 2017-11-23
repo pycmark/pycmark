@@ -41,12 +41,14 @@ from pycmark.inlineparser import InlineParser
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
     CodeSpanProcessor,
+    EmphasisProcessor,
 )
 from pycmark.transforms import (
     TightListsDetector,
     TightListsCompactor,
     BlanklineFilter,
     SparseTextConverter,
+    EmphasisConverter,
     TextNodeConnector,
 )
 
@@ -88,6 +90,7 @@ class CommonMarkParser(Parser):
         return [
             BackslashEscapeProcessor,
             CodeSpanProcessor,
+            EmphasisProcessor,
         ]
 
     def get_transforms(self):
@@ -96,6 +99,7 @@ class CommonMarkParser(Parser):
             TightListsCompactor,
             BlanklineFilter,
             SparseTextConverter,
+            EmphasisConverter,
             TextNodeConnector,
         ]
 

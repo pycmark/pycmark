@@ -10,6 +10,8 @@
 """
 
 import re
+from docutils import nodes
+from functools import wraps
 from pycmark.addnodes import SparseText
 from pycmark.readers import TextReader
 
@@ -21,7 +23,7 @@ class InlineParser(object):
         self.processors = []
 
     def add_processor(self, processor):
-        # type: (BlockProcessor) -> None
+        # type: (InlineProcessor) -> None
         """Add a inline processor to parser."""
         self.processors.append(processor)
 
@@ -40,10 +42,10 @@ class InlineParser(object):
                 if len(document) == 0 or not isinstance(document[-1], SparseText):
                     document += SparseText(reader.subject, reader.position, reader.position + 1)
                 else:
-                    document[-1]['end'] += 1
+                    document[-1].spread(end=1)
 
                 if reader.remain[0] == '\\':  # escaped
-                    document[-1]['end'] += 1
+                    document[-1].spread(end=1)
                     reader.step(2)
                 else:
                     reader.step(1)
@@ -67,3 +69,27 @@ class PatternInlineProcessor(InlineProcessor):
 
     def match(self, reader, **kwargs):
         return bool(self.pattern.match(reader.remain))
+
+
+class UnmatchedTokenError(Exception):
+    pass
+
+
+def backtrack_onerror(func):
+    @wraps(func)
+    def wrapper(self, document, reader):
+        new_reader = TextReader(reader.subject, reader.position)
+        try:
+            ret = func(self, document, new_reader)
+            if ret:
+                reader.position = new_reader.position
+            return ret
+        except UnmatchedTokenError as exc:
+            text = exc.args[0]
+            document += nodes.Text(text)
+            reader.step(len(text))
+            return True
+        except Exception:
+            return False
+
+    return wrapper

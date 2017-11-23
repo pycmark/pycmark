@@ -75,13 +75,9 @@ class SparseTextConverter(Transform):
 
     def apply(self):
         for node in self.document.traverse(addnodes.SparseText):
-            start = node['start']
-            end = node['end']
-            text = node['text'][start:end]
-
             pos = node.parent.index(node)
             node.parent.remove(node)
-            node.parent.insert(pos, nodes.Text(text))
+            node.parent.insert(pos, nodes.Text(node))
 
 
 class TextNodeConnector(Transform):

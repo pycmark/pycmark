@@ -40,6 +40,7 @@ from pycmark.blockparser.container_processors import (
 from pycmark.inlineparser import InlineParser
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
+    CodeSpanProcessor,
 )
 from pycmark.transforms import (
     TightListsDetector,
@@ -48,6 +49,10 @@ from pycmark.transforms import (
     SparseTextConverter,
     TextNodeConnector,
 )
+
+
+def is_text_container(node):
+    return isinstance(node, nodes.TextElement) and not isinstance(node, nodes.FixedTextElement)
 
 
 class CommonMarkParser(Parser):
@@ -82,6 +87,7 @@ class CommonMarkParser(Parser):
         """Returns inline processors. Overrided by subclasses."""
         return [
             BackslashEscapeProcessor,
+            CodeSpanProcessor,
         ]
 
     def get_transforms(self):
@@ -121,5 +127,5 @@ class CommonMarkParser(Parser):
         block_parser.parse(reader, document)
 
         inline_parser = self.create_inline_parser()
-        for node in document.traverse(nodes.TextElement):
+        for node in document.traverse(is_text_container):
             inline_parser.parse(node)

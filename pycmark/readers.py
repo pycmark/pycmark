@@ -12,7 +12,6 @@
 import re
 import typing
 
-
 if typing.TYPE_CHECKING:
     from typing import Any, List, Tuple, Union  # NOQA
     from pycmark.blockparser.list_processors import ListProcessor  # NOQA

@@ -23,5 +23,12 @@ class SparseText(nodes.Element):
     def __init__(self, text, start, end):
         nodes.Element.__init__(self)
         self['text'] = text
-        self['start'] = start
-        self['end'] = end
+        self.start = start
+        self.end = end
+
+    def __str__(self):
+        return self['text'][self.start:self.end]
+
+    def spread(self, end=1, start=0):
+        self.start -= start
+        self.end += end

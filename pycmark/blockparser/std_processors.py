@@ -14,6 +14,7 @@ from docutils import nodes
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import LazyLineReader
+from pycmark.utils import entitytrans
 
 
 # 4.1 Thematic breaks
@@ -94,7 +95,7 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
         document[-1].source = source
         document[-1].line = lineno + 1  # lineno points previous line
         if language and language.strip():
-            language = language.strip()
+            language = entitytrans._unescape(language.strip())
             document[-1]['language'] = language
             document[-1]['classes'].append('language-%s' % language.split()[0])
 

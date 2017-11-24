@@ -40,6 +40,7 @@ from pycmark.blockparser.container_processors import (
 from pycmark.inlineparser import InlineParser
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
+    EntityReferenceProcessor,
     CodeSpanProcessor,
     EmphasisProcessor,
 )
@@ -89,6 +90,7 @@ class CommonMarkParser(Parser):
         """Returns inline processors. Overrided by subclasses."""
         return [
             BackslashEscapeProcessor,
+            EntityReferenceProcessor,
             CodeSpanProcessor,
             EmphasisProcessor,
         ]

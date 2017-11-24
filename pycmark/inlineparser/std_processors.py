@@ -16,6 +16,7 @@ from pycmark import addnodes
 from pycmark.inlineparser import (
     PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 )
+from pycmark.utils import entitytrans
 
 
 def is_punctuation(char):
@@ -29,6 +30,17 @@ class BackslashEscapeProcessor(PatternInlineProcessor):
     def run(self, document, reader):
         document += addnodes.SparseText(reader.subject, reader.position + 1, reader.position + 2)
         reader.step(2)
+        return True
+
+
+# 6.2 Entity and numeric character references
+class EntityReferenceProcessor(PatternInlineProcessor):
+    pattern = re.compile('&(?:\w{1,32}|#\d+|#X[0-9A-Fa-f]+);')
+
+    def run(self, document, reader):
+        text = self.pattern.match(reader.remain).group(0)
+        reader.step(len(text))
+        document += nodes.Text(entitytrans._unescape(text))
         return True
 
 

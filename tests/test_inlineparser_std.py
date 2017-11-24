@@ -43,6 +43,59 @@ def test_example_291():
                                                            "[foo]: /url \"not a reference\"")])
 
 
+def test_example_302():
+    text = ("&nbsp; &amp; &copy; &AElig; &Dcaron;\n"
+            "&frac34; &HilbertSpace; &DifferentialD;\n"
+            "&ClockwiseContourIntegral; &ngE;\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("\xa0 & © Æ Ď\n"
+                                                           "¾ ℋ ⅆ\n"
+                                                           "∲ ≧̸")])
+
+
+def test_example_303():
+    result = publish("&#35; &#1234; &#992; &#98765432; &#0;")
+    assert_node(result, [nodes.document, nodes.paragraph, "# Ӓ Ϡ � �"])
+
+
+def test_example_304():
+    text = ("&nbsp &x; &#; &#x;\n"
+            "&ThisIsNotDefined; &hi?;")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_305():
+    result = publish("&copy")
+    assert_node(result, [nodes.document, nodes.paragraph, "&copy"])
+
+
+def test_example_306():
+    result = publish("&MadeUpEntity;")
+    assert_node(result, [nodes.document, nodes.paragraph, "&MadeUpEntity;"])
+
+# TODO: add test for combination with HTML tags and link (Example 308, 309, 310)
+
+
+def test_example_311():
+    text = ("``` f&ouml;&ouml;\n"
+            "foo\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "foo\n"])
+    assert_node(result[0], classes=["language-föö"])
+
+
+def test_example_312():
+    result = publish("`f&ouml;&ouml;`")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "f&ouml;&ouml;"])
+
+
+def test_example_313():
+    result = publish("    f&ouml;f&ouml;")
+    assert_node(result, [nodes.document, nodes.literal_block, "f&ouml;f&ouml;"])
+
+
 def test_example_314():
     result = publish("`foo`")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "foo"])

@@ -483,3 +483,49 @@ def test_example_573():
 def test_example_574():
     result = publish("<http://example.com/\\[\\>")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "http://example.com/\\[\\"])
+
+
+def test_example_575():
+    result = publish("<foo@bar.example.com>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "foo@bar.example.com"])
+    assert_node(result[0][0], refuri='mailto:foo@bar.example.com')
+
+
+def test_example_576():
+    result = publish("<foo+special@Bar.baz-bar0.com>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "foo+special@Bar.baz-bar0.com"])
+
+
+def test_example_577():
+    result = publish("<foo\+@bar.example.com>")
+    assert_node(result, [nodes.document, nodes.paragraph, "<foo+@bar.example.com>"])
+
+
+def test_example_578():
+    result = publish("<>")
+    assert_node(result, [nodes.document, nodes.paragraph, "<>"])
+
+
+def test_example_579():
+    result = publish("< http://foo.bar >")
+    assert_node(result, [nodes.document, nodes.paragraph, "< http://foo.bar >"])
+
+
+def test_example_580():
+    result = publish("<m:abc>")
+    assert_node(result, [nodes.document, nodes.paragraph, "<m:abc>"])
+
+
+def test_example_581():
+    result = publish("<foo.bar.baz>")
+    assert_node(result, [nodes.document, nodes.paragraph, "<foo.bar.baz>"])
+
+
+def test_example_582():
+    result = publish("http://example.com")
+    assert_node(result, [nodes.document, nodes.paragraph, "http://example.com"])
+
+
+def test_example_583():
+    result = publish("foo@bar.example.com")
+    assert_node(result, [nodes.document, nodes.paragraph, "foo@bar.example.com"])

@@ -121,11 +121,23 @@ class EmphasisProcessor(PatternInlineProcessor):
 
 
 # 6.7 Autolinks
-class AutolinkProcessor(PatternInlineProcessor):
+class URIAutolinkProcessor(PatternInlineProcessor):
     pattern = re.compile('<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
 
     def run(self, document, reader):
         uri = self.pattern.match(reader.remain).group(1)
         reader.step(len(uri) + 2)
         document += nodes.reference(uri, uri, refuri=uri)
+        return True
+
+
+class EmailAutolinkProcessor(PatternInlineProcessor):
+    pattern = re.compile('<([a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9]'
+                         '(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?'
+                         '(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>')
+
+    def run(self, document, reader):
+        uri = self.pattern.match(reader.remain).group(1)
+        reader.step(len(uri) + 2)
+        document += nodes.reference(uri, uri, refuri='mailto:' + uri)
         return True

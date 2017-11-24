@@ -118,3 +118,14 @@ class EmphasisProcessor(PatternInlineProcessor):
         document += addnodes.delimiter(marker=marker, can_open=can_open, can_close=can_close,
                                        orig_length=len(marker), curr_length=len(marker))
         return True
+
+
+# 6.7 Autolinks
+class AutolinkProcessor(PatternInlineProcessor):
+    pattern = re.compile('<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
+
+    def run(self, document, reader):
+        uri = self.pattern.match(reader.remain).group(1)
+        reader.step(len(uri) + 2)
+        document += nodes.reference(uri, uri, refuri=uri)
+        return True

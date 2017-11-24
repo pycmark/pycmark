@@ -43,6 +43,7 @@ from pycmark.inlineparser.std_processors import (
     EntityReferenceProcessor,
     CodeSpanProcessor,
     EmphasisProcessor,
+    AutolinkProcessor,
 )
 from pycmark.transforms import (
     TightListsDetector,
@@ -93,6 +94,7 @@ class CommonMarkParser(Parser):
             EntityReferenceProcessor,
             CodeSpanProcessor,
             EmphasisProcessor,
+            AutolinkProcessor,
         ]
 
     def get_transforms(self):

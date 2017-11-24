@@ -440,3 +440,46 @@ def test_example_456():
     result = publish("_a `_`_")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.emphasis, ("a ",
                                                                            [nodes.literal, "_"])])
+
+
+def test_example_565():
+    result = publish("<http://foo.bar.baz>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "http://foo.bar.baz"])
+    assert_node(result[0][0], refuri="http://foo.bar.baz")
+
+
+def test_example_566():
+    result = publish("<http://foo.bar.baz/test?q=hello&id=22&boolean>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference,
+                         "http://foo.bar.baz/test?q=hello&id=22&boolean"])
+    assert_node(result[0][0], refuri="http://foo.bar.baz/test?q=hello&id=22&boolean")
+
+
+def test_example_567():
+    result = publish("<irc://foo.bar:2233/baz>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "irc://foo.bar:2233/baz"])
+
+
+def test_example_568():
+    result = publish("<MAILTO:FOO@BAR.BAZ>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "MAILTO:FOO@BAR.BAZ"])
+
+
+def test_example_569():
+    result = publish("<a+b+c:d>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "a+b+c:d"])
+
+
+def test_example_570():
+    result = publish("<made-up-scheme://foo,bar>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "made-up-scheme://foo,bar"])
+
+
+def test_example_573():
+    result = publish("<http://foo.bar/baz bim>")
+    assert_node(result, [nodes.document, nodes.paragraph, "<http://foo.bar/baz bim>"])
+
+
+def test_example_574():
+    result = publish("<http://example.com/\\[\\>")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "http://example.com/\\[\\"])

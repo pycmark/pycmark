@@ -156,3 +156,16 @@ class RawHTMLProcessor(PatternInlineProcessor):
         html = reader.consume(self.pattern).group(0)
         document += nodes.raw(html, html, format='html')
         return True
+
+
+# 6.9 Hard line breaks
+class HardLinebreakProcessor(PatternInlineProcessor):
+    pattern = re.compile(r'( {2,}|\\)\n')
+
+    def run(self, document: Element, reader: TextReader) -> bool:
+        if not isinstance(document, nodes.paragraph):
+            return False
+        else:
+            reader.consume(self.pattern)
+            document += addnodes.linebreak()
+            return True

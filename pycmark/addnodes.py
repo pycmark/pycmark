@@ -17,6 +17,11 @@ class blankline(Element, Invisible):
     pass
 
 
+class linebreak(Element, Invisible):
+    """A node represents a hard linebreak."""
+    pass
+
+
 class emphasis(Element):
     """A node reprents a marker for emphasis and strong."""
 

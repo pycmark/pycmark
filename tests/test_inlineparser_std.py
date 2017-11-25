@@ -10,6 +10,8 @@
 from docutils import nodes
 from utils import publish, assert_node
 
+from pycmark import addnodes
+
 
 def test_example_289():
     text = r"""\!\"\#\$\%\&\'\(\)\*\+\,\-\.\/\:\;\<\=\>\?\@\[\\\]\^\_\`\{\|\}\~"""
@@ -723,3 +725,69 @@ def test_example_604():
     text = '<a href="\"">'
     result = publish(text)
     assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_605():
+    text = ("foo  \n"
+            "baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo", addnodes.linebreak, "baz")])
+
+
+def test_example_606():
+    text = ("foo\\\n"
+            "baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo", addnodes.linebreak, "baz")])
+
+
+def test_example_607():
+    text = ("foo       \n"
+            "baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo", addnodes.linebreak, "baz")])
+
+
+def test_example_608():
+    text = ("foo  \n"
+            "     bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo", addnodes.linebreak, "bar")])
+
+
+def test_example_610():
+    text = ("*foo  \n"
+            "baz*\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.emphasis,
+                         ("foo", addnodes.linebreak, "baz")])
+
+
+def test_example_611():
+    text = ("`code  \n"
+            "span`\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "code span"])
+
+
+# TODO: add test for HTML tags (Example 614 and 615)
+
+
+def test_example_616():
+    result = publish("foo\\")
+    assert_node(result, [nodes.document, nodes.paragraph, "foo\\"])
+
+
+def test_example_617():
+    result = publish("foo  ")
+    assert_node(result, [nodes.document, nodes.paragraph, "foo"])
+
+
+def test_example_618():
+    result = publish("### foo\\")
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "foo\\"])
+
+
+def test_example_619():
+    result = publish("### foo  ")
+    assert_node(result, [nodes.document, nodes.section, nodes.title, "foo"])

@@ -7,6 +7,7 @@
     :license: BSD, see LICENSE for details.
 """
 
+import re
 from pycmark.blockparser import BlockProcessor
 from pycmark.readers import (
     LineReader, BlockQuoteReader, ListItemReader, LazyLineReader, TextReader
@@ -196,10 +197,15 @@ def test_TextReader():
     reader.step()
     assert reader.remain == 'ello world'
 
-    reader.step(5)
-    assert reader.remain == 'world'
+    matched = reader.consume(re.compile('\w+'))
+    assert matched
+    assert matched.group(0) == 'ello'
+    assert reader.remain == ' world'
 
-    reader.step(5)
+    matched = reader.consume(re.compile('\w+'))
+    assert matched is None
+
+    reader.step(6)
     assert reader.remain == ''
 
     reader.step(1)

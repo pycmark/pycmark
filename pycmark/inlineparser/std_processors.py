@@ -38,20 +38,18 @@ class EntityReferenceProcessor(PatternInlineProcessor):
     pattern = re.compile('&(?:\w{1,32}|#\d+|#X[0-9A-Fa-f]+);')
 
     def run(self, document, reader):
-        text = self.pattern.match(reader.remain).group(0)
-        reader.step(len(text))
+        text = reader.consume(self.pattern).group(0)
         document += nodes.Text(entitytrans._unescape(text))
         return True
 
 
 # 6.3 Code spans
 class CodeSpanProcessor(PatternInlineProcessor):
-    pattern = re.compile('(`+)')
+    pattern = re.compile('`+')
 
     @backtrack_onerror
     def run(self, document, reader):
-        marker = self.pattern.match(reader.remain).group(1)
-        reader.step(len(marker))
+        marker = reader.consume(self.pattern).group(0)
 
         pattern = re.compile(marker + "([^`]|$)")
         text = addnodes.SparseText(reader.remain, 0, 0)
@@ -86,8 +84,7 @@ class EmphasisProcessor(PatternInlineProcessor):
             before_is_whitespace = self.whitespaces.match(before)
             before_is_punctuation = is_punctuation(before)
 
-        marker = self.pattern.match(reader.remain).group(1)
-        reader.step(len(marker))
+        marker = reader.consume(self.pattern).group(0)
 
         if reader.remain:
             after = reader.remain[0]
@@ -125,8 +122,7 @@ class URIAutolinkProcessor(PatternInlineProcessor):
     pattern = re.compile('<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
 
     def run(self, document, reader):
-        uri = self.pattern.match(reader.remain).group(1)
-        reader.step(len(uri) + 2)
+        uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri=uri)
         return True
 
@@ -137,7 +133,6 @@ class EmailAutolinkProcessor(PatternInlineProcessor):
                          '(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>')
 
     def run(self, document, reader):
-        uri = self.pattern.match(reader.remain).group(1)
-        reader.step(len(uri) + 2)
+        uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri='mailto:' + uri)
         return True

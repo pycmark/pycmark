@@ -13,7 +13,7 @@ import re
 import typing
 
 if typing.TYPE_CHECKING:
-    from typing import Any, List, Tuple, Union  # NOQA
+    from typing import Any, List, Match, Pattern, Tuple, Union  # NOQA
     from pycmark.blockparser.list_processors import ListProcessor  # NOQA
 
 
@@ -215,3 +215,11 @@ class TextReader(object):
     def step(self, n=1):
         # type: (int) -> None
         self.position += n
+
+    def consume(self, pattern):
+        # type: (Pattern) -> Match
+        matched = pattern.match(self.remain)
+        if matched:
+            self.step(len(matched.group(0)))
+
+        return matched

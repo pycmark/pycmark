@@ -442,6 +442,259 @@ def test_example_456():
                                                                            [nodes.literal, "_"])])
 
 
+def test_example_459():
+    result = publish("""[link](/uri "title")""")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/uri", reftitle='title')
+
+
+def test_example_460():
+    result = publish("[link](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/uri")
+
+
+def test_example_461():
+    result = publish("[link]()")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="")
+
+
+def test_example_462():
+    result = publish("[link](<>)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="")
+
+
+def test_example_463():
+    text = "[link](/my uri)"
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_464():
+    text = "[link](</my uri>)"
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_465():
+    text = ("[link](foo\n"
+            "bar)\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text.strip()])
+
+
+def test_example_466():
+    text = ("[link](<foo\n"
+            "bar>)\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text.strip()])
+
+
+def test_example_467():
+    result = publish("[link](\(foo\))")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="(foo)")
+
+
+def test_example_468():
+    result = publish("[link](foo(and(bar)))")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo(and(bar))")
+
+
+def test_example_469():
+    result = publish("[link](foo\(and\(bar\))")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo(and(bar)")
+
+
+def test_example_470():
+    result = publish("[link](<foo(and(bar)>)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo(and(bar)")
+
+
+def test_example_471():
+    result = publish("[link](foo\)\:)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo):")
+
+
+def test_example_472():
+    text = ("[link](#fragment)\n"
+            "\n"
+            "[link](http://example.com#fragment)\n"
+            "\n"
+            "[link](http://example.com?foo=3#frag)\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "link"],
+                                          [nodes.paragraph, nodes.reference, "link"],
+                                          [nodes.paragraph, nodes.reference, "link"])])
+    assert_node(result[0][0], refuri="#fragment")
+    assert_node(result[1][0], refuri="http://example.com#fragment")
+    assert_node(result[2][0], refuri="http://example.com?foo=3#frag")
+
+
+def test_example_473():
+    result = publish("[link](foo\bar)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo\bar")
+
+
+def test_example_474():
+    result = publish("[link](foo%20b&auml;)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo%20bä")
+
+
+def test_example_474_2():
+    result = publish("[link](<foo%20b&auml;>)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="foo%20bä")
+
+
+def test_example_475():
+    result = publish("""[link]("title")""")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri='"title"')
+
+
+def test_example_476():
+    text = ("""[link](/url "title")\n"""
+            """[link](/url 'title')\n"""
+            """[link](/url (title))\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.reference, "link"],
+                                                           "\n",
+                                                           [nodes.reference, "link"],
+                                                           "\n",
+                                                           [nodes.reference, "link"])])
+    assert_node(result[0][0], refuri="/url", reftitle="title")
+    assert_node(result[0][2], refuri="/url", reftitle="title")
+    assert_node(result[0][4], refuri="/url", reftitle="title")
+
+
+def test_example_477():
+    result = publish("""[link](/url "title \\"&quot;")""")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/url", reftitle='title ""')
+
+
+def test_example_478():
+    result = publish("""[link](/url\xa0"title")""")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri='/url\xa0"title"')
+
+
+def test_example_479():
+    text = '[link](/url "title "and" title")'
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_480():
+    result = publish("""[link](/url 'title "and" title')""")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/url", reftitle='title "and" title')
+
+
+def test_example_481():
+    text = ('[link](   /uri\n'
+            '  "title"  )\n')
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/uri", reftitle="title")
+
+
+def test_example_482():
+    result = publish("[link] (/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, "[link] (/uri)"])
+
+
+def test_example_483():
+    result = publish("[link [foo [bar]]](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link [foo [bar]]"])
+    assert_node(result[0][0], refuri="/uri")
+
+
+def test_example_484():
+    result = publish("[link] bar](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, "[link] bar](/uri)"])
+
+
+def test_example_485():
+    result = publish("[link [bar](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, ("[link ",
+                                                           [nodes.reference, "bar"])])
+
+
+def test_example_486():
+    result = publish("[link \\[bar](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link [bar"])
+
+
+def test_example_487():
+    result = publish("[link *foo **bar** `#`*](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, ("link ",
+                                                                            [nodes.emphasis, ("foo ",
+                                                                                              [nodes.strong, "bar"],
+                                                                                              " ",
+                                                                                              [nodes.literal, "#"])])])
+
+
+# TODO: add test for combination with image (Example 488)
+
+
+def test_example_489():
+    result = publish("[foo [bar](/uri)](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, ("[foo ",
+                                                           [nodes.reference, "bar"],
+                                                           "](/uri)")])
+
+
+def test_example_490():
+    result = publish("[foo *[bar [baz](/uri)](/uri)*](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, ("[foo ",
+                                                           [nodes.emphasis, ("[bar ",
+                                                                             [nodes.reference, "baz"],
+                                                                             "](/uri)")],
+                                                           "](/uri)")])
+
+# TODO: add test for combination with image (Example 491)
+
+
+def test_example_492():
+    result = publish("*[foo*](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, ("*",
+                                                           [nodes.reference, "foo*"])])
+
+
+def test_example_493():
+    result = publish("[foo *bar](baz*)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "foo *bar"])
+    assert_node(result[0][0], refuri="baz*")
+
+
+def test_example_494():
+    result = publish("*foo [bar* baz]")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.emphasis, "foo [bar"],
+                                                           " baz]")])
+
+
+# TODO: add test for combination with HTML tags (Example 495)
+
+
+def test_example_496():
+    result = publish("[foo`](/uri)`")
+    assert_node(result, [nodes.document, nodes.paragraph, ("[foo",
+                                                           [nodes.literal, "](/uri)"])])
+
+
+# TODO: add test for combination with HTML tags (Example 497)
+
+
 def test_example_565():
     result = publish("<http://foo.bar.baz>")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "http://foo.bar.baz"])

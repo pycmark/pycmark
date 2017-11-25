@@ -14,9 +14,10 @@ import unicodedata
 from docutils import nodes
 from pycmark import addnodes
 from pycmark.inlineparser import (
-    PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
+    PatternInlineProcessor, UnmatchedTokenError, ParseError, backtrack_onerror
 )
 from pycmark.utils import entitytrans
+from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape
 
 
 def is_punctuation(char):
@@ -25,7 +26,7 @@ def is_punctuation(char):
 
 # 6.1 Backslash escapes
 class BackslashEscapeProcessor(PatternInlineProcessor):
-    pattern = re.compile('\\\\[!"#$%&\'()*+,./:;<=>?@[\\\\\\]^_`{|}~-]')
+    pattern = escaped_chars_pattern
 
     def run(self, document, reader):
         document += addnodes.SparseText(reader.subject, reader.position + 1, reader.position + 2)
@@ -115,6 +116,128 @@ class EmphasisProcessor(PatternInlineProcessor):
         document += addnodes.emphasis(marker=marker, can_open=can_open, can_close=can_close,
                                       orig_length=len(marker), curr_length=len(marker))
         return True
+
+
+# 6.5 Links
+# 6.6 Images
+class LinkOpenerProcessor(PatternInlineProcessor):
+    pattern = re.compile('\!?\[')
+
+    def run(self, document, reader):
+        marker = reader.consume(self.pattern).group(0)
+        document += addnodes.bracket(marker=marker, can_open=True)
+        return True
+
+
+class LinkCloserProcessor(PatternInlineProcessor):
+    pattern = re.compile('\]')
+
+    def run(self, document, reader):
+        reader.step(1)
+        document += addnodes.bracket(marker="]", can_open=False)
+        self.process_link_or_image(document, reader)
+        return True
+
+    @backtrack_onerror
+    def process_link_or_image(self, document, reader):
+        brackets = list(n for n in document.children if isinstance(n, addnodes.bracket))
+        openers = list(d for d in brackets if d['can_open'])
+        if len(openers) == 0:
+            return
+
+        opener = openers.pop()
+        closer = brackets.pop()
+
+        if reader.remain.startswith('('):
+            # link destination + link title (optional)
+            #     [...](<.+> ".+")
+            #     [...](.+ ".+")
+            reader.step()
+            destination = LinkDestinationParser().parse(document, reader)
+            title = LinkTitleParser().parse(document, reader)
+            assert reader.consume(re.compile('\s*\)'))
+        elif reader.remain.startswith('['):
+            # link label
+            #     [...][.*]
+            raise NotImplementedError
+        else:
+            # deactivate brackets because no trailing link destination or link-label
+            opener.replace_self(nodes.Text(opener['marker']))
+            closer.replace_self(nodes.Text(closer['marker']))
+            raise
+
+        if opener['marker'] == '![':
+            raise NotImplementedError
+        else:
+            node = nodes.reference('', refuri=destination)
+            if title:
+                node['reftitle'] = title
+
+            # deactivate all left brackets before the link
+            for n in openers:
+                n.replace_self(nodes.Text(n['marker']))
+
+        start = document.index(opener)
+        end = document.index(closer)
+        for _ in range(start + 1, end):
+            # Note: do not use Element.remove() here.
+            # It removes wrong node if the target is Text.
+            subnode = document.pop(start + 1)
+            node += subnode
+
+        document += node
+        document.remove(opener)
+        document.remove(closer)
+        return True
+
+
+class LinkDestinationParser(object):
+    pattern = re.compile(r'\s*<((?:[^ <>\n\\]|' + ESCAPED_CHARS + r'|\\)*)>', re.S)
+
+    def parse(self, document, reader):
+        matched = reader.consume(self.pattern)
+        if matched:
+            return unescape(entitytrans._unescape(matched.group(1)))
+        else:
+            return self.parseBareLinkDestination(document, reader)
+
+    def parseBareLinkDestination(self, document, reader):
+        assert reader.consume(re.compile('[ \n]*'))
+
+        parens = 0
+        start = reader.position
+        while reader.remain:
+            c = reader.remain[0]
+            if c in (' ', '\n'):
+                break
+            elif c == '(':
+                parens += 1
+            elif c == ')':
+                parens -= 1
+                if parens < 0:
+                    break
+            elif escaped_chars_pattern.match(reader.remain):
+                reader.step()  # one more step for escaping
+
+            reader.step()
+        else:
+            raise ParseError
+
+        end = reader.position
+        return unescape(entitytrans._unescape(reader[start:end]))
+
+
+class LinkTitleParser(object):
+    pattern = re.compile('\s*("(' + ESCAPED_CHARS + '|[^"])*"|' +
+                         "'(" + ESCAPED_CHARS + "|[^'])*'|" +
+                         "\\((" + ESCAPED_CHARS + "|[^)])*\\))")
+
+    def parse(self, document, reader):
+        matched = reader.consume(self.pattern)
+        if matched:
+            return unescape(entitytrans._unescape(matched.group(1)[1:-1]))
+        else:
+            return None
 
 
 # 6.7 Autolinks

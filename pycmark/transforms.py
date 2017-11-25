@@ -105,8 +105,10 @@ class EmphasisConverter(Transform):
 
                 opener_pos = node.index(opener)
                 closer_pos = node.index(closer)
-                for subnode in node[opener_pos + 1:closer_pos]:
-                    node.remove(subnode)
+                for _ in range(opener_pos + 1, closer_pos):
+                    # Note: do not use Element.remove() here.
+                    # It removes wrong node if the target is Text.
+                    subnode = node.pop(opener_pos + 1)
                     emph_node += subnode
                 self.deactivate_markers(emph_node)
 
@@ -136,6 +138,14 @@ class EmphasisConverter(Transform):
         for delim in markers:
             marker = str(delim)
             delim.replace_self(nodes.Text(marker, marker))
+
+
+class BracketConverter(Transform):
+    default_priority = 900
+
+    def apply(self):
+        for node in self.document.traverse(addnodes.bracket):
+            node.replace_self(nodes.Text(node['marker']))
 
 
 class TextNodeConnector(Transform):

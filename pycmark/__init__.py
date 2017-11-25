@@ -43,6 +43,8 @@ from pycmark.inlineparser.std_processors import (
     EntityReferenceProcessor,
     CodeSpanProcessor,
     EmphasisProcessor,
+    LinkOpenerProcessor,
+    LinkCloserProcessor,
     URIAutolinkProcessor,
     EmailAutolinkProcessor,
 )
@@ -52,6 +54,7 @@ from pycmark.transforms import (
     BlanklineFilter,
     SparseTextConverter,
     EmphasisConverter,
+    BracketConverter,
     TextNodeConnector,
 )
 
@@ -95,6 +98,8 @@ class CommonMarkParser(Parser):
             EntityReferenceProcessor,
             CodeSpanProcessor,
             EmphasisProcessor,
+            LinkOpenerProcessor,
+            LinkCloserProcessor,
             URIAutolinkProcessor,
             EmailAutolinkProcessor,
         ]
@@ -106,6 +111,7 @@ class CommonMarkParser(Parser):
             BlanklineFilter,
             SparseTextConverter,
             EmphasisConverter,
+            BracketConverter,
             TextNodeConnector,
         ]
 

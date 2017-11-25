@@ -75,6 +75,10 @@ class UnmatchedTokenError(Exception):
     pass
 
 
+class ParseError(Exception):
+    pass
+
+
 def backtrack_onerror(func):
     @wraps(func)
     def wrapper(self, document, reader):

@@ -31,6 +31,13 @@ class emphasis(nodes.Element):
             self['curr_length'] -= n
 
 
+class bracket(nodes.Element):
+    """A node reprenents a square bracket (both opening and closing)."""
+
+    def __str__(self):
+        return self['marker']
+
+
 class SparseText(nodes.Element):
     """A node represents a text."""
 

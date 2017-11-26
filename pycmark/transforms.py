@@ -12,6 +12,7 @@
 from docutils import nodes
 from docutils.transforms import Transform
 from pycmark import addnodes
+from pycmark.utils import transplant_nodes
 
 
 class BlanklineFilter(Transform):
@@ -103,15 +104,10 @@ class EmphasisConverter(Transform):
                     length = 1
                     emph_node = nodes.emphasis()
 
-                opener_pos = node.index(opener)
-                closer_pos = node.index(closer)
-                for _ in range(opener_pos + 1, closer_pos):
-                    # Note: do not use Element.remove() here.
-                    # It removes wrong node if the target is Text.
-                    subnode = node.pop(opener_pos + 1)
-                    emph_node += subnode
+                transplant_nodes(node, emph_node, start=opener, end=closer)
                 self.deactivate_markers(emph_node)
 
+                opener_pos = node.index(opener)
                 node.insert(opener_pos + 1, emph_node)
                 opener.shrink(length)
                 closer.shrink(length)

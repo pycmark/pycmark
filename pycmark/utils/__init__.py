@@ -17,3 +17,15 @@ escaped_chars_pattern = re.compile(ESCAPED_CHARS)
 
 def unescape(text):
     return escaped_chars_pattern.sub(lambda m: m.group(0)[1], text)
+
+
+def transplant_nodes(parent, new_parent, start, end):
+    start_pos = parent.index(start)
+    end_pos = parent.index(end)
+    for _ in range(start_pos + 1, end_pos):
+        # Note: do not use Element.remove() here.
+        # It removes wrong node if the target is Text.
+        subnode = parent.pop(start_pos + 1)
+        new_parent += subnode
+
+    return new_parent

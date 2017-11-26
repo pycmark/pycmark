@@ -24,6 +24,9 @@ class emphasis(nodes.Element):
         length = self['curr_length']
         return self['marker'][:length]
 
+    def astext(self):
+        return str(self)
+
     def shrink(self, n):
         if self['curr_length'] == n:
             self.parent.remove(self)
@@ -37,6 +40,9 @@ class bracket(nodes.Element):
     def __str__(self):
         return self['marker']
 
+    def astext(self):
+        return str(self)
+
 
 class SparseText(nodes.Element):
     """A node represents a text."""
@@ -49,6 +55,9 @@ class SparseText(nodes.Element):
 
     def __str__(self):
         return self['text'][self.start:self.end]
+
+    def astext(self):
+        return str(self)
 
     def spread(self, end=1, start=0):
         self.start -= start

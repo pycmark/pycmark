@@ -17,7 +17,7 @@ from pycmark.inlineparser import (
     PatternInlineProcessor, UnmatchedTokenError, ParseError, backtrack_onerror
 )
 from pycmark.utils import entitytrans
-from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape
+from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, transplant_nodes
 
 
 def is_punctuation(char):
@@ -167,23 +167,20 @@ class LinkCloserProcessor(PatternInlineProcessor):
             raise
 
         if opener['marker'] == '![':
-            raise NotImplementedError
+            para = transplant_nodes(document, nodes.paragraph(), start=opener, end=closer)
+            node = nodes.image('', uri=destination, alt=para.astext())
+            if title:
+                node['title'] = title
         else:
             node = nodes.reference('', refuri=destination)
+            transplant_nodes(document, node, start=opener, end=closer)
             if title:
                 node['reftitle'] = title
 
             # deactivate all left brackets before the link
             for n in openers:
-                n.replace_self(nodes.Text(n['marker']))
-
-        start = document.index(opener)
-        end = document.index(closer)
-        for _ in range(start + 1, end):
-            # Note: do not use Element.remove() here.
-            # It removes wrong node if the target is Text.
-            subnode = document.pop(start + 1)
-            node += subnode
+                if n['marker'] == '[':
+                    n.replace_self(nodes.Text(n['marker']))
 
         document += node
         document.remove(opener)

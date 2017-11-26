@@ -695,6 +695,55 @@ def test_example_496():
 # TODO: add test for combination with HTML tags (Example 497)
 
 
+def test_example_543():
+    result = publish('![foo](/url "title")')
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="/url", alt="foo", title="title")
+
+
+# TODO: add test for link label (Example 544)
+
+
+def test_example_545():
+    result = publish("![foo ![bar](/url)](/url2)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="/url2", alt="foo bar")
+
+
+def test_example_546():
+    result = publish("![foo [bar](/url)](/url2)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="/url2", alt="foo bar")
+
+
+# TODO: add test for link label (Example 547 and 548)
+
+
+def test_example_549():
+    result = publish("![foo](train.jpg)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="train.jpg", alt="foo")
+
+
+def test_example_550():
+    result = publish('My ![foo bar](/path/to/train.jpg  "title"   )')
+    assert_node(result, [nodes.document, nodes.paragraph, ("My ",
+                                                           nodes.image)])
+    assert_node(result[0][1], uri="/path/to/train.jpg", alt="foo bar", title="title")
+
+
+def test_example_551():
+    result = publish("![foo](<url>)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="url", alt="foo")
+
+
+def test_example_552():
+    result = publish("![](/url)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="url", alt="")
+
+
 def test_example_565():
     result = publish("<http://foo.bar.baz>")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "http://foo.bar.baz"])

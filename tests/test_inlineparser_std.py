@@ -741,7 +741,7 @@ def test_example_551():
 def test_example_552():
     result = publish("![](/url)")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
-    assert_node(result[0][0], uri="url", alt="")
+    assert_node(result[0][0], uri="/url", alt="")
 
 
 def test_example_565():

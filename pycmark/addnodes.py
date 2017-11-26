@@ -17,8 +17,8 @@ class blankline(nodes.Element, nodes.Invisible):
     pass
 
 
-class delimiter(nodes.Element):
-    """A node reprents a delimiter for emphasis and strong."""
+class emphasis(nodes.Element):
+    """A node reprents a marker for emphasis and strong."""
 
     def __str__(self):
         length = self['curr_length']

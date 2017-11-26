@@ -86,12 +86,12 @@ class EmphasisConverter(Transform):
     def apply(self):
         for node in self.document.traverse(nodes.TextElement):
             while True:
-                delimiters = list(n for n in node.children if isinstance(n, addnodes.delimiter))
-                closers = list(d for d in delimiters if d['can_close'])
+                markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
+                closers = list(d for d in markers if d['can_close'])
                 if len(closers) == 0:
                     break
                 closer = closers[0]
-                opener = self.find_opener(delimiters, closer)
+                opener = self.find_opener(markers, closer)
                 if opener is None:
                     closer['can_close'] = False
                     continue
@@ -108,17 +108,17 @@ class EmphasisConverter(Transform):
                 for subnode in node[opener_pos + 1:closer_pos]:
                     node.remove(subnode)
                     emph_node += subnode
-                self.deactivate_delimiters(emph_node)
+                self.deactivate_markers(emph_node)
 
                 node.insert(opener_pos + 1, emph_node)
                 opener.shrink(length)
                 closer.shrink(length)
 
-            self.deactivate_delimiters(node)
+            self.deactivate_markers(node)
 
-    def find_opener(self, delimiters, closer):
-        pos = delimiters.index(closer)
-        for opener in reversed(delimiters[:pos]):
+    def find_opener(self, markers, closer):
+        pos = markers.index(closer)
+        for opener in reversed(markers[:pos]):
             if opener['can_open'] is False:
                 continue
             elif opener['marker'][0] != closer['marker'][0]:
@@ -131,9 +131,9 @@ class EmphasisConverter(Transform):
 
         return None
 
-    def deactivate_delimiters(self, node):
-        delimiters = list(n for n in node.children if isinstance(n, addnodes.delimiter))
-        for delim in delimiters:
+    def deactivate_markers(self, node):
+        markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
+        for delim in markers:
             marker = str(delim)
             delim.replace_self(nodes.Text(marker, marker))
 

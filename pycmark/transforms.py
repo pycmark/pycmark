@@ -71,6 +71,44 @@ class TightListsCompactor(Transform):
                         list_item.remove(para)
 
 
+class SectionTreeConstructor(Transform):
+    default_priority = 500
+
+    def apply(self):
+        def is_container_node(node):
+            return isinstance(node, (nodes.document, nodes.block_quote, nodes.list_item))
+
+        for node in self.document.traverse(is_container_node):
+            self.construct_section_tree(node)
+
+    def construct_section_tree(self, container):
+        current_depth = 0
+        last_section = None
+        for node in container[:]:
+            if isinstance(node, nodes.section):
+                if current_depth + 1 < node['depth']:
+                    msg = ('Invalid deep section "%s" (<h%d>) appeared. Recognized a <h%d>.' %
+                           (node.astext(), node['depth'], current_depth + 1))
+                    self.document.reporter.warning(msg, source=node[0].source, line=node[0].line)
+                    node['depth'] = current_depth + 1
+                elif current_depth >= node['depth']:
+                    # leave the section
+                    for _ in range(current_depth - node['depth'] + 1):
+                        if last_section is not None:
+                            last_section = last_section.parent
+
+                if last_section:
+                    node.parent.remove(node)
+                    last_section += node
+
+                current_depth = node['depth']
+                last_section = node
+            else:
+                if last_section:
+                    node.parent.remove(node)
+                    last_section += node
+
+
 class SparseTextConverter(Transform):
     default_priority = 900
 

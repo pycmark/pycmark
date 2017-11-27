@@ -106,18 +106,19 @@ def test_example_32():
             "##### foo\n"
             "###### foo\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"])])
+    assert_node(result, [nodes.document, nodes.section, ([nodes.title, "foo"],
+                                                         [nodes.section, ([nodes.title, "foo"],
+                                                                          [nodes.section, ([nodes.title, "foo"],
+                                                                                           nodes.section)])])])
+    assert_node(result[0][1][1][1], [nodes.section, ([nodes.title, "foo"],
+                                                     [nodes.section, ([nodes.title, "foo"],
+                                                                      [nodes.section, nodes.title, "foo"])])])
     assert_node(result[0], nodes.section, depth=1)
-    assert_node(result[1], nodes.section, depth=2)
-    assert_node(result[2], nodes.section, depth=3)
-    assert_node(result[3], nodes.section, depth=4)
-    assert_node(result[4], nodes.section, depth=5)
-    assert_node(result[5], nodes.section, depth=6)
+    assert_node(result[0][1], nodes.section, depth=2)
+    assert_node(result[0][1][1], nodes.section, depth=3)
+    assert_node(result[0][1][1][1], nodes.section, depth=4)
+    assert_node(result[0][1][1][1][1], nodes.section, depth=5)
+    assert_node(result[0][1][1][1][1][1], nodes.section, depth=6)
 
 
 def test_example_33():
@@ -146,28 +147,28 @@ def test_example_38():
             "  ## foo\n"
             "   # foo\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"],
+    assert_node(result, [nodes.document, ([nodes.section, ([nodes.title, "foo"],
+                                                           [nodes.section, nodes.title, "foo"])],
                                           [nodes.section, nodes.title, "foo"])])
-    assert_node(result[0], nodes.section, depth=3)
-    assert_node(result[1], nodes.section, depth=2)
-    assert_node(result[2], nodes.section, depth=1)
+    assert_node(result[0], nodes.section, depth=1)
+    assert_node(result[0][1], nodes.section, depth=2)
+    assert_node(result[1], nodes.section, depth=1)
 
 
 def test_example_41():
     text = ("## foo ##\n"
             "  ###   bar    ###\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "bar"])])
+    assert_node(result, [nodes.document, ([nodes.section, ([nodes.title, "foo"],
+                                                           [nodes.section, nodes.title, "bar"])])])
 
 
 def test_example_42():
     text = ("# foo ##################################\n"
             "##### foo ##\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo"],
-                                          [nodes.section, nodes.title, "foo"])])
+    assert_node(result, [nodes.document, ([nodes.section, ([nodes.title, "foo"],
+                                                           [nodes.section, nodes.title, "foo"])])])
 
 
 def test_example_43():
@@ -190,8 +191,8 @@ def test_example_46():
             "## foo #\\##\n"
             "# foo \\#\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "foo ###"],
-                                          [nodes.section, nodes.title, "foo ###"],
+    assert_node(result, [nodes.document, ([nodes.section, ([nodes.title, "foo ###"],
+                                                           [nodes.section, nodes.title, "foo ###"])],
                                           [nodes.section, nodes.title, "foo #"])])
 
 
@@ -201,8 +202,8 @@ def test_example_48():
             "Bar foo\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, "Foo bar"],
-                                          [nodes.section, nodes.title, "baz"],
-                                          [nodes.paragraph, "Bar foo"])])
+                                          [nodes.section, ([nodes.title, "baz"],
+                                                           [nodes.paragraph, "Bar foo"])])])
 
 
 def test_example_49():
@@ -211,8 +212,8 @@ def test_example_49():
             "### ###\n")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.section, nodes.title],
-                                          [nodes.section, nodes.title],
-                                          [nodes.section, nodes.title])])
+                                          [nodes.section, (nodes.title,
+                                                           [nodes.section, nodes.title])])])
 
 
 # TODO: add test for inline heading (Example 50)
@@ -236,7 +237,7 @@ def test_example_52():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.section, nodes.title, "Foo"],
                                           [nodes.section, nodes.title, "Foo"])])
-    assert_node(result[0], depth=2)
+    assert_node(result[0], depth=1)
     assert_node(result[1], depth=1)
 
 
@@ -250,8 +251,8 @@ def test_example_53():
             "  Foo\n"
             "  ===\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "Foo"],
-                                          [nodes.section, nodes.title, "Foo"],
+    assert_node(result, [nodes.document, ([nodes.section, ([nodes.title, "Foo"],
+                                                           [nodes.section, nodes.title, "Foo"])],
                                           [nodes.section, nodes.title, "Foo"])])
 
 
@@ -303,10 +304,10 @@ def test_example_60():
             """---\n"""
             """of dashes"/>\n""")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.section, nodes.title, "`Foo"],
-                                          [nodes.paragraph, "`"],
-                                          [nodes.section, nodes.title, """<a title="a lot"""],
-                                          [nodes.paragraph, """of dashes"/>"""])])
+    assert_node(result, [nodes.document, ([nodes.section, ([nodes.title, "`Foo"],
+                                                           [nodes.paragraph, "`"],
+                                                           [nodes.section, ([nodes.title, """<a title="a lot"""],
+                                                                            [nodes.paragraph, """of dashes"/>"""])])])])
 
 
 def test_example_61():
@@ -342,9 +343,9 @@ def test_example_65():
             "Baz\n")
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.transition,
-                                          [nodes.section, nodes.title, "Foo"],
-                                          [nodes.section, nodes.title, "Bar"],
-                                          [nodes.paragraph, "Baz"])])
+                                          [nodes.section, ([nodes.title, "Foo"],
+                                                           [nodes.section, ([nodes.title, "Bar"],
+                                                                            [nodes.paragraph, "Baz"])])])])
 
 
 def test_example_66():

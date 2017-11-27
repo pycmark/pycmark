@@ -30,8 +30,8 @@ class BlockQuoteProcessor(PatternBlockProcessor):
         quote = nodes.block_quote()
         quote.source, quote.line = reader.get_source_and_line()
         quote.line += 1
-        self.parser.parse(BlockQuoteReader(reader), quote)
         document += quote
+        self.parser.parse(BlockQuoteReader(reader), quote)
         return True
 
 
@@ -50,11 +50,12 @@ class ListProcessor(BlockProcessor):
         # type: (nodes.Node, LineReader) -> bool
         marker = self.first_item_pattern.match(reader.next_line).group(2)
         list_node = self.create_list_node(marker)
+        document += list_node
         while True:
             list_item = nodes.list_item()
+            list_node += list_item
             indent = self.get_indent_depth(reader)
             self.parser.parse(ListItemReader(reader, indent, self), list_item)
-            list_node += list_item
 
             if not self.is_next_list_item(reader, marker):
                 break
@@ -66,7 +67,6 @@ class ListProcessor(BlockProcessor):
                 document += node
             else:
                 break
-        document += list_node
         return True
 
     def get_indent_depth(self, reader):

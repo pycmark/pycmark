@@ -16,8 +16,8 @@ def test_example_191():
             "> bar\n"
             "> baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, nodes.title, "Foo"],
-                                                             [nodes.paragraph, "bar\nbaz"])])
+    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, ([nodes.title, "Foo"],
+                                                                              [nodes.paragraph, "bar\nbaz"])])])
 
 
 def test_example_192():
@@ -25,8 +25,8 @@ def test_example_192():
             ">bar\n"
             "> baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, nodes.title, "Foo"],
-                                                             [nodes.paragraph, "bar\nbaz"])])
+    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, ([nodes.title, "Foo"],
+                                                                              [nodes.paragraph, "bar\nbaz"])])])
 
 
 def test_example_193():
@@ -34,8 +34,8 @@ def test_example_193():
             "   > bar\n"
             " > baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, nodes.title, "Foo"],
-                                                             [nodes.paragraph, "bar\nbaz"])])
+    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, ([nodes.title, "Foo"],
+                                                                              [nodes.paragraph, "bar\nbaz"])])])
 
 
 def test_example_195():
@@ -43,8 +43,8 @@ def test_example_195():
             "> bar\n"
             "baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, nodes.title, "Foo"],
-                                                             [nodes.paragraph, "bar\nbaz"])])
+    assert_node(result, [nodes.document, nodes.block_quote, ([nodes.section, ([nodes.title, "Foo"],
+                                                                              [nodes.paragraph, "bar\nbaz"])])])
 
 
 def test_example_196():

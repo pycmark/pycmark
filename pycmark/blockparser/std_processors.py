@@ -40,7 +40,14 @@ class ATXHeadingProcessor(PatternBlockProcessor):
         title_node = nodes.title(title, title)
         title_node.source, title_node.line = reader.get_source_and_line()
         document += nodes.section('', title_node, depth=len(marker))
+        self.note_implicit_target(document, document[-1])
         return True
+
+    def note_implicit_target(self, document, node):
+        while document.parent:
+            document = document.parent
+
+        document.note_implicit_target(node)
 
 
 # 4.4 Indented code blocks
@@ -116,6 +123,7 @@ class ParagraphProcessor(BlockProcessor):
         if isinstance(node, nodes.section):
             node[0].source = source
             node[0].line = lineno + 1  # lineno points previous line
+            self.note_implicit_target(document, node)
         else:
             text = self.read(LazyLineReader(reader), node.rawsource).rawsource.strip()
             node = nodes.paragraph(text, text)
@@ -148,6 +156,12 @@ class ParagraphProcessor(BlockProcessor):
                 break
 
         return nodes.paragraph(text, text)
+
+    def note_implicit_target(self, document, node):
+        while document.parent:
+            document = document.parent
+
+        document.note_implicit_target(node)
 
 
 # 4.9 Blank lines

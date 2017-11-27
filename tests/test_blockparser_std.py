@@ -556,3 +556,253 @@ def test_example_115():
             "```\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "``` aaa\n"])
+
+
+def test_example_159():
+    text = ("""[foo]: /url "title"\n"""
+            """\n"""
+            """[foo]\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[0], refuri="/url", title="title")
+    assert_node(result[1][0], refuri="/url", reftitle="title")
+
+
+def test_example_160():
+    text = ("   [foo]: \n"
+            "      /url  \n"
+            "           'the title'  \n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[0], refuri="/url", title="the title")
+    assert_node(result[1][0], refuri="/url", reftitle="the title")
+
+
+def test_example_161():
+    text = ("[Foo*bar\\]]:my_(url) 'title (with parens)'\n"
+            "\n"
+            "[Foo*bar\\]]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "Foo*bar]"])])
+    assert_node(result[0], refuri="my_(url)", title="title (with parens)")
+    assert_node(result[1][0], refuri="my_(url)", reftitle="title (with parens)")
+
+
+def test_example_162():
+    text = ("[Foo bar]:\n"
+            "<my%20url>\n"
+            "'title'\n"
+            "\n"
+            "[Foo bar]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "Foo bar"])])
+    assert_node(result[0], refuri="my%20url", title="title")
+    assert_node(result[1][0], refuri="my%20url", reftitle="title")
+
+
+def test_example_163():
+    text = ("[foo]: /url '\n"
+            "title\n"
+            "line1\n"
+            "line2\n"
+            "'\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[0], refuri="/url", title="\ntitle\nline1\nline2\n")
+    assert_node(result[1][0], refuri="/url", reftitle="\ntitle\nline1\nline2\n")
+
+
+def test_example_164():
+    text = ("[foo]: /url 'title\n"
+            "\n"
+            "with blank line'\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "[foo]: /url 'title"],
+                                          [nodes.paragraph, "with blank line'"],
+                                          [nodes.paragraph, "[foo]"])])
+
+
+def test_example_165():
+    text = ("[foo]:\n"
+            "/url\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[0], refuri="/url")
+    assert_node(result[1][0], refuri="/url")
+
+
+def test_example_166():
+    text = ("[foo]:\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "[foo]:"],
+                                          [nodes.paragraph, "[foo]"])])
+
+
+def test_example_167():
+    text = ("""[foo]: /url\\bar\\*baz "foo\\"bar\\baz"\n"""
+            """\n"""
+            """[foo]\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[0], refuri="/url\\bar*baz", title='foo"bar\\baz')
+    assert_node(result[1][0], refuri="/url\\bar*baz", reftitle='foo"bar\\baz')
+
+
+def test_example_168():
+    text = ("[foo]\n"
+            "\n"
+            "[foo]: url\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
+                                          nodes.target)])
+    assert_node(result[1], refuri="url")
+    assert_node(result[0][0], refuri="url")
+
+
+def test_example_169():
+    text = ("[foo]\n"
+            "\n"
+            "[foo]: first\n"
+            "[foo]: second\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
+                                          nodes.target,
+                                          nodes.target)])
+    assert_node(result[1], refuri="first")
+    assert_node(result[2], refuri="second")
+    assert_node(result[0][0], refuri="first")
+
+
+def test_example_170():
+    text = ("[FOO]: /url\n"
+            "\n"
+            "[Foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "Foo"])])
+    assert_node(result[0], refuri="/url")
+    assert_node(result[1][0], refuri="/url")
+
+
+def test_example_171():
+    text = ("[ΑΓΩ]: /φου\n"
+            "\n"
+            "[αγω]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "αγω"])])
+    assert_node(result[0], refuri="/φου")
+    assert_node(result[1][0], refuri="/φου")
+
+
+def test_example_172():
+    result = publish("[foo]: /url")
+    assert_node(result, [nodes.document, nodes.target])
+
+
+def test_example_173():
+    text = ("[\n"
+            "foo\n"
+            "]: /url\n"
+            "bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, "bar"])])
+
+
+def test_example_174():
+    result = publish('[foo]: /url "title" ok')
+    assert_node(result, [nodes.document, nodes.paragraph, '[foo]: /url "title" ok'])
+
+
+def test_example_175():
+    text = ('[foo]: /url\n'
+            '"title" ok\n')
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, '[foo]: /url\n"title" ok'])
+
+
+def test_example_176():
+    text = ('    [foo]: /url "title"\n'
+            '\n'
+            '[foo]\n')
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.literal_block, '[foo]: /url "title"\n'],
+                                          [nodes.paragraph, "[foo]"])])
+
+
+def test_example_177():
+    text = ("```\n"
+            "[foo]: /url\n"
+            "```\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.literal_block, "[foo]: /url\n"],
+                                          [nodes.paragraph, "[foo]"])])
+
+
+def test_example_178():
+    text = ("Foo\n"
+            "[bar]: /baz\n"
+            "\n"
+            "[bar]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "Foo\n[bar]: /baz"],
+                                          [nodes.paragraph, "[bar]"])])
+
+
+def test_example_179():
+    text = ("# [Foo]\n"
+            "[foo]: /url\n"
+            "> bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, ([nodes.title, nodes.reference, "Foo"],
+                                                         nodes.target,
+                                                         [nodes.block_quote, nodes.paragraph, "bar"])])
+
+
+def test_example_180():
+    text = ("""[foo]: /foo-url "foo"\n"""
+            """[bar]: /bar-url\n"""
+            """  "bar"\n"""
+            """[baz]: /baz-url\n"""
+            """\n"""
+            """[foo],\n"""
+            """[bar],\n"""
+            """[baz]\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          nodes.target,
+                                          nodes.target,
+                                          [nodes.paragraph, ([nodes.reference, "foo"],
+                                                             ",\n",
+                                                             [nodes.reference, "bar"],
+                                                             ",\n",
+                                                             [nodes.reference, "baz"])])])
+
+
+def test_example_181():
+    text = ("[foo]\n"
+            "\n"
+            "> [foo]: /url\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
+                                          [nodes.block_quote, ()])])

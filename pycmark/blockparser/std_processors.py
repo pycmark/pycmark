@@ -110,6 +110,7 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
 
 
 # 4.3 Setext headings
+# 4.7 Link reference definitions
 # 4.8 Paragraphs
 class ParagraphProcessor(BlockProcessor):
     setext_heading_underline = re.compile('^ {0,3}(=+|-+)\s*$')

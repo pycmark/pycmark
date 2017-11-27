@@ -9,10 +9,14 @@
     :license: BSD, see LICENSE for details.
 """
 
+import re
 from docutils import nodes
 from docutils.transforms import Transform
 from pycmark import addnodes
-from pycmark.utils import transplant_nodes
+from pycmark.readers import TextReader
+from pycmark.inlineparser import backtrack_onerror
+from pycmark.inlineparser.std_processors import LinkDestinationParser, LinkTitleParser
+from pycmark.utils import ESCAPED_CHARS, transplant_nodes
 
 
 class BlanklineFilter(Transform):
@@ -107,6 +111,53 @@ class SectionTreeConstructor(Transform):
                 if last_section:
                     node.parent.remove(node)
                     last_section += node
+
+
+class LinkReferenceDefinitionDetector(Transform):
+    default_priority = 500
+    pattern = re.compile(r'\s*\[((?:[^]\\]|' + ESCAPED_CHARS + ')+)\]:')
+
+    def apply(self):
+        for node in self.document.traverse(nodes.paragraph):
+            reader = TextReader(node[0])
+            self.parse_linkref_definition(node, reader)
+
+    @backtrack_onerror
+    def parse_linkref_definition(self, node, reader):
+        targets = []
+        while True:
+            matched = reader.consume(self.pattern)
+            if not matched:
+                break
+            else:
+                label = matched.group(1).strip().casefold()
+                destination = LinkDestinationParser().parse(node, reader)
+                if destination == '':
+                    break
+                title = LinkTitleParser().parse(node, reader)
+                eol = reader.consume(re.compile('\s*(\n|$)'))
+                if eol is None:
+                    break
+
+                target = nodes.target('', names=[label], refuri=destination, title=title)
+                if label not in self.document.nameids:
+                    self.document.note_explicit_target(target)
+                else:
+                    self.document.reporter.warning('Duplicate explicit target name: "%s"' % label,
+                                                   source=node.source, line=node.line)
+                targets.append(target)
+
+        if targets:
+            # insert found targets before the paragraph
+            pos = node.parent.index(node)
+            for target in reversed(targets):
+                node.parent.insert(pos, target)
+
+            if reader.remain:
+                node.pop(0)
+                node.insert(0, nodes.Text(reader.remain))
+            else:
+                node.parent.remove(node)
 
 
 class SparseTextConverter(Transform):

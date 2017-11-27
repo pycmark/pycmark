@@ -53,6 +53,7 @@ from pycmark.transforms import (
     TightListsCompactor,
     BlanklineFilter,
     SectionTreeConstructor,
+    LinkReferenceDefinitionDetector,
     SparseTextConverter,
     EmphasisConverter,
     BracketConverter,
@@ -143,6 +144,9 @@ class CommonMarkParser(Parser):
         reader = LineReader(inputtext.splitlines(True), source=document['source'])
         block_parser = self.create_block_parser()
         block_parser.parse(reader, document)
+
+        link_detector = LinkReferenceDefinitionDetector(document)
+        link_detector.apply()
 
         inline_parser = self.create_inline_parser()
         for node in document.traverse(is_text_container):

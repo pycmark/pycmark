@@ -13,9 +13,7 @@ import re
 import unicodedata
 from docutils import nodes
 from pycmark import addnodes
-from pycmark.inlineparser import (
-    PatternInlineProcessor, UnmatchedTokenError, ParseError, backtrack_onerror
-)
+from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 from pycmark.utils import entitytrans
 from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, transplant_nodes
 
@@ -125,7 +123,7 @@ class LinkOpenerProcessor(PatternInlineProcessor):
 
     def run(self, document, reader):
         marker = reader.consume(self.pattern).group(0)
-        document += addnodes.bracket(marker=marker, can_open=True)
+        document += addnodes.bracket(marker=marker, can_open=True, position=reader.position)
         return True
 
 
@@ -134,7 +132,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
 
     def run(self, document, reader):
         reader.step(1)
-        document += addnodes.bracket(marker="]", can_open=False)
+        document += addnodes.bracket(marker="]", can_open=False, position=reader.position - 1)
         self.process_link_or_image(document, reader)
         return True
 
@@ -161,10 +159,16 @@ class LinkCloserProcessor(PatternInlineProcessor):
             #     [...][.*]
             raise NotImplementedError
         else:
-            # deactivate brackets because no trailing link destination or link-label
-            opener.replace_self(nodes.Text(opener['marker']))
-            closer.replace_self(nodes.Text(closer['marker']))
-            raise
+            refid = reader[opener['position']:closer['position']]
+            target = self.lookup_target(document, refid)
+            if target:
+                destination = target.get('refuri')
+                title = target.get('title')
+            else:
+                # deactivate brackets because no trailing link destination or link-label
+                opener.replace_self(nodes.Text(opener['marker']))
+                closer.replace_self(nodes.Text(closer['marker']))
+                raise
 
         if opener['marker'] == '![':
             para = transplant_nodes(document, nodes.paragraph(), start=opener, end=closer)
@@ -186,6 +190,16 @@ class LinkCloserProcessor(PatternInlineProcessor):
         document.remove(opener)
         document.remove(closer)
         return True
+
+    def lookup_target(self, document, refid):
+        while document.parent:
+            document = document.parent
+
+        node_id = document.nameids.get(refid.casefold())
+        if node_id is None:
+            return None
+
+        return document.ids.get(node_id)
 
 
 class LinkDestinationParser(object):
@@ -217,8 +231,6 @@ class LinkDestinationParser(object):
                 reader.step()  # one more step for escaping
 
             reader.step()
-        else:
-            raise ParseError
 
         end = reader.position
         return unescape(entitytrans._unescape(reader[start:end]))

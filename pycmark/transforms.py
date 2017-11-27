@@ -78,7 +78,7 @@ class SparseTextConverter(Transform):
         for node in self.document.traverse(addnodes.SparseText):
             pos = node.parent.index(node)
             node.parent.remove(node)
-            node.parent.insert(pos, nodes.Text(node))
+            node.parent.insert(pos, nodes.Text(str(node)))
 
 
 class EmphasisConverter(Transform):

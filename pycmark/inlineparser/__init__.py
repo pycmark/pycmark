@@ -81,10 +81,10 @@ class ParseError(Exception):
 
 def backtrack_onerror(func):
     @wraps(func)
-    def wrapper(self, document, reader):
+    def wrapper(self, document, reader, **kwargs):
         new_reader = TextReader(reader.subject, reader.position)
         try:
-            ret = func(self, document, new_reader)
+            ret = func(self, document, new_reader, **kwargs)
             if ret:
                 reader.position = new_reader.position
             return ret
@@ -93,7 +93,7 @@ def backtrack_onerror(func):
             document += nodes.Text(text)
             reader.step(len(text))
             return True
-        except Exception:
+        except Exception as exc:
             return False
 
     return wrapper

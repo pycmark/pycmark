@@ -19,6 +19,12 @@ def unescape(text):
     return escaped_chars_pattern.sub(lambda m: m.group(0)[1], text)
 
 
+def normalize_link_label(label):
+    label = unescape(label)
+    label = re.sub('\s+', '', label)
+    return label.strip().casefold()
+
+
 def transplant_nodes(parent, new_parent, start, end):
     start_pos = parent.index(start)
     end_pos = parent.index(end)

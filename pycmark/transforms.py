@@ -16,7 +16,7 @@ from pycmark import addnodes
 from pycmark.readers import TextReader
 from pycmark.inlineparser import backtrack_onerror
 from pycmark.inlineparser.std_processors import LinkDestinationParser, LinkTitleParser
-from pycmark.utils import ESCAPED_CHARS, transplant_nodes
+from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
 
 
 class BlanklineFilter(Transform):
@@ -115,7 +115,7 @@ class SectionTreeConstructor(Transform):
 
 class LinkReferenceDefinitionDetector(Transform):
     default_priority = 500
-    pattern = re.compile(r'\s*\[((?:[^]\\]|' + ESCAPED_CHARS + ')+)\]:')
+    pattern = re.compile(r'\s*\[((?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\)+)\]:')
 
     def apply(self):
         for node in self.document.traverse(nodes.paragraph):
@@ -130,7 +130,9 @@ class LinkReferenceDefinitionDetector(Transform):
             if not matched:
                 break
             else:
-                label = matched.group(1).strip().casefold()
+                label = normalize_link_label(matched.group(1))
+                if label.strip() == '':
+                    break
                 destination = LinkDestinationParser().parse(node, reader)
                 if destination == '':
                     break

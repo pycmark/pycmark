@@ -15,7 +15,11 @@ from docutils import nodes
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 from pycmark.utils import entitytrans
-from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, transplant_nodes
+from pycmark.utils import (
+    ESCAPED_CHARS, escaped_chars_pattern, unescape, normalize_link_label, transplant_nodes
+)
+
+LABEL_NOT_MATCHED = object()
 
 
 def is_punctuation(char):
@@ -146,19 +150,27 @@ class LinkCloserProcessor(PatternInlineProcessor):
         opener = openers.pop()
         closer = brackets.pop()
 
-        if reader.remain.startswith('('):
-            # link destination + link title (optional)
-            #     [...](<.+> ".+")
-            #     [...](.+ ".+")
-            reader.step()
-            destination = LinkDestinationParser().parse(document, reader)
-            title = LinkTitleParser().parse(document, reader)
-            assert reader.consume(re.compile('\s*\)'))
-        elif reader.remain.startswith('['):
-            # link label
-            #     [...][.*]
-            raise NotImplementedError
-        else:
+        try:
+            if reader.remain.startswith('('):
+                # link destination + link title (optional)
+                #     [...](<.+> ".+")
+                #     [...](.+ ".+")
+                destination, title = self.parse_link_destination(document, reader)
+            elif reader.remain.startswith('['):
+                # link label
+                #     [...][.+]
+                #     [...][]
+                destination, title = self.parse_link_label(document, reader, opener=opener, closer=closer)
+            else:
+                destination = None
+                title = None
+        except (TypeError, ValueError):
+            destination = None
+            title = None
+
+        if destination is None:
+            # shortcut reference link
+            #    [...]
             refid = reader[opener['position']:closer['position']]
             target = self.lookup_target(document, refid)
             if target:
@@ -169,6 +181,10 @@ class LinkCloserProcessor(PatternInlineProcessor):
                 opener.replace_self(nodes.Text(opener['marker']))
                 closer.replace_self(nodes.Text(closer['marker']))
                 raise
+        elif destination == LABEL_NOT_MATCHED:
+            opener.replace_self(nodes.Text(opener['marker']))
+            closer.replace_self(nodes.Text(closer['marker']))
+            raise
 
         if opener['marker'] == '![':
             para = transplant_nodes(document, nodes.paragraph(), start=opener, end=closer)
@@ -191,11 +207,37 @@ class LinkCloserProcessor(PatternInlineProcessor):
         document.remove(closer)
         return True
 
+    @backtrack_onerror
+    def parse_link_destination(self, document, reader):
+        reader.step()
+        destination = LinkDestinationParser().parse(document, reader)
+        title = LinkTitleParser().parse(document, reader)
+        assert reader.consume(re.compile('\s*\)'))
+
+        return destination, title
+
+    @backtrack_onerror
+    def parse_link_label(self, document, reader, opener=None, closer=None):
+        reader.step()
+        refid = LinkLabelParser().parse(document, reader)
+        if refid == '':
+            # collapsed reference link
+            #     [...][]
+            refid = reader[opener['position']:closer['position']]
+
+        target = self.lookup_target(document, refid)
+        if target:
+            destination = target.get('refuri')
+            title = target.get('title')
+            return destination, title
+        else:
+            return LABEL_NOT_MATCHED, None
+
     def lookup_target(self, document, refid):
         while document.parent:
             document = document.parent
 
-        node_id = document.nameids.get(refid.casefold())
+        node_id = document.nameids.get(normalize_link_label(refid))
         if node_id is None:
             return None
 
@@ -245,6 +287,17 @@ class LinkTitleParser(object):
         matched = reader.consume(self.pattern)
         if matched:
             return unescape(entitytrans._unescape(matched.group(1)[1:-1]))
+        else:
+            return None
+
+
+class LinkLabelParser(object):
+    pattern = re.compile(r'(?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\){0,1000}\]')
+
+    def parse(self, document, reader):
+        matched = reader.consume(self.pattern)
+        if matched:
+            return unescape(matched.group(0)[:-1])
         else:
             return None
 

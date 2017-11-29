@@ -529,3 +529,141 @@ def test_example_582():
 def test_example_583():
     result = publish("foo@bar.example.com")
     assert_node(result, [nodes.document, nodes.paragraph, "foo@bar.example.com"])
+
+
+def test_example_584():
+    result = publish("<a><bab><c2c>")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.raw, "<a>"],
+                                                           [nodes.raw, "<bab>"],
+                                                           [nodes.raw, "<c2c>"])])
+    assert_node(result[0][0], format='html')
+    assert_node(result[0][1], format='html')
+    assert_node(result[0][2], format='html')
+
+
+def test_example_585():
+    result = publish("<a/><b2/>")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.raw, "<a/>"],
+                                                           [nodes.raw, "<b2/>"])])
+
+
+def test_example_586():
+    text = ('<a  /><b2\n'
+            'data="foo" >\n')
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.raw, "<a  />"],
+                                                           [nodes.raw, '<b2\ndata="foo" >'])])
+
+
+def test_example_587():
+    text = ("""<a foo="bar" bam = 'baz <em>"</em>'\n"""
+            """_boolean zoop:33=zoop:33 />\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.raw, text.strip()])
+
+
+def test_example_588():
+    result = publish('Foo <responsive-image src="foo.jpg" />')
+    assert_node(result, [nodes.document, nodes.paragraph, ("Foo ",
+                                                           [nodes.raw, '<responsive-image src="foo.jpg" />'])])
+
+
+def test_example_589():
+    result = publish("<33> <__>")
+    assert_node(result, [nodes.document, nodes.paragraph, "<33> <__>"])
+
+
+def test_example_590():
+    text = '<a h*#ref="hi">'
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_591():
+    text = """<a href="hi'> <a href=hi'>"""
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_592():
+    text = ("< a><\n"
+            "foo><bar/ >\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text.strip()])
+
+
+def test_example_593():
+    text = "<a href='bar'title=title>"
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_594():
+    result = publish("</a></foo >")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.raw, "</a>"],
+                                                           [nodes.raw, "</foo >"])])
+
+
+def test_example_595():
+    text = '</a href="foo">'
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_596():
+    text = ("foo <!-- this is a\n"
+            "comment - with hyphen -->\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
+                                                           [nodes.raw, "<!-- this is a\ncomment - with hyphen -->"])])
+
+
+def test_example_597():
+    text = "foo <!-- not a comment -- two hyphens -->"
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])
+
+
+def test_example_598():
+    text = ("foo <!--> foo -->\n"
+            "\n"
+            "foo <!-- foo--->\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, "foo <!--> foo -->"],
+                                          [nodes.paragraph, "foo <!-- foo--->"])])
+
+
+def test_example_599():
+    result = publish("foo <?php echo $a; ?>\n")
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
+                                                           [nodes.raw, "<?php echo $a; ?>"])])
+
+
+def test_example_600():
+    result = publish("foo <!ELEMENT br EMPTY>\n")
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
+                                                           [nodes.raw, "<!ELEMENT br EMPTY>"])])
+
+
+def test_example_601():
+    result = publish("foo <![CDATA[>&<]]>\n")
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
+                                                           [nodes.raw, "<![CDATA[>&<]]>"])])
+
+
+def test_example_602():
+    result = publish('foo <a href="&ouml;">\n')
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
+                                                           [nodes.raw, '<a href="&ouml;">'])])
+
+
+def test_example_603():
+    result = publish('foo <a href="\\*">\n')
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
+                                                           [nodes.raw, '<a href="\\*">'])])
+
+
+def test_example_604():
+    text = '<a href="\"">'
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, text])

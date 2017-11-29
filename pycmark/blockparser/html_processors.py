@@ -12,6 +12,7 @@
 import re
 from docutils import nodes
 from pycmark.blockparser import PatternBlockProcessor
+from pycmark.utils import OPENTAG, CLOSETAG
 
 STANDARD_HTML_TAGS = (
     'address', 'article', 'aside', 'base', 'basefont', 'blockquote', 'body',
@@ -83,5 +84,5 @@ class StandardTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
 # 4.6 HTML blocks; complete tags
 class CompleteTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
     paragraph_interruptable = False
-    pattern = re.compile('^ {0,3}</?\w+(\s+\S+)*\s*>')
+    pattern = re.compile('^ {0,3}(?:' + OPENTAG + '|' + CLOSETAG + ')\s*$')
     closing_pattern = re.compile('^\s*$')

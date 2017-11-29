@@ -11,8 +11,22 @@
 
 import re
 
+# common regexp
 ESCAPED_CHARS = r'\\[!"#$%&\'()*+,./:;<=>?@[\\\]^_`{|}~-]'
 escaped_chars_pattern = re.compile(ESCAPED_CHARS)
+
+# HTML regexp
+TAGNAME = '[a-zA-Z][a-zA-Z0-9-]*'
+ATTRIBUTE_NAME = '[a-zA-Z_:][a-zA-Z0-9_.:-]*'
+UNQUOTED_VALUE = "[^ \"'=<>`]+"
+SINGLE_QUOTED_VALUE = "'[^']*'"
+DOUBLE_QUOTED_VALUE = '"[^"]*"'
+ATTRIBUTE_VALUE = ("(?:" + UNQUOTED_VALUE + "|" + SINGLE_QUOTED_VALUE + "|" +
+                   DOUBLE_QUOTED_VALUE + ")")
+ATTRIBUTE_VALUE_SPEC = "(?:\\s*=\\s*" + ATTRIBUTE_VALUE + ")"
+ATTRIBUTE = "(?:\\s+" + ATTRIBUTE_NAME + ATTRIBUTE_VALUE_SPEC + "?)"
+OPENTAG = "<" + TAGNAME + ATTRIBUTE + "*\\s*/?>"
+CLOSETAG = "</" + TAGNAME + "\\s*>"
 
 
 def unescape(text):

@@ -227,7 +227,9 @@ def test_example_154():
             """<a href="bar">\n"""
             """baz\n""")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text.strip()])
+    assert_node(result, [nodes.document, nodes.paragraph, ("Foo\n",
+                                                           [nodes.raw, '<a href="bar">'],
+                                                           "\nbaz")])
 
 
 def test_example_157():

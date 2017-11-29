@@ -15,7 +15,7 @@ from docutils import nodes
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 from pycmark.utils import entitytrans
-from pycmark.utils import escaped_chars_pattern
+from pycmark.utils import OPENTAG, CLOSETAG, escaped_chars_pattern
 
 
 def is_punctuation(char):
@@ -134,4 +134,20 @@ class EmailAutolinkProcessor(PatternInlineProcessor):
     def run(self, document, reader):
         uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri='mailto:' + uri)
+        return True
+
+
+# 6.8 Raw HTML
+class RawHTMLProcessor(PatternInlineProcessor):
+    HTML_COMMENT = '<!---->|<!--(?:-?[^>-])(?:-?[^-])*-->'
+    PROCESSING_INSTRUCTION = "<\\?.*?\\?>"
+    DECLARATION = "<![A-Z]+" + "\\s+[^>]*>"
+    CDATA = '<!\\[CDATA\\[[\\s\\S]*?\\]\\]>'
+    HTMLTAG = ("(?:" + OPENTAG + "|" + CLOSETAG + "|" + HTML_COMMENT + "|" +
+               PROCESSING_INSTRUCTION + "|" + DECLARATION + "|" + CDATA + ")")
+    pattern = re.compile(HTMLTAG)
+
+    def run(self, document, reader):
+        html = reader.consume(self.pattern).group(0)
+        document += nodes.raw(html, html, format='html')
         return True

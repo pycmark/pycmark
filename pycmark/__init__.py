@@ -43,6 +43,7 @@ from pycmark.inlineparser.std_processors import (
     EmphasisProcessor,
     URIAutolinkProcessor,
     EmailAutolinkProcessor,
+    RawHTMLProcessor,
 )
 from pycmark.inlineparser.link_processors import (
     LinkOpenerProcessor,
@@ -101,6 +102,7 @@ class CommonMarkParser(Parser):
             LinkCloserProcessor,
             URIAutolinkProcessor,
             EmailAutolinkProcessor,
+            RawHTMLProcessor,
         ]
 
     def get_transforms(self):

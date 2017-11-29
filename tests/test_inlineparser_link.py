@@ -58,7 +58,9 @@ def test_example_466():
     text = ("[link](<foo\n"
             "bar>)\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text.strip()])
+    assert_node(result, [nodes.document, nodes.paragraph, ("[link](",
+                                                           [nodes.raw, "<foo\nbar>"],
+                                                           ")")])
 
 
 def test_example_467():

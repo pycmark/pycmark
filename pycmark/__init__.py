@@ -41,10 +41,12 @@ from pycmark.inlineparser.std_processors import (
     EntityReferenceProcessor,
     CodeSpanProcessor,
     EmphasisProcessor,
-    LinkOpenerProcessor,
-    LinkCloserProcessor,
     URIAutolinkProcessor,
     EmailAutolinkProcessor,
+)
+from pycmark.inlineparser.link_processors import (
+    LinkOpenerProcessor,
+    LinkCloserProcessor,
 )
 from pycmark.transforms import (
     TightListsDetector,

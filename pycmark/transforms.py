@@ -15,7 +15,7 @@ from docutils.transforms import Transform
 from pycmark import addnodes
 from pycmark.readers import TextReader
 from pycmark.inlineparser import InlineParser, backtrack_onerror
-from pycmark.inlineparser.std_processors import LinkDestinationParser, LinkTitleParser
+from pycmark.inlineparser.link_processors import LinkDestinationParser, LinkTitleParser
 from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
 
 

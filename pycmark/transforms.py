@@ -14,7 +14,7 @@ from docutils import nodes
 from docutils.transforms import Transform
 from pycmark import addnodes
 from pycmark.readers import TextReader
-from pycmark.inlineparser import backtrack_onerror
+from pycmark.inlineparser import InlineParser, backtrack_onerror
 from pycmark.inlineparser.std_processors import LinkDestinationParser, LinkTitleParser
 from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
 
@@ -114,7 +114,7 @@ class SectionTreeConstructor(Transform):
 
 
 class LinkReferenceDefinitionDetector(Transform):
-    default_priority = 500
+    default_priority = 100
     pattern = re.compile(r'\s*\[((?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\)+)\]:')
 
     def apply(self):
@@ -160,6 +160,25 @@ class LinkReferenceDefinitionDetector(Transform):
                 node.insert(0, nodes.Text(reader.remain))
             else:
                 node.parent.remove(node)
+
+
+class InlineTransform(Transform):
+    default_priority = 200
+
+    def apply(self):
+        def is_text_container(node):
+            return isinstance(node, nodes.TextElement) and not isinstance(node, nodes.FixedTextElement)
+
+        parser = self.create_parser()
+        for node in self.document.traverse(is_text_container):
+            parser.parse(node)
+
+    def create_parser(self):
+        parser = InlineParser()
+        for processor in self.document.settings.inline_processors:
+            parser.add_processor(processor(parser))
+
+        return parser
 
 
 class SparseTextConverter(Transform):

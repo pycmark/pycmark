@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for details.
 """
 
-from docutils import nodes
 from docutils.parsers import Parser
 from pycmark.readers import LineReader
 from pycmark.blockparser import BlockParser
@@ -37,7 +36,6 @@ from pycmark.blockparser.container_processors import (
     OrderedListProcessor,
     OneBasedOrderedListProcessor,
 )
-from pycmark.inlineparser import InlineParser
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
     EntityReferenceProcessor,
@@ -54,15 +52,12 @@ from pycmark.transforms import (
     BlanklineFilter,
     SectionTreeConstructor,
     LinkReferenceDefinitionDetector,
+    InlineTransform,
     SparseTextConverter,
     EmphasisConverter,
     BracketConverter,
     TextNodeConnector,
 )
-
-
-def is_text_container(node):
-    return isinstance(node, nodes.TextElement) and not isinstance(node, nodes.FixedTextElement)
 
 
 class CommonMarkParser(Parser):
@@ -112,6 +107,8 @@ class CommonMarkParser(Parser):
             TightListsCompactor,
             BlanklineFilter,
             SectionTreeConstructor,
+            LinkReferenceDefinitionDetector,
+            InlineTransform,
             SparseTextConverter,
             EmphasisConverter,
             BracketConverter,
@@ -129,25 +126,9 @@ class CommonMarkParser(Parser):
             parser.add_processor(processor(parser))
         return parser
 
-    def create_inline_parser(self):
-        """Creates a inline parser and returns it.
-
-        Internally, ``get_inline_processors()`` is called to create a parser.
-        So you can change the processors by subclassing."""
-        parser = InlineParser()
-        for processor in self.get_inline_processors():
-            parser.add_processor(processor(parser))
-        return parser
-
     def parse(self, inputtext, document):
         """Parses a text and build document."""
+        document.settings.inline_processors = self.get_inline_processors()
         reader = LineReader(inputtext.splitlines(True), source=document['source'])
         block_parser = self.create_block_parser()
         block_parser.parse(reader, document)
-
-        link_detector = LinkReferenceDefinitionDetector(document)
-        link_detector.apply()
-
-        inline_parser = self.create_inline_parser()
-        for node in document.traverse(is_text_container):
-            inline_parser.parse(node)

@@ -11,7 +11,20 @@ from docutils import nodes
 from utils import publish, assert_node
 
 
-# TODO: add test for breaking by a blank line (Example 116)
+def test_example_116():
+    text = ("<table><tr><td>\n"
+            "<pre>\n"
+            "**Hello**,\n"
+            "\n"
+            "_world_.\n"
+            "</pre>\n"
+            "</td></tr></table>\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.raw, "<table><tr><td>\n<pre>\n**Hello**,\n"],
+                                          [nodes.paragraph, ([nodes.emphasis, "world"],
+                                                             ".\n",
+                                                             [nodes.raw, "</pre>"])],
+                                          [nodes.raw, "</td></tr></table>\n"])])
 
 
 def test_example_117():
@@ -83,7 +96,12 @@ def test_example_131():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.raw, text])
 
-# TODO: add test for standard tags and inline notation (Example 136)
+
+def test_example_136():
+    result = publish("<del>*foo*</del>")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.raw, "<del>"],
+                                                           [nodes.emphasis, "foo"],
+                                                           [nodes.raw, "</del>"])])
 
 
 def test_example_137():
@@ -133,9 +151,21 @@ def test_example_141():
     assert_node(result, [nodes.document, ([nodes.block_quote, nodes.raw, "<div>\nfoo\n"],
                                           [nodes.paragraph, "bar"])])
 
-# TODO: add test for bullet_list containing HTML tags (Example 142)
 
-# TODO: add test for HTML tags containing paragraph (Example 143)
+def test_example_142():
+    text = ("- <div>\n"
+            "- foo\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.raw, "<div>\n"],
+                                                             [nodes.list_item, "foo"])])
+
+
+def test_example_143():
+    text = ("<style>p{color:red;}</style>\n"
+            "*foo*\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.raw, "<style>p{color:red;}</style>\n"],
+                                          [nodes.paragraph, nodes.emphasis, "foo"])])
 
 
 def test_example_145():

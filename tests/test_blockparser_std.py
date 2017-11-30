@@ -95,7 +95,24 @@ def test_example_28():
                                           nodes.transition,
                                           [nodes.paragraph, "bar"])])
 
-# TODO: add test for combination with other notations (Example 29, 30, 31)
+
+def test_example_29():
+    text = ("Foo\n"
+            "---\n"
+            "bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, ([nodes.title, "Foo"],
+                                                         [nodes.paragraph, "bar"])])
+
+# TODO: add test for combination with bullet_list (Example 30)
+
+
+def test_example_31():
+    text = ("- Foo\n"
+            "- * * *\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "Foo"],
+                                                             [nodes.list_item, nodes.transition])])
 
 
 def test_example_32():
@@ -134,7 +151,12 @@ def test_example_34():
     assert_node(result, [nodes.document, ([nodes.paragraph, "#5 bolt"],
                                           [nodes.paragraph, "#hashtag"])])
 
-# TODO: add test for inlines in title (Example 36)
+
+def test_example_36():
+    result = publish("# foo *bar* \*baz\*")
+    assert_node(result, [nodes.document, nodes.section, nodes.title, ("foo ",
+                                                                      [nodes.emphasis, "bar"],
+                                                                      " *baz*")])
 
 
 def test_example_37():
@@ -216,7 +238,20 @@ def test_example_49():
                                                            [nodes.section, nodes.title])])])
 
 
-# TODO: add test for inline heading (Example 50)
+def test_example_50():
+    text = ("Foo *bar*\n"
+            "=========\n"
+            "\n"
+            "Foo *bar*\n"
+            "---------\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.section, ([nodes.title, ("Foo ",
+                                                                        [nodes.emphasis, "bar"])],
+                                                         [nodes.section, nodes.title, ("Foo ",
+                                                                                       [nodes.emphasis, "bar"])])])
+    assert_node(result[0], depth=1)
+    assert_node(result[0][1], depth=2)
+
 
 def test_example_51():
     text = ("Foo *bar\n"
@@ -522,7 +557,13 @@ def test_example_106():
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "aaa\n    ```\n"])
 
-# TODO: add test for inline code spans (Example 107)
+
+def test_example_107():
+    text = ("``` ```\n"
+            "aaa\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, (nodes.literal,
+                                                           "\naaa")])
 
 
 def test_example_109():
@@ -547,7 +588,13 @@ def test_example_111():
     assert_node(result, [nodes.document, nodes.literal_block, "def foo(x)\n  return 3\nend\n"])
     assert_node(result[0], nodes.literal_block, classes=["language-ruby"])
 
-# TODO: add test for inline code spans (Example 114)
+
+def test_example_114():
+    text = ("``` aa ```\n"
+            "foo\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.literal, "aa"],
+                                                           "\nfoo")])
 
 
 def test_example_115():

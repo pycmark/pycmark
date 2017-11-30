@@ -62,7 +62,13 @@ def test_example_197():
     assert_node(result, [nodes.document, ([nodes.block_quote, nodes.paragraph, "foo"],
                                           nodes.transition)])
 
-# TODO: Add test for combination with bullet list (Example 198)
+
+def test_example_198():
+    text = ("> - foo\n"
+            "- bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.block_quote, nodes.bullet_list, nodes.list_item, "foo"],
+                                          [nodes.bullet_list, nodes.list_item, "bar"])])
 
 
 def test_example_199():
@@ -465,7 +471,17 @@ def test_example_262():
     assert_node(result, [nodes.document, nodes.enumerated_list, nodes.list_item,
                          nodes.bullet_list, nodes.list_item, nodes.enumerated_list, nodes.list_item, "foo"])
 
-# TODO: Add test for combination with heading (Example 263)
+
+def test_example_263():
+    text = ("- # Foo\n"
+            "- Bar\n"
+            "  ---\n"
+            "  baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list,
+                         ([nodes.list_item, nodes.section, nodes.title, "Foo"],
+                          [nodes.list_item, nodes.section, ([nodes.title, "Bar"],
+                                                            [nodes.paragraph, "baz"])])])
 
 
 def test_example_264():

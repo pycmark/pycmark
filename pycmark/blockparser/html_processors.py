@@ -77,7 +77,7 @@ class CdataHTMLBlockProcessor(BaseHTMLBlockProcessor):
 
 # 4.6 HTML blocks; Standard tags
 class StandardTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}<(%s)( |>|/>|$)' % '|'.join(STANDARD_HTML_TAGS), re.I)
+    pattern = re.compile('^ {0,3}</?(%s)( |>|/>|$)' % '|'.join(STANDARD_HTML_TAGS), re.I)
     closing_pattern = re.compile('^\s*$')
 
 

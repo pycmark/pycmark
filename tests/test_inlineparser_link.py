@@ -215,7 +215,11 @@ def test_example_487():
                                                                                               [nodes.literal, "#"])])])
 
 
-# TODO: add test for combination with image (Example 488)
+def test_example_488():
+    result = publish("[![moon](moon.jpg)](/uri)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, nodes.image])
+    assert_node(result[0][0], refuri="/uri")
+    assert_node(result[0][0][0], uri="moon.jpg", alt="moon")
 
 
 def test_example_489():
@@ -254,7 +258,10 @@ def test_example_494():
                                                            " baz]")])
 
 
-# TODO: add test for combination with HTML tags (Example 495)
+def test_example_495():
+    result = publish('[foo <bar attr="](baz)">')
+    assert_node(result, [nodes.document, nodes.paragraph, ("[foo ",
+                                                           [nodes.raw, '<bar attr="](baz)">'])])
 
 
 def test_example_496():
@@ -263,7 +270,10 @@ def test_example_496():
                                                            [nodes.literal, "](/uri)"])])
 
 
-# TODO: add test for combination with HTML tags (Example 497)
+def test_example_497():
+    result = publish("[foo<http://example.com/?search=](uri)>")
+    assert_node(result, [nodes.document, nodes.paragraph, ("[foo",
+                                                           [nodes.reference, "http://example.com/?search=](uri)"])])
 
 
 def test_example_499():
@@ -358,7 +368,14 @@ def test_example_506():
                                           nodes.target)])
 
 
-# TODO: add test for combination with HTML tags (Example 507)
+def test_example_507():
+    text = ('[foo <bar attr="][ref]">\n'
+            '\n'
+            '[ref]: /uri\n')
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, ("[foo ",
+                                                             [nodes.raw, '<bar attr="][ref]">'])],
+                                          nodes.target)])
 
 
 def test_example_508():
@@ -371,7 +388,14 @@ def test_example_508():
                                           nodes.target)])
 
 
-# TODO: add test for combination with HTML tags (Example 509)
+def test_example_509():
+    text = ("[foo<http://example.com/?search=][ref]>\n"
+            "\n"
+            "[ref]: /uri\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, ("[foo",
+                                                             [nodes.reference, "http://example.com/?search=][ref]"])],
+                                          nodes.target)])
 
 
 def test_example_510():

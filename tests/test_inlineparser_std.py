@@ -74,7 +74,26 @@ def test_example_306():
     result = publish("&MadeUpEntity;")
     assert_node(result, [nodes.document, nodes.paragraph, "&MadeUpEntity;"])
 
-# TODO: add test for combination with HTML tags and link (Example 308, 309, 310)
+
+def test_example_308():
+    result = publish('<a href="&ouml;&ouml;.html">')
+    assert_node(result, [nodes.document, nodes.raw, '<a href="&ouml;&ouml;.html">'])
+
+
+def test_example_309():
+    result = publish('[foo](/f&ouml;&ouml; "f&ouml;&ouml;")')
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "foo"])
+    assert_node(result[0][0], refuri="/föö", reftitle="föö")
+
+
+def test_example_310():
+    text = ('[foo]\n'
+            '\n'
+            '[foo]: /f&ouml;&ouml; "f&ouml;&ouml;"\n')
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
+                                          nodes.target)])
+    assert_node(result[0][0], refuri="/föö", reftitle="föö")
 
 
 def test_example_311():
@@ -142,9 +161,17 @@ def test_example_324():
     assert_node(result, [nodes.document, nodes.paragraph, ([nodes.literal, "<a href=\""],
                                                            "\">`")])
 
-# TODO: add test for Example 325
 
-# TODO: add test for Example 327
+def test_example_325():
+    result = publish("""<a href="`">`""")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.raw, '<a href="`">'],
+                                                           "`")])
+
+
+def test_example_327():
+    result = publish("<http://foo.bar.`baz>`")
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.reference, "http://foo.bar.`baz"],
+                                                           "`")])
 
 
 def test_example_328():
@@ -292,7 +319,11 @@ def test_example_374():
                                                                          [nodes.emphasis, "Asclepias physocarpa"],
                                                                          ")")])
 
-# TODO: add test for Example 384
+
+def test_example_384():
+    result = publish("*foo [bar](/url)*")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.emphasis, ("foo ",
+                                                                           [nodes.reference, "bar"])])
 
 
 def test_example_386():
@@ -334,7 +365,11 @@ def test_example_395():
                                                                                            " bim")],
                                                                            " bop")])
 
-# TODO: add test for Example 396
+
+def test_example_396():
+    result = publish("*foo [*bar*](/url)*")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.emphasis, ("foo ",
+                                                                           [nodes.reference, nodes.emphasis, "bar"])])
 
 
 def test_example_397():
@@ -427,7 +462,28 @@ def test_example_448():
                                                            [nodes.strong, "bar baz"])])
 
 
-# TODO: Add test for Example 450, 451, 452 and 453
+def test_example_450():
+    result = publish("*[bar*](/url)")
+    assert_node(result, [nodes.document, nodes.paragraph, ("*",
+                                                           [nodes.reference, "bar*"])])
+
+
+def test_example_451():
+    result = publish("_foo [bar_](/url)")
+    assert_node(result, [nodes.document, nodes.paragraph, ("_foo ",
+                                                           [nodes.reference, "bar_"])])
+
+
+def test_example_452():
+    result = publish('*<img src="foo" title="*"/>')
+    assert_node(result, [nodes.document, nodes.paragraph, ("*",
+                                                           [nodes.raw, '<img src="foo" title="*"/>'])])
+
+
+def test_example_453():
+    result = publish('**<a href="**">')
+    assert_node(result, [nodes.document, nodes.paragraph, ("**",
+                                                           [nodes.raw, '<a href="**">'])])
 
 
 def test_example_455():

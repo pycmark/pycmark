@@ -112,6 +112,18 @@ class BulletListProcessor(ListProcessor):
         # type: (str) -> nodes.Node
         return nodes.bullet_list(bullet=marker)
 
+    def is_next_list_item(self, reader, marker):
+        # type: (LineReader, str) -> bool
+        try:
+            pattern = re.compile('^(\s*\\%s){2,}\s*$' % marker)
+            if pattern.match(reader.next_line):
+                # themantic break detected
+                return False
+            else:
+                return super(BulletListProcessor, self).is_next_list_item(reader, marker)
+        except IOError:
+            return False
+
     def is_same_marker_type(self, marker, candidate):
         # type: (str, str) -> bool
         return marker == candidate

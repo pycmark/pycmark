@@ -104,7 +104,15 @@ def test_example_29():
     assert_node(result, [nodes.document, nodes.section, ([nodes.title, "Foo"],
                                                          [nodes.paragraph, "bar"])])
 
-# TODO: add test for combination with bullet_list (Example 30)
+
+def test_example_30():
+    text = ("* Foo\n"
+            "* * *\n"
+            "* Bar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item, "Foo"],
+                                          nodes.transition,
+                                          [nodes.bullet_list, nodes.list_item, "Bar"])])
 
 
 def test_example_31():

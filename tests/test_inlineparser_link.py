@@ -237,7 +237,11 @@ def test_example_490():
                                                                              "](/uri)")],
                                                            "](/uri)")])
 
-# TODO: add test for combination with image (Example 491)
+
+def test_example_491():
+    result = publish("![[[foo](uri1)](uri2)](uri3)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.image])
+    assert_node(result[0][0], uri="uri3", alt="[foo](uri2)")
 
 
 def test_example_492():

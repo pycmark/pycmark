@@ -26,7 +26,7 @@ class LinkOpenerProcessor(PatternInlineProcessor):
 
     def run(self, document, reader):
         marker = reader.consume(self.pattern).group(0)
-        document += addnodes.bracket(marker=marker, can_open=True, position=reader.position)
+        document += addnodes.bracket(marker=marker, can_open=True, active=True, position=reader.position)
         return True
 
 
@@ -48,6 +48,11 @@ class LinkCloserProcessor(PatternInlineProcessor):
 
         opener = openers.pop()
         closer = brackets.pop()
+
+        if not opener['active']:
+            opener.replace_self(nodes.Text(opener['marker']))
+            closer.replace_self(nodes.Text(closer['marker']))
+            return
 
         try:
             if reader.remain.startswith('('):
@@ -99,7 +104,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
             # deactivate all left brackets before the link
             for n in openers:
                 if n['marker'] == '[':
-                    n.replace_self(nodes.Text(n['marker']))
+                    n['active'] = False
 
         document += node
         document.remove(opener)

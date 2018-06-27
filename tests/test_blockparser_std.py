@@ -594,7 +594,7 @@ def test_example_111():
             "```\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "def foo(x)\n  return 3\nend\n"])
-    assert_node(result[0], nodes.literal_block, classes=["language-ruby"])
+    assert_node(result[0], nodes.literal_block, classes=["code", "language-ruby"])
 
 
 def test_example_114():

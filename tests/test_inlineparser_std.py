@@ -102,7 +102,7 @@ def test_example_311():
             "```\n")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.literal_block, "foo\n"])
-    assert_node(result[0], classes=["language-föö"])
+    assert_node(result[0], classes=["code", "language-föö"])
 
 
 def test_example_312():

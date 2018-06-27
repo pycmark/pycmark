@@ -75,7 +75,7 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
                 break
 
         code = re.sub('^\n*(.*\n)\n*$', '\\1', code)  # strip blank lines
-        document += nodes.literal_block(code, code)
+        document += nodes.literal_block(code, code, classes=['code'])
         document[-1].source = source
         document[-1].line = lineno + 1  # lineno points previous line
         return True
@@ -101,7 +101,7 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
             else:
                 code += unindent(line, len(indent))
 
-        literal_block = nodes.literal_block(code, code)
+        literal_block = nodes.literal_block(code, code, classes=['code'])
         literal_block.source = source
         literal_block.line = lineno + 1  # lineno points previous line
         if language and language.strip():

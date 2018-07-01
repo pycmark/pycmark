@@ -10,6 +10,7 @@
 """
 
 import re
+
 from docutils.nodes import Element, Node
 
 # common regexp

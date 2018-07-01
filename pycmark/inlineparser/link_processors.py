@@ -10,14 +10,16 @@
 """
 
 import re
+from typing import Tuple
+
 from docutils import nodes
 from docutils.nodes import Element, Text
+
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
 from pycmark.readers import TextReader
 from pycmark.utils import entitytrans
 from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, normalize_link_label, transplant_nodes
-from typing import Tuple
 
 LABEL_NOT_MATCHED = object()
 

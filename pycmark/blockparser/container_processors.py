@@ -10,12 +10,14 @@
 """
 
 import re
+from typing import List, cast
+
 from docutils import nodes
 from docutils.nodes import Element
+
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import BlockQuoteReader, LineReader, ListItemReader
-from typing import List, cast
 
 
 # 5.1 Block quotes

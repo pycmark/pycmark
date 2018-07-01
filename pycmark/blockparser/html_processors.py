@@ -10,8 +10,10 @@
 """
 
 import re
+
 from docutils import nodes
 from docutils.nodes import Element
+
 from pycmark.blockparser import PatternBlockProcessor
 from pycmark.readers import LineReader
 from pycmark.utils import OPENTAG, CLOSETAG

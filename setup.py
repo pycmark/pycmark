@@ -32,6 +32,7 @@ setup(
         'test': [
             'tox',
             'flake8',
+            'flake8-import-order',
             'pytest',
             'mypy',
         ],

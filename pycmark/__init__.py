@@ -9,18 +9,19 @@
     :license: BSD, see LICENSE for details.
 """
 
+from typing import List, Type
+
 from docutils import nodes
 from docutils.parsers import Parser
 from docutils.transforms import Transform
-from pycmark.readers import LineReader
+
 from pycmark.blockparser import BlockParser, BlockProcessor
-from pycmark.blockparser.std_processors import (
-    ThematicBreakProcessor,
-    ATXHeadingProcessor,
-    IndentedCodeBlockProcessor,
-    BlankLineProcessor,
-    FencedCodeBlockProcessor,
-    ParagraphProcessor,
+from pycmark.blockparser.container_processors import (
+    BlockQuoteProcessor,
+    BulletListProcessor,
+    NonEmptyBulletListProcessor,
+    OrderedListProcessor,
+    OneBasedOrderedListProcessor,
 )
 from pycmark.blockparser.html_processors import (
     ScriptHTMLBlockProcessor,
@@ -31,14 +32,19 @@ from pycmark.blockparser.html_processors import (
     StandardTagsHTMLBlockProcessor,
     CompleteTagsHTMLBlockProcessor,
 )
-from pycmark.blockparser.container_processors import (
-    BlockQuoteProcessor,
-    BulletListProcessor,
-    NonEmptyBulletListProcessor,
-    OrderedListProcessor,
-    OneBasedOrderedListProcessor,
+from pycmark.blockparser.std_processors import (
+    ThematicBreakProcessor,
+    ATXHeadingProcessor,
+    IndentedCodeBlockProcessor,
+    BlankLineProcessor,
+    FencedCodeBlockProcessor,
+    ParagraphProcessor,
 )
 from pycmark.inlineparser import InlineProcessor
+from pycmark.inlineparser.link_processors import (
+    LinkOpenerProcessor,
+    LinkCloserProcessor,
+)
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
     EntityReferenceProcessor,
@@ -48,10 +54,7 @@ from pycmark.inlineparser.std_processors import (
     EmailAutolinkProcessor,
     RawHTMLProcessor,
 )
-from pycmark.inlineparser.link_processors import (
-    LinkOpenerProcessor,
-    LinkCloserProcessor,
-)
+from pycmark.readers import LineReader
 from pycmark.transforms import (
     TightListsDetector,
     TightListsCompactor,
@@ -64,7 +67,6 @@ from pycmark.transforms import (
     BracketConverter,
     TextNodeConnector,
 )
-from typing import List, Type
 
 
 class CommonMarkParser(Parser):

@@ -10,9 +10,11 @@
 """
 
 import re
-from docutils.nodes import Element
-from pycmark.readers import LineReader
 from typing import List
+
+from docutils.nodes import Element
+
+from pycmark.readers import LineReader
 
 
 class BlockParser:

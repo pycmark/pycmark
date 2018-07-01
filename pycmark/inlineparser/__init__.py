@@ -10,11 +10,13 @@
 """
 
 import re
-from docutils.nodes import Element, Text, TextElement
 from functools import wraps
+from typing import Callable, List, cast
+
+from docutils.nodes import Element, Text, TextElement
+
 from pycmark.addnodes import SparseText
 from pycmark.readers import TextReader
-from typing import Callable, List, cast
 
 
 class InlineParser:

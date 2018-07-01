@@ -8,8 +8,9 @@ Based on
 https://hg.python.org/cpython/file/500d3d6f22ff/Lib/html/__init__.py
 """
 from __future__ import unicode_literals
-import sys
+
 import re as _re
+import sys
 from typing import Match
 
 __all__ = ['_unescape']

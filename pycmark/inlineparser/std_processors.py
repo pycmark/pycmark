@@ -11,14 +11,16 @@
 
 import re
 import unicodedata
+from typing import Any
+
 from docutils import nodes
 from docutils.nodes import Element, Text
+
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 from pycmark.readers import TextReader
 from pycmark.utils import entitytrans
 from pycmark.utils import OPENTAG, CLOSETAG, escaped_chars_pattern
-from typing import Any
 
 
 def is_punctuation(char: str) -> bool:

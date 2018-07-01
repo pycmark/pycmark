@@ -8,6 +8,7 @@
 """
 
 import re
+
 from pycmark.blockparser import BlockProcessor
 from pycmark.readers import (
     LineReader, BlockQuoteReader, ListItemReader, LazyLineReader, TextReader

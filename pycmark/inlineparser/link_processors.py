@@ -11,6 +11,7 @@
 
 import re
 from docutils import nodes
+from docutils.nodes import Element, Text
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
 from pycmark.utils import entitytrans
@@ -50,8 +51,8 @@ class LinkCloserProcessor(PatternInlineProcessor):
         closer = brackets.pop()
 
         if not opener['active']:
-            opener.replace_self(nodes.Text(opener['marker']))
-            closer.replace_self(nodes.Text(closer['marker']))
+            opener.replace_self(Text(opener['marker']))
+            closer.replace_self(Text(closer['marker']))
             return
 
         try:
@@ -82,14 +83,15 @@ class LinkCloserProcessor(PatternInlineProcessor):
                 title = target.get('title')
             else:
                 # deactivate brackets because no trailing link destination or link-label
-                opener.replace_self(nodes.Text(opener['marker']))
-                closer.replace_self(nodes.Text(closer['marker']))
+                opener.replace_self(Text(opener['marker']))
+                closer.replace_self(Text(closer['marker']))
                 raise
         elif destination == LABEL_NOT_MATCHED:
-            opener.replace_self(nodes.Text(opener['marker']))
-            closer.replace_self(nodes.Text(closer['marker']))
+            opener.replace_self(Text(opener['marker']))
+            closer.replace_self(Text(closer['marker']))
             raise
 
+        node: Element = None
         if opener['marker'] == '![':
             para = transplant_nodes(document, nodes.paragraph(), start=opener, end=closer)
             node = nodes.image('', uri=destination, alt=para.astext())

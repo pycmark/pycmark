@@ -10,8 +10,8 @@
 """
 
 import re
-import typing
 from docutils import nodes
+from docutils.nodes import Element, FixedTextElement, Node, Text, TextElement
 from docutils.transforms import Transform
 from pycmark import addnodes
 from pycmark.readers import TextReader
@@ -20,14 +20,11 @@ from pycmark.inlineparser.link_processors import LinkDestinationParser, LinkTitl
 from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
 from typing import List, cast
 
-if typing.TYPE_CHECKING:
-    from typing import Any  # NOQA
-
 
 class BlanklineFilter(Transform):
     default_priority = 500
 
-    def apply(self):
+    def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.blankline):
             node.parent.remove(node)
 
@@ -35,21 +32,17 @@ class BlanklineFilter(Transform):
 class TightListsDetector(Transform):
     default_priority = BlanklineFilter.default_priority - 1  # must be eariler than BlanklineFilter
 
-    def apply(self, **kwargs):
-        # type: (Any) -> None
+    def apply(self, **kwargs) -> None:
         self.detect(self.document)
 
-    def detect(self, document):
-        # type: (nodes.Element) -> None
-        def is_list_node(node):
-            # type: (nodes.Node) -> bool
+    def detect(self, document: Element) -> None:
+        def is_list_node(node: Node) -> bool:
             return isinstance(node, (nodes.bullet_list, nodes.enumerated_list))
 
-        def has_loose_element(node):
-            # type: (nodes.Element) -> bool
+        def has_loose_element(node: Element) -> bool:
             return any(isinstance(subnode, addnodes.blankline) for subnode in node)
 
-        for node in document.traverse(is_list_node):  # type: nodes.Element
+        for node in document.traverse(is_list_node):  # type: Element
             children = cast(List[nodes.list_item], node)
             if any(has_loose_element(item) for item in children):
                 node['tight'] = False
@@ -64,13 +57,12 @@ class TightListsDetector(Transform):
 class TightListsCompactor(Transform):
     default_priority = 999
 
-    def apply(self):
-        def is_tight_list(node):
-            # type: (nodes.Node) -> bool
+    def apply(self, **kwargs) -> None:
+        def is_tight_list(node: Node) -> bool:
             return (isinstance(node, (nodes.bullet_list, nodes.enumerated_list)) and
                     node['tight'] is True)
 
-        for list_node in self.document.traverse(is_tight_list):
+        for list_node in self.document.traverse(is_tight_list):  # type: List[Element]
             for list_item in list_node:
                 for para in list_item[:]:
                     pos = list_item.index(para)
@@ -84,11 +76,11 @@ class TightListsCompactor(Transform):
 class SectionTreeConstructor(Transform):
     default_priority = 500
 
-    def apply(self):
+    def apply(self, **kwargs) -> None:
         def is_container_node(node):
             return isinstance(node, (nodes.document, nodes.block_quote, nodes.list_item))
 
-        for node in self.document.traverse(is_container_node):
+        for node in self.document.traverse(is_container_node):  # type: Element
             self.construct_section_tree(node)
 
     def construct_section_tree(self, container):
@@ -123,9 +115,9 @@ class LinkReferenceDefinitionDetector(Transform):
     default_priority = 100
     pattern = re.compile(r'\s*\[((?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\)+)\]:')
 
-    def apply(self):
+    def apply(self, **kwargs) -> None:
         for node in self.document.traverse(nodes.paragraph):
-            reader = TextReader(node[0])
+            reader = TextReader(cast(Text, node[0]))
             self.parse_linkref_definition(node, reader)
 
     @backtrack_onerror
@@ -163,7 +155,7 @@ class LinkReferenceDefinitionDetector(Transform):
 
             if reader.remain:
                 node.pop(0)
-                node.insert(0, nodes.Text(reader.remain))
+                node.insert(0, Text(reader.remain))
             else:
                 node.parent.remove(node)
 
@@ -171,12 +163,12 @@ class LinkReferenceDefinitionDetector(Transform):
 class InlineTransform(Transform):
     default_priority = 200
 
-    def apply(self):
+    def apply(self, **kwargs) -> None:
         def is_text_container(node):
-            return isinstance(node, nodes.TextElement) and not isinstance(node, nodes.FixedTextElement)
+            return isinstance(node, TextElement) and not isinstance(node, FixedTextElement)
 
         parser = self.create_parser()
-        for node in self.document.traverse(is_text_container):
+        for node in self.document.traverse(is_text_container):  # type: List[Text]
             parser.parse(node)
 
     def create_parser(self):
@@ -190,18 +182,18 @@ class InlineTransform(Transform):
 class SparseTextConverter(Transform):
     default_priority = 900
 
-    def apply(self):
+    def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.SparseText):
             pos = node.parent.index(node)
             node.parent.remove(node)
-            node.parent.insert(pos, nodes.Text(str(node)))
+            node.parent.insert(pos, Text(str(node)))
 
 
 class EmphasisConverter(Transform):
     default_priority = 900
 
-    def apply(self):
-        for node in self.document.traverse(nodes.TextElement):
+    def apply(self, **kwargs) -> None:
+        for node in self.document.traverse(TextElement):
             while True:
                 markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
                 closers = list(d for d in markers if d['can_close'])
@@ -215,7 +207,7 @@ class EmphasisConverter(Transform):
 
                 if opener['curr_length'] >= 2 and closer['curr_length'] >= 2:
                     length = 2
-                    emph_node = nodes.strong()
+                    emph_node: Element = nodes.strong()
                 else:
                     length = 1
                     emph_node = nodes.emphasis()
@@ -249,28 +241,28 @@ class EmphasisConverter(Transform):
         markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
         for delim in markers:
             marker = str(delim)
-            delim.replace_self(nodes.Text(marker, marker))
+            delim.replace_self(Text(marker, marker))
 
 
 class BracketConverter(Transform):
     default_priority = 900
 
-    def apply(self):
+    def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.bracket):
-            node.replace_self(nodes.Text(node['marker']))
+            node.replace_self(Text(node['marker']))
 
 
 class TextNodeConnector(Transform):
     default_priority = 950  # must be executed after SparseTextConverter
 
-    def apply(self):
-        for node in self.document.traverse(nodes.TextElement):
+    def apply(self, **kwargs) -> None:
+        for node in self.document.traverse(TextElement):
             pos = 0
             while len(node) > pos + 1:
-                if isinstance(node[pos], nodes.Text) and isinstance(node[pos + 1], nodes.Text):
-                    text = node[pos] + node[pos + 1]
+                if isinstance(node[pos], Text) and isinstance(node[pos + 1], Text):
+                    text = node[pos] + node[pos + 1]  # type: ignore
                     node.remove(node[pos + 1])
                     node.remove(node[pos])
-                    node.insert(pos, nodes.Text(text, text))
+                    node.insert(pos, Text(text, text))
                 else:
                     pos += 1

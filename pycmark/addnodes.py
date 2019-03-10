@@ -10,14 +10,15 @@
 """
 
 from docutils import nodes
+from docutils.nodes import Element, Invisible
 
 
-class blankline(nodes.Element, nodes.Invisible):
+class blankline(Element, Invisible):
     """A node represents a blank line."""
     pass
 
 
-class emphasis(nodes.Element):
+class emphasis(Element):
     """A node reprents a marker for emphasis and strong."""
 
     def __str__(self):
@@ -34,7 +35,7 @@ class emphasis(nodes.Element):
             self['curr_length'] -= n
 
 
-class bracket(nodes.Element):
+class bracket(Element):
     """A node reprenents a square bracket (both opening and closing)."""
 
     def __str__(self):
@@ -44,7 +45,7 @@ class bracket(nodes.Element):
         return str(self)
 
 
-class SparseText(nodes.Element):
+class SparseText(Element):
     """A node represents a text."""
 
     def __init__(self, text, start, end):

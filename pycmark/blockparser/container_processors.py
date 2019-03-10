@@ -10,16 +10,12 @@
 """
 
 import re
-import typing
 from docutils import nodes
+from docutils.nodes import Element
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
-from pycmark.readers import BlockQuoteReader, ListItemReader
+from pycmark.readers import BlockQuoteReader, LineReader, ListItemReader
 from typing import List, cast
-
-if typing.TYPE_CHECKING:
-    from typing import Any  # NOQA
-    from pycmark.readers import LineReader  # NOQA
 
 
 # 5.1 Block quotes
@@ -40,15 +36,13 @@ class ListProcessor(BlockProcessor):
     first_item_pattern = re.compile('^$')
     next_item_pattern = re.compile('^$')
 
-    def match(self, reader, in_list=False, **kwargs):
-        # type: (LineReader, bool, Any) -> bool
+    def match(self, reader: LineReader, in_list: bool = False, **kwargs) -> bool:
         if in_list:
             return bool(self.next_item_pattern.match(reader.next_line))
         else:
             return bool(self.first_item_pattern.match(reader.next_line))
 
-    def run(self, document, reader):
-        # type: (nodes.document, LineReader) -> bool
+    def run(self, document: Element, reader: LineReader) -> bool:
         marker = self.first_item_pattern.match(reader.next_line).group(2)
         list_node = self.create_list_node(marker)
         document += list_node
@@ -62,7 +56,7 @@ class ListProcessor(BlockProcessor):
                 break
 
         # blank lines at tail of last list_item should be recognized as a part of outside of list
-        last_item = cast(List[nodes.Element], list_node[-1])
+        last_item = cast(List[Element], list_node[-1])
         for node in reversed(last_item):
             if isinstance(node, addnodes.blankline):
                 last_item.remove(node)
@@ -71,8 +65,7 @@ class ListProcessor(BlockProcessor):
                 break
         return True
 
-    def get_indent_depth(self, reader):
-        # type: (LineReader) -> int
+    def get_indent_depth(self, reader: LineReader) -> int:
         indent, marker, following, content = self.next_item_pattern.match(reader.next_line).groups()
         if 1 <= len(following) <= 4 and content.strip():
             # the case a list_item having small indents
@@ -81,8 +74,7 @@ class ListProcessor(BlockProcessor):
             # the case a list_item having much indents (>= 4) or nothing (the line is marker only)
             return len(indent) + len(marker) + 1
 
-    def is_next_list_item(self, reader, marker):
-        # type: (LineReader, str) -> bool
+    def is_next_list_item(self, reader: LineReader, marker: str) -> bool:
         """Checks the next line is a next list item or not."""
         try:
             matched = self.next_item_pattern.match(reader.next_line)
@@ -95,12 +87,10 @@ class ListProcessor(BlockProcessor):
         except IOError:
             return False
 
-    def create_list_node(self, marker):
-        # type: (str) -> nodes.Element
+    def create_list_node(self, marker: str) -> Element:
         raise NotImplementedError
 
-    def is_same_marker_type(self, marker, candidate):
-        # type: (str, str) -> bool
+    def is_same_marker_type(self, marker: str, candidate: str) -> bool:
         raise NotImplementedError
 
 
@@ -110,12 +100,10 @@ class BulletListProcessor(ListProcessor):
     first_item_pattern = re.compile('^( {0,3})([-+*])( +|$)(.*)')
     next_item_pattern = re.compile('^( *)([-+*])( +|$)(.*)')
 
-    def create_list_node(self, marker):
-        # type: (str) -> nodes.Element
+    def create_list_node(self, marker: str) -> Element:
         return nodes.bullet_list(bullet=marker)
 
-    def is_next_list_item(self, reader, marker):
-        # type: (LineReader, str) -> bool
+    def is_next_list_item(self, reader: LineReader, marker: str) -> bool:
         try:
             pattern = re.compile(r'^(\s*\%s){2,}\s*$' % marker)
             if pattern.match(reader.next_line):
@@ -126,8 +114,7 @@ class BulletListProcessor(ListProcessor):
         except IOError:
             return False
 
-    def is_same_marker_type(self, marker, candidate):
-        # type: (str, str) -> bool
+    def is_same_marker_type(self, marker: str, candidate: str) -> bool:
         return marker == candidate
 
 
@@ -143,12 +130,10 @@ class OrderedListProcessor(ListProcessor):
     first_item_pattern = re.compile(r'^( {0,3})(\d{1,9}[.)])( +|$)(.*)')
     next_item_pattern = re.compile(r'^( *)(\d{1,9}[.)])( +|$)(.*)')
 
-    def create_list_node(self, marker):
-        # type: (str) -> nodes.Element
+    def create_list_node(self, marker: str) -> Element:
         return nodes.enumerated_list(start=int(marker[:-1]), enumtype="arabic", suffix=marker[-1])
 
-    def is_same_marker_type(self, marker, candidate):
-        # type: (str, str) -> bool
+    def is_same_marker_type(self, marker: str, candidate: str) -> bool:
         return marker[-1] == candidate[-1]
 
 

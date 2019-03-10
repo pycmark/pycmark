@@ -12,6 +12,7 @@
 import re
 import unicodedata
 from docutils import nodes
+from docutils.nodes import Text
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 from pycmark.utils import entitytrans
@@ -38,7 +39,7 @@ class EntityReferenceProcessor(PatternInlineProcessor):
 
     def run(self, document, reader):
         text = reader.consume(self.pattern).group(0)
-        document += nodes.Text(entitytrans._unescape(text))
+        document += Text(entitytrans._unescape(text))
         return True
 
 

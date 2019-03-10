@@ -10,58 +10,50 @@
 """
 
 import re
-import typing
+from typing import List, Match, Pattern, Tuple, TYPE_CHECKING
 
-if typing.TYPE_CHECKING:
-    from typing import Any, List, Match, Pattern, Tuple, Union  # NOQA
-    from pycmark.blockparser.list_processors import ListProcessor  # NOQA
+if TYPE_CHECKING:
+    from pycmark.inlineparser.list_processors import ListProcessor
 
 
 class LineReader(object):
     """A line based reader for text."""
 
-    def __init__(self, lines, source=None, lineno=0):
-        # type: (List[str], str, int) -> None
+    def __init__(self, lines: List[str], source: str = None, lineno: int = 0) -> None:
         self.lines = lines
         self.source = source
         self.lineno = lineno  # lineno is 1 origin
 
-    def __getitem__(self, key):
-        # type: (int) -> str
+    def __getitem__(self, key: int) -> str:
         """Returns arbitrary line or lines."""
         return self.lines[key]
 
-    def __iter__(self):
-        # type: () -> LineReader
+    def __iter__(self) -> "LineReader":
         """Returns itself as a iterator."""
         return self
 
-    def __next__(self):
-        # type: () -> str
+    def __next__(self) -> str:
         """Returns a next line from buffer. same as :meth:`readline()`."""
         try:
             return self.readline()
         except IOError:
             raise StopIteration
 
-    def get_source_and_line(self, lineno=None):
-        # type: (int) -> Tuple[str, int]
+    def get_source_and_line(self, lineno: int = None) -> Tuple[str, int]:
         """Returns source filename and current line number."""
         if lineno is not None:
             return self.source, lineno
         else:
             return self.source, self.lineno
 
-    def fetch(self, relative=0, **kwargs):
-        # type: (int, Any) -> str
+    def fetch(self, relative: int = 0, **kwargs) -> str:
         """Returns an arbitrary line without moving the current line."""
         try:
             return self.lines[self.lineno + relative - 1]
         except IndexError:
             raise IOError
 
-    def readline(self, **kwargs):
-        # type: (Any) -> str
+    def readline(self, **kwargs) -> str:
         """Reads a next line from buffer and steps the current line to next."""
         try:
             line = self.fetch(1, **kwargs)
@@ -70,25 +62,21 @@ class LineReader(object):
         except IndexError:
             raise IOError
 
-    def eof(self, **kwargs):
-        # type: (Any) -> bool
+    def eof(self, **kwargs) -> bool:
         """Returns it reaches the EOF (end of file) or not."""
         return len(self.lines) == self.lineno
 
     @property
-    def current_line(self):
-        # type: () -> str
+    def current_line(self) -> str:
         """Returns the current line."""
         return self.fetch(0)
 
     @property
-    def next_line(self):
-        # type: () -> str
+    def next_line(self) -> str:
         """Returns the next line."""
         return self.fetch(1)
 
-    def step(self, n=1):
-        # type: (int) -> None
+    def step(self, n: int = 1) -> None:
         """Steps the current line to next."""
         self.lineno += n
 
@@ -96,29 +84,23 @@ class LineReader(object):
 class LineReaderDecorator(LineReader):
     """A base class of LineReader decorators."""
 
-    def __init__(self, reader):
-        # type: (LineReader) -> None
+    def __init__(self, reader: LineReader) -> None:
         self.reader = reader
 
-    def __getitem__(self, key):
-        # type: (int) -> str
+    def __getitem__(self, key: int) -> str:
         return self.reader[key]
 
     @property
-    def lineno(self):  # type: ignore
-        # type: () -> int
+    def lineno(self) -> int:  # type: ignore
         return self.reader.lineno
 
-    def get_source_and_line(self, lineno=None):
-        # type: (int) -> Tuple[str, int]
+    def get_source_and_line(self, lineno: int = None) -> Tuple[str, int]:
         return self.reader.get_source_and_line(lineno)
 
-    def fetch(self, relative=0, **kwargs):
-        # type: (int, Any) -> str
+    def fetch(self, relative: int = 0, **kwargs) -> str:
         raise NotImplementedError
 
-    def eof(self, **kwargs):
-        # type: (Any) -> bool
+    def eof(self, **kwargs) -> bool:
         if self.reader.eof(**kwargs):
             return True
         else:
@@ -128,8 +110,7 @@ class LineReaderDecorator(LineReader):
             except IOError:
                 return True
 
-    def step(self, n=1):
-        # type: (int) -> None
+    def step(self, n: int = 1) -> None:
         self.reader.step(n)
 
 
@@ -137,8 +118,7 @@ class BlockQuoteReader(LineReaderDecorator):
     """A reader for block quotes."""
     pattern = re.compile('^ {0,3}> ?')
 
-    def fetch(self, relative=0, **kwargs):
-        # type: (int, Any) -> str
+    def fetch(self, relative: int = 0, **kwargs) -> str:
         """Returns a line without quote markers."""
         line = self.reader.fetch(relative, lazy=kwargs.get('lazy'))
         if self.pattern.match(line):
@@ -152,29 +132,26 @@ class BlockQuoteReader(LineReaderDecorator):
 class LazyLineReader(LineReaderDecorator):
     """A reader supports laziness paragraphs."""
 
-    def fetch(self, relative=0):
+    def fetch(self, relative: int = 0, **kwargs) -> str:
         return self.reader.fetch(relative, lazy=True)
 
-    def eof(self, **kwargs):
-        # type: (Any) -> bool
+    def eof(self, **kwargs) -> bool:
         return self.reader.eof(lazy=True)
 
 
 class ListItemReader(LineReaderDecorator):
     """A reader for list items."""
 
-    def __init__(self, reader, indent, processor):
-        # type: (LineReader, int, ListProcessor) -> None
+    def __init__(self, reader: LineReader, indent: int, processor: "ListProcessor") -> None:
         self.indent = indent
         self.pattern = re.compile('^ {%d}' % indent)
         self.begining_lineno = reader.lineno + 1
         self.processor = processor
         super(ListItemReader, self).__init__(reader)
 
-    def fetch(self, relative=0, **kwargs):
-        # type: (int, Any) -> str
+    def fetch(self, relative: int = 0, **kwargs) -> str:
         if kwargs.get('lazy'):
-            reader = LazyLineReader(self.reader)  # type: LineReader
+            reader: LineReader = LazyLineReader(self.reader)
         else:
             reader = self.reader
 
@@ -198,26 +175,21 @@ class ListItemReader(LineReaderDecorator):
 class TextReader(object):
     """A character based reader."""
 
-    def __init__(self, text, position=0):
-        # type: (str, int) -> None
+    def __init__(self, text: str, position: int = 0) -> None:
         self.subject = text
         self.position = position
 
-    def __getitem__(self, key):
-        # type: (int) -> str
+    def __getitem__(self, key: int) -> str:
         return self.subject[key]
 
     @property
-    def remain(self):
-        # type: () -> str
+    def remain(self) -> str:
         return self.subject[self.position:]
 
-    def step(self, n=1):
-        # type: (int) -> None
+    def step(self, n: int = 1) -> None:
         self.position += n
 
-    def consume(self, pattern):
-        # type: (Pattern) -> Match
+    def consume(self, pattern: Pattern) -> Match:
         matched = pattern.match(self.remain)
         if matched:
             self.step(len(matched.group(0)))

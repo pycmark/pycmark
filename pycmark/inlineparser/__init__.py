@@ -10,42 +10,44 @@
 """
 
 import re
-from docutils import nodes
+from docutils.nodes import Text, TextElement
 from functools import wraps
 from pycmark.addnodes import SparseText
 from pycmark.readers import TextReader
+from typing import List, cast
 
 
 class InlineParser(object):
     """A parser for inline elements."""
 
-    def __init__(self):
-        self.processors = []
+    def __init__(self) -> None:
+        self.processors: List["InlineProcessor"] = []
 
-    def add_processor(self, processor):
-        # type: (InlineProcessor) -> None
+    def add_processor(self, processor: "InlineProcessor") -> None:
         """Add a inline processor to parser."""
         self.processors.append(processor)
 
-    def parse(self, document):
+    def parse(self, document: TextElement) -> TextElement:
         """Parses a text and build TextElement."""
         if len(document) == 0:
-            return
+            return document
 
-        reader = TextReader(document.pop())
+        reader = TextReader(cast(Text, document.pop()))
         while reader.remain:
             for processor in self.processors:
                 if processor.match(reader):
                     if processor.run(document, reader) is True:
                         break
             else:
-                if len(document) == 0 or not isinstance(document[-1], SparseText):
-                    document += SparseText(reader.subject, reader.position, reader.position + 1)
+                if len(document) > 0 and isinstance(document[-1], SparseText):
+                    tail = document[-1]
+                    tail.spread(end=1)
                 else:
-                    document[-1].spread(end=1)
+                    tail = SparseText(reader.subject, reader.position, reader.position + 1)
+                    document += tail
 
                 if reader.remain[0] == '\\':  # escaped
-                    document[-1].spread(end=1)
+                    tail.spread(end=1)
                     reader.step(2)
                 else:
                     reader.step(1)
@@ -54,20 +56,20 @@ class InlineParser(object):
 
 
 class InlineProcessor(object):
-    def __init__(self, parser):
+    def __init__(self, parser: InlineParser) -> None:
         self.parser = parser
 
-    def match(self, reader):
+    def match(self, reader: TextReader) -> bool:
         return False
 
-    def run(self, document, reader):
+    def run(self, document: TextElement, reader: TextReader) -> bool:
         return False
 
 
 class PatternInlineProcessor(InlineProcessor):
     pattern = re.compile('^$')
 
-    def match(self, reader, **kwargs):
+    def match(self, reader: TextReader, **kwargs) -> bool:
         return bool(self.pattern.match(reader.remain))
 
 
@@ -90,7 +92,7 @@ def backtrack_onerror(func):
             return ret
         except UnmatchedTokenError as exc:
             text = exc.args[0]
-            document += nodes.Text(text)
+            document += Text(text)
             reader.step(len(text))
             return True
         except Exception:

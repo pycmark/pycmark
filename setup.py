@@ -9,6 +9,9 @@ setup(
     license='BSD',
     author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',
+    description='CommonMark parser for docutils',
+    long_description='ComomnMark parser for docutils',
+    long_description_content_type='text/x-rst',
     zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',

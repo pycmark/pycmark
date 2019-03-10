@@ -143,7 +143,7 @@ class LinkReferenceDefinitionDetector(Transform):
                 if destination == '':
                     break
                 title = LinkTitleParser().parse(node, reader)
-                eol = reader.consume(re.compile('\s*(\n|$)'))
+                eol = reader.consume(re.compile('\\s*(\n|$)'))
                 if eol is None:
                     break
 

@@ -28,7 +28,7 @@ STANDARD_HTML_TAGS = (
 
 class BaseHTMLBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    closing_pattern = re.compile('^$')
+    closing_pattern = re.compile(r'^$')
 
     def run(self, document, reader):
         source, lineno = reader.get_source_and_line()
@@ -47,42 +47,42 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
 
 # 4.6 HTML blocks; <script>, <pre>, <script>
 class ScriptHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}<(script|pre|style)( |>|$)', re.I)
-    closing_pattern = re.compile('</(script|pre|style)>', re.I)
+    pattern = re.compile(r'^ {0,3}<(script|pre|style)( |>|$)', re.I)
+    closing_pattern = re.compile(r'</(script|pre|style)>', re.I)
 
 
 # 4.6 HTML blocks; <!-- ... -->
 class CommentHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}<\!--')
-    closing_pattern = re.compile('-->')
+    pattern = re.compile(r'^ {0,3}<\!--')
+    closing_pattern = re.compile(r'-->')
 
 
 # 4.6 HTML blocks; <? ... ?>
 class ProcessingInstructionHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}<\?', re.I)
-    closing_pattern = re.compile('\?>', re.I)
+    pattern = re.compile(r'^ {0,3}<\?', re.I)
+    closing_pattern = re.compile(r'\?>', re.I)
 
 
 # 4.6 HTML blocks; declarations
 class DeclarationHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}<\![A-Z]+')
-    closing_pattern = re.compile('>')
+    pattern = re.compile(r'^ {0,3}<\![A-Z]+')
+    closing_pattern = re.compile(r'>')
 
 
 # 4.6 HTML blocks; CDATA
 class CdataHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}<\!\[CDATA\[')
-    closing_pattern = re.compile(']]>')
+    pattern = re.compile(r'^ {0,3}<\!\[CDATA\[')
+    closing_pattern = re.compile(r']]>')
 
 
 # 4.6 HTML blocks; Standard tags
 class StandardTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
-    pattern = re.compile('^ {0,3}</?(%s)( |>|/>|$)' % '|'.join(STANDARD_HTML_TAGS), re.I)
-    closing_pattern = re.compile('^\s*$')
+    pattern = re.compile(r'^ {0,3}</?(%s)( |>|/>|$)' % '|'.join(STANDARD_HTML_TAGS), re.I)
+    closing_pattern = re.compile(r'^\s*$')
 
 
 # 4.6 HTML blocks; complete tags
 class CompleteTagsHTMLBlockProcessor(BaseHTMLBlockProcessor):
     paragraph_interruptable = False
-    pattern = re.compile('^ {0,3}(?:' + OPENTAG + '|' + CLOSETAG + ')\s*$')
-    closing_pattern = re.compile('^\s*$')
+    pattern = re.compile(r'^ {0,3}(?:' + OPENTAG + '|' + CLOSETAG + r')\s*$')
+    closing_pattern = re.compile(r'^\s*$')

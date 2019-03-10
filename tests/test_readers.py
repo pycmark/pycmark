@@ -197,12 +197,12 @@ def test_TextReader():
     reader.step()
     assert reader.remain == 'ello world'
 
-    matched = reader.consume(re.compile('\w+'))
+    matched = reader.consume(re.compile(r'\w+'))
     assert matched
     assert matched.group(0) == 'ello'
     assert reader.remain == ' world'
 
-    matched = reader.consume(re.compile('\w+'))
+    matched = reader.consume(re.compile(r'\w+'))
     assert matched is None
 
     reader.step(6)

@@ -64,7 +64,7 @@ def test_example_466():
 
 
 def test_example_467():
-    result = publish("[link](\(foo\))")
+    result = publish(r"[link](\(foo\))")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
     assert_node(result[0][0], refuri="(foo)")
 
@@ -76,7 +76,7 @@ def test_example_468():
 
 
 def test_example_469():
-    result = publish("[link](foo\(and\(bar\))")
+    result = publish(r"[link](foo\(and\(bar\))")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
     assert_node(result[0][0], refuri="foo(and(bar)")
 
@@ -88,7 +88,7 @@ def test_example_470():
 
 
 def test_example_471():
-    result = publish("[link](foo\)\:)")
+    result = publish(r"[link](foo\)\:)")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
     assert_node(result[0][0], refuri="foo):")
 

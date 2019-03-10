@@ -93,7 +93,7 @@ def backtrack_onerror(func):
             document += nodes.Text(text)
             reader.step(len(text))
             return True
-        except Exception as exc:
+        except Exception:
             return False
 
     return wrapper

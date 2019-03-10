@@ -161,7 +161,7 @@ def test_example_34():
 
 
 def test_example_36():
-    result = publish("# foo *bar* \*baz\*")
+    result = publish(r"# foo *bar* \*baz\*")
     assert_node(result, [nodes.document, nodes.section, nodes.title, ("foo ",
                                                                       [nodes.emphasis, "bar"],
                                                                       " *baz*")])

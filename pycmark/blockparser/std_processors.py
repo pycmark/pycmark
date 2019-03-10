@@ -20,7 +20,7 @@ from pycmark.utils import entitytrans
 # 4.1 Thematic breaks
 class ThematicBreakProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    pattern = re.compile('^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})\s*$')
+    pattern = re.compile(r'^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})\s*$')
 
     def run(self, document, reader):
         reader.readline()
@@ -31,8 +31,8 @@ class ThematicBreakProcessor(PatternBlockProcessor):
 # 4.2 ATX headings
 class ATXHeadingProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    pattern = re.compile('^ {0,3}(#{1,6})\s(.*)$')
-    trailing_hashes = re.compile('\s+#+\s*$')
+    pattern = re.compile(r'^ {0,3}(#{1,6})\s(.*)$')
+    trailing_hashes = re.compile(r'\s+#+\s*$')
 
     def run(self, document, reader):
         marker, title = self.pattern.match(reader.readline()).groups()
@@ -53,8 +53,8 @@ class ATXHeadingProcessor(PatternBlockProcessor):
 # 4.4 Indented code blocks
 class IndentedCodeBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = False
-    pattern = re.compile('^(    | {0,3}\t)(.*\n?)$')
-    followings = re.compile('^((?:    | {0,3}\t)(.*\n?)|\s*)$')
+    pattern = re.compile(r'^(    | {0,3}\t)(.*\n?)$')
+    followings = re.compile(r'^((?:    | {0,3}\t)(.*\n?)|\s*)$')
 
     def run(self, document, reader):
         source, lineno = reader.get_source_and_line()
@@ -81,17 +81,17 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
 # 4.5 Fenced code blocks
 class FencedCodeBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    pattern = re.compile('^( {0,3})(`{3,}|~{3,})([^`]*)$')
+    pattern = re.compile(r'^( {0,3})(`{3,}|~{3,})([^`]*)$')
 
     def run(self, document, reader):
         def unindent(text, length):
-            return re.sub('^ {0,%d}' % length, '', text)
+            return re.sub(r'^ {0,%d}' % length, '', text)
 
         source, lineno = reader.get_source_and_line()
 
         code = ''
         indent, marker, language = self.pattern.match(reader.readline()).groups()
-        closing_pattern = re.compile('^ {0,3}%s+\s*$' % marker)
+        closing_pattern = re.compile(r'^ {0,3}%s+\s*$' % marker)
         for line in reader:
             if closing_pattern.match(line):
                 break
@@ -113,7 +113,7 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
 # 4.7 Link reference definitions
 # 4.8 Paragraphs
 class ParagraphProcessor(BlockProcessor):
-    setext_heading_underline = re.compile('^ {0,3}(=+|-+)\s*$')
+    setext_heading_underline = re.compile(r'^ {0,3}(=+|-+)\s*$')
 
     def match(self, reader, **kwargs):
         return True
@@ -168,7 +168,7 @@ class ParagraphProcessor(BlockProcessor):
 # 4.9 Blank lines
 class BlankLineProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    pattern = re.compile('^\s*$')
+    pattern = re.compile(r'^\s*$')
 
     def run(self, document, reader):
         reader.readline()  # skip the line

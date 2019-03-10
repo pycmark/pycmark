@@ -117,7 +117,7 @@ class BulletListProcessor(ListProcessor):
     def is_next_list_item(self, reader, marker):
         # type: (LineReader, str) -> bool
         try:
-            pattern = re.compile('^(\s*\\%s){2,}\s*$' % marker)
+            pattern = re.compile(r'^(\s*\%s){2,}\s*$' % marker)
             if pattern.match(reader.next_line):
                 # themantic break detected
                 return False
@@ -134,14 +134,14 @@ class BulletListProcessor(ListProcessor):
 class NonEmptyBulletListProcessor(ListProcessor):
     # The non-empty bullet list can interrupt paragraphs
     paragraph_interruptable = True
-    first_item_pattern = re.compile('^( {0,3})([-+*])( +)(?=\S)(.*)')
+    first_item_pattern = re.compile(r'^( {0,3})([-+*])( +)(?=\S)(.*)')
 
 
 # 5.2 List items; ordered lists
 class OrderedListProcessor(ListProcessor):
     paragraph_interruptable = False
-    first_item_pattern = re.compile('^( {0,3})(\d{1,9}[.)])( +|$)(.*)')
-    next_item_pattern = re.compile('^( *)(\d{1,9}[.)])( +|$)(.*)')
+    first_item_pattern = re.compile(r'^( {0,3})(\d{1,9}[.)])( +|$)(.*)')
+    next_item_pattern = re.compile(r'^( *)(\d{1,9}[.)])( +|$)(.*)')
 
     def create_list_node(self, marker):
         # type: (str) -> nodes.Element
@@ -155,4 +155,4 @@ class OrderedListProcessor(ListProcessor):
 class OneBasedOrderedListProcessor(OrderedListProcessor):
     # The ordered list starts with 1 can interrupt paragraphs
     paragraph_interruptable = True
-    first_item_pattern = re.compile('^( {0,3})(1[.)])( +)(?=\S)(.*)')
+    first_item_pattern = re.compile(r'^( {0,3})(1[.)])( +)(?=\S)(.*)')

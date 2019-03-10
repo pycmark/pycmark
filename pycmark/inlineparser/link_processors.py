@@ -22,7 +22,7 @@ LABEL_NOT_MATCHED = object()
 # 6.5 Links
 # 6.6 Images
 class LinkOpenerProcessor(PatternInlineProcessor):
-    pattern = re.compile('\!?\[')
+    pattern = re.compile(r'\!?\[')
 
     def run(self, document, reader):
         marker = reader.consume(self.pattern).group(0)
@@ -31,7 +31,7 @@ class LinkOpenerProcessor(PatternInlineProcessor):
 
 
 class LinkCloserProcessor(PatternInlineProcessor):
-    pattern = re.compile('\]')
+    pattern = re.compile(r'\]')
 
     def run(self, document, reader):
         reader.step(1)
@@ -116,7 +116,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
         reader.step()
         destination = LinkDestinationParser().parse(document, reader)
         title = LinkTitleParser().parse(document, reader)
-        assert reader.consume(re.compile('\s*\)'))
+        assert reader.consume(re.compile(r'\s*\)'))
 
         return destination, title
 
@@ -159,7 +159,7 @@ class LinkDestinationParser(object):
             return self.parseBareLinkDestination(document, reader)
 
     def parseBareLinkDestination(self, document, reader):
-        assert reader.consume(re.compile('[ \n]*'))
+        assert reader.consume(re.compile(r'[ \n]*'))
 
         parens = 0
         start = reader.position
@@ -183,9 +183,9 @@ class LinkDestinationParser(object):
 
 
 class LinkTitleParser(object):
-    pattern = re.compile('\s*("(' + ESCAPED_CHARS + '|[^"])*"|' +
-                         "'(" + ESCAPED_CHARS + "|[^'])*'|" +
-                         "\\((" + ESCAPED_CHARS + "|[^)])*\\))")
+    pattern = re.compile(r'\s*("(' + ESCAPED_CHARS + r'|[^"])*"|' +
+                         r"'(" + ESCAPED_CHARS + r"|[^'])*'|" +
+                         r"\((" + ESCAPED_CHARS + r"|[^)])*\))")
 
     def parse(self, document, reader):
         matched = reader.consume(self.pattern)

@@ -138,7 +138,7 @@ def test_example_318():
 
 
 def test_example_321():
-    result = publish("`foo\`bar`")
+    result = publish(r"`foo\`bar`")
     assert_node(result, [nodes.document, nodes.paragraph, ([nodes.literal, "foo\\"],
                                                            "bar`")])
 
@@ -388,7 +388,7 @@ def test_example_413():
 
 
 def test_example_414():
-    result = publish("foo *\**")
+    result = publish(r"foo *\**")
     assert_node(result, [nodes.document, nodes.paragraph, ("foo ",
                                                            [nodes.emphasis, "*"])])
 
@@ -553,7 +553,7 @@ def test_example_576():
 
 
 def test_example_577():
-    result = publish("<foo\+@bar.example.com>")
+    result = publish(r"<foo\+@bar.example.com>")
     assert_node(result, [nodes.document, nodes.paragraph, "<foo+@bar.example.com>"])
 
 

@@ -34,7 +34,7 @@ class BackslashEscapeProcessor(PatternInlineProcessor):
 
 # 6.2 Entity and numeric character references
 class EntityReferenceProcessor(PatternInlineProcessor):
-    pattern = re.compile('&(?:\w{1,32}|#\d+|#X[0-9A-Fa-f]+);')
+    pattern = re.compile(r'&(?:\w{1,32}|#\d+|#X[0-9A-Fa-f]+);')
 
     def run(self, document, reader):
         text = reader.consume(self.pattern).group(0)
@@ -44,17 +44,17 @@ class EntityReferenceProcessor(PatternInlineProcessor):
 
 # 6.3 Code spans
 class CodeSpanProcessor(PatternInlineProcessor):
-    pattern = re.compile('`+')
+    pattern = re.compile(r'`+')
 
     @backtrack_onerror
     def run(self, document, reader):
         marker = reader.consume(self.pattern).group(0)
 
-        pattern = re.compile(marker + "([^`]|$)")
+        pattern = re.compile(marker + r"([^`]|$)")
         text = addnodes.SparseText(reader.remain, 0, 0)
         while reader.remain:
             if pattern.match(reader.remain):
-                code = re.sub('\s+', ' ', str(text), re.S).strip()
+                code = re.sub(r'\s+', ' ', str(text), re.S).strip()
                 document += nodes.literal(code, code)
                 reader.step(len(marker))
                 return True
@@ -71,8 +71,8 @@ class CodeSpanProcessor(PatternInlineProcessor):
 
 # 6.4 Emphasis and strong emphasis
 class EmphasisProcessor(PatternInlineProcessor):
-    pattern = re.compile('(\*+|_+)')
-    whitespaces = re.compile('\s|0xa0')
+    pattern = re.compile(r'(\*+|_+)')
+    whitespaces = re.compile(r'\s|0xa0')
 
     def run(self, document, reader):
         if reader.position == 0:
@@ -118,7 +118,7 @@ class EmphasisProcessor(PatternInlineProcessor):
 
 # 6.7 Autolinks
 class URIAutolinkProcessor(PatternInlineProcessor):
-    pattern = re.compile('<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
+    pattern = re.compile(r'<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
 
     def run(self, document, reader):
         uri = reader.consume(self.pattern).group(1)
@@ -127,9 +127,9 @@ class URIAutolinkProcessor(PatternInlineProcessor):
 
 
 class EmailAutolinkProcessor(PatternInlineProcessor):
-    pattern = re.compile('<([a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9]'
-                         '(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?'
-                         '(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>')
+    pattern = re.compile(r'<([a-zA-Z0-9.!#$%&\'*+/=?^_`{|}~-]+@[a-zA-Z0-9]'
+                         r'(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?'
+                         r'(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>')
 
     def run(self, document, reader):
         uri = reader.consume(self.pattern).group(1)
@@ -139,10 +139,10 @@ class EmailAutolinkProcessor(PatternInlineProcessor):
 
 # 6.8 Raw HTML
 class RawHTMLProcessor(PatternInlineProcessor):
-    HTML_COMMENT = '<!---->|<!--(?:-?[^>-])(?:-?[^-])*-->'
-    PROCESSING_INSTRUCTION = "<\\?.*?\\?>"
-    DECLARATION = "<![A-Z]+" + "\\s+[^>]*>"
-    CDATA = '<!\\[CDATA\\[[\\s\\S]*?\\]\\]>'
+    HTML_COMMENT = r'<!---->|<!--(?:-?[^>-])(?:-?[^-])*-->'
+    PROCESSING_INSTRUCTION = r"<\?.*?\?>"
+    DECLARATION = r"<![A-Z]+" + r"\s+[^>]*>"
+    CDATA = r'<!\[CDATA\[[\s\S]*?\]\]>'
     HTMLTAG = ("(?:" + OPENTAG + "|" + CLOSETAG + "|" + HTML_COMMENT + "|" +
                PROCESSING_INSTRUCTION + "|" + DECLARATION + "|" + CDATA + ")")
     pattern = re.compile(HTMLTAG)

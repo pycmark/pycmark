@@ -23,7 +23,7 @@ class BlockQuoteProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile('^ {0,3}> ?')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         quote = nodes.block_quote()
         quote.source, quote.line = reader.get_source_and_line()
         quote.line += 1

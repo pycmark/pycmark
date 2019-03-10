@@ -10,7 +10,7 @@
 """
 
 import re
-from typing import List, Match, Pattern, Tuple, TYPE_CHECKING
+from typing import List, Match, Pattern, Tuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
     from pycmark.inlineparser.list_processors import ListProcessor
@@ -179,7 +179,7 @@ class TextReader:
         self.subject = text
         self.position = position
 
-    def __getitem__(self, key: int) -> str:
+    def __getitem__(self, key: Union[int, slice]) -> str:
         return self.subject[key]
 
     @property

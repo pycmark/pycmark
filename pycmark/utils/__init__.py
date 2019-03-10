@@ -10,6 +10,7 @@
 """
 
 import re
+from docutils.nodes import Element, Node
 
 # common regexp
 ESCAPED_CHARS = r'\\[!"#$%&\'()*+,./:;<=>?@[\\\]^_`{|}~-]'
@@ -29,17 +30,17 @@ OPENTAG = "<" + TAGNAME + ATTRIBUTE + r"*\s*/?>"
 CLOSETAG = "</" + TAGNAME + r"\s*>"
 
 
-def unescape(text):
+def unescape(text: str) -> str:
     return escaped_chars_pattern.sub(lambda m: m.group(0)[1], text)
 
 
-def normalize_link_label(label):
+def normalize_link_label(label: str) -> str:
     label = unescape(label)
     label = re.sub(r'\s+', '', label)
     return label.strip().casefold()
 
 
-def transplant_nodes(parent, new_parent, start, end):
+def transplant_nodes(parent: Element, new_parent: Element, start: Node, end: Node) -> Element:
     start_pos = parent.index(start)
     end_pos = parent.index(end)
     for _ in range(start_pos + 1, end_pos):

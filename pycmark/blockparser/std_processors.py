@@ -11,9 +11,10 @@
 
 import re
 from docutils import nodes
+from docutils.nodes import Element, Node
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
-from pycmark.readers import LazyLineReader
+from pycmark.readers import LazyLineReader, LineReader
 from pycmark.utils import entitytrans
 
 
@@ -22,7 +23,7 @@ class ThematicBreakProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile(r'^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})\s*$')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         reader.readline()
         document += nodes.transition()
         return True
@@ -34,7 +35,7 @@ class ATXHeadingProcessor(PatternBlockProcessor):
     pattern = re.compile(r'^ {0,3}(#{1,6})\s(.*)$')
     trailing_hashes = re.compile(r'\s+#+\s*$')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         marker, title = self.pattern.match(reader.readline()).groups()
         title = self.trailing_hashes.sub('', title.strip())
         title_node = nodes.title(title, title)
@@ -43,11 +44,11 @@ class ATXHeadingProcessor(PatternBlockProcessor):
         self.note_implicit_target(document, document[-1])
         return True
 
-    def note_implicit_target(self, document, node):
+    def note_implicit_target(self, document: Element, node: Node) -> None:
         while document.parent:
             document = document.parent
 
-        document.note_implicit_target(node)
+        document.note_implicit_target(node)  # type: ignore
 
 
 # 4.4 Indented code blocks
@@ -56,7 +57,7 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
     pattern = re.compile(r'^(    | {0,3}\t)(.*\n?)$')
     followings = re.compile(r'^((?:    | {0,3}\t)(.*\n?)|\s*)$')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         source, lineno = reader.get_source_and_line()
 
         code = ''
@@ -83,8 +84,8 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile(r'^( {0,3})(`{3,}|~{3,})([^`]*)$')
 
-    def run(self, document, reader):
-        def unindent(text, length):
+    def run(self, document: Element, reader: LineReader) -> bool:
+        def unindent(text: str, length: int) -> str:
             return re.sub(r'^ {0,%d}' % length, '', text)
 
         source, lineno = reader.get_source_and_line()
@@ -98,13 +99,14 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
             else:
                 code += unindent(line, len(indent))
 
-        document += nodes.literal_block(code, code)
-        document[-1].source = source
-        document[-1].line = lineno + 1  # lineno points previous line
+        literal_block = nodes.literal_block(code, code)
+        literal_block.source = source
+        literal_block.line = lineno + 1  # lineno points previous line
         if language and language.strip():
             language = entitytrans._unescape(language.strip())
-            document[-1]['language'] = language
-            document[-1]['classes'].append('language-%s' % language.split()[0])
+            literal_block['language'] = language
+            literal_block['classes'].append('language-%s' % language.split()[0])
+        document += literal_block
 
         return True
 
@@ -115,10 +117,10 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
 class ParagraphProcessor(BlockProcessor):
     setext_heading_underline = re.compile(r'^ {0,3}(=+|-+)\s*$')
 
-    def match(self, reader, **kwargs):
+    def match(self, reader: LineReader, **kwargs) -> bool:
         return True
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         source, lineno = reader.get_source_and_line()
         node = self.read(reader, setext_heading_allowed=True)
         if isinstance(node, nodes.section):
@@ -134,8 +136,8 @@ class ParagraphProcessor(BlockProcessor):
         document += node
         return True
 
-    def read(self, reader, text='', setext_heading_allowed=False):
-        def get_depth(line):
+    def read(self, reader: LineReader, text: str = '', setext_heading_allowed: bool = False) -> Element:
+        def get_depth(line: str) -> int:
             if line.strip()[0] == '=':
                 return 1
             else:
@@ -158,11 +160,11 @@ class ParagraphProcessor(BlockProcessor):
 
         return nodes.paragraph(text, text)
 
-    def note_implicit_target(self, document, node):
+    def note_implicit_target(self, document: Element, node: Node) -> None:
         while document.parent:
             document = document.parent
 
-        document.note_implicit_target(node)
+        document.note_implicit_target(node)  # type: ignore
 
 
 # 4.9 Blank lines
@@ -170,7 +172,7 @@ class BlankLineProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile(r'^\s*$')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         reader.readline()  # skip the line
         document += addnodes.blankline()
         return True

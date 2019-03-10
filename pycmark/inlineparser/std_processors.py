@@ -12,14 +12,16 @@
 import re
 import unicodedata
 from docutils import nodes
-from docutils.nodes import Text
+from docutils.nodes import Element, Text
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
+from pycmark.readers import TextReader
 from pycmark.utils import entitytrans
 from pycmark.utils import OPENTAG, CLOSETAG, escaped_chars_pattern
+from typing import Any
 
 
-def is_punctuation(char):
+def is_punctuation(char: str) -> bool:
     return 'P' in unicodedata.category(char)
 
 
@@ -27,7 +29,7 @@ def is_punctuation(char):
 class BackslashEscapeProcessor(PatternInlineProcessor):
     pattern = escaped_chars_pattern
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         document += addnodes.SparseText(reader.subject, reader.position + 1, reader.position + 2)
         reader.step(2)
         return True
@@ -37,7 +39,7 @@ class BackslashEscapeProcessor(PatternInlineProcessor):
 class EntityReferenceProcessor(PatternInlineProcessor):
     pattern = re.compile(r'&(?:\w{1,32}|#\d+|#X[0-9A-Fa-f]+);')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         text = reader.consume(self.pattern).group(0)
         document += Text(entitytrans._unescape(text))
         return True
@@ -48,7 +50,7 @@ class CodeSpanProcessor(PatternInlineProcessor):
     pattern = re.compile(r'`+')
 
     @backtrack_onerror
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         marker = reader.consume(self.pattern).group(0)
 
         pattern = re.compile(marker + r"([^`]|$)")
@@ -75,10 +77,10 @@ class EmphasisProcessor(PatternInlineProcessor):
     pattern = re.compile(r'(\*+|_+)')
     whitespaces = re.compile(r'\s|0xa0')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         if reader.position == 0:
-            before_is_whitespace = True
-            before_is_punctuation = False
+            before_is_whitespace: Any = True
+            before_is_punctuation: Any = False
         else:
             before = reader[reader.position - 1]
             before_is_whitespace = self.whitespaces.match(before)
@@ -88,8 +90,8 @@ class EmphasisProcessor(PatternInlineProcessor):
 
         if reader.remain:
             after = reader.remain[0]
-            after_is_whitespace = self.whitespaces.match(after)
-            after_is_punctuation = is_punctuation(after)
+            after_is_whitespace: Any = self.whitespaces.match(after)
+            after_is_punctuation: Any = is_punctuation(after)
         else:
             after_is_whitespace = True
             after_is_punctuation = False
@@ -121,7 +123,7 @@ class EmphasisProcessor(PatternInlineProcessor):
 class URIAutolinkProcessor(PatternInlineProcessor):
     pattern = re.compile(r'<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri=uri)
         return True
@@ -132,7 +134,7 @@ class EmailAutolinkProcessor(PatternInlineProcessor):
                          r'(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?'
                          r'(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri='mailto:' + uri)
         return True
@@ -148,7 +150,7 @@ class RawHTMLProcessor(PatternInlineProcessor):
                PROCESSING_INSTRUCTION + "|" + DECLARATION + "|" + CDATA + ")")
     pattern = re.compile(HTMLTAG)
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         html = reader.consume(self.pattern).group(0)
         document += nodes.raw(html, html, format='html')
         return True

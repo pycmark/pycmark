@@ -14,8 +14,10 @@ from docutils import nodes
 from docutils.nodes import Element, Text
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
+from pycmark.readers import TextReader
 from pycmark.utils import entitytrans
 from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, normalize_link_label, transplant_nodes
+from typing import Tuple
 
 LABEL_NOT_MATCHED = object()
 
@@ -25,7 +27,7 @@ LABEL_NOT_MATCHED = object()
 class LinkOpenerProcessor(PatternInlineProcessor):
     pattern = re.compile(r'\!?\[')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         marker = reader.consume(self.pattern).group(0)
         document += addnodes.bracket(marker=marker, can_open=True, active=True, position=reader.position)
         return True
@@ -34,18 +36,18 @@ class LinkOpenerProcessor(PatternInlineProcessor):
 class LinkCloserProcessor(PatternInlineProcessor):
     pattern = re.compile(r'\]')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: TextReader) -> bool:
         reader.step(1)
         document += addnodes.bracket(marker="]", can_open=False, position=reader.position - 1)
         self.process_link_or_image(document, reader)
         return True
 
     @backtrack_onerror
-    def process_link_or_image(self, document, reader):
+    def process_link_or_image(self, document: Element, reader: TextReader) -> bool:
         brackets = list(n for n in document.children if isinstance(n, addnodes.bracket))
         openers = list(d for d in brackets if d['can_open'])
         if len(openers) == 0:
-            return
+            return True
 
         opener = openers.pop()
         closer = brackets.pop()
@@ -53,7 +55,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
         if not opener['active']:
             opener.replace_self(Text(opener['marker']))
             closer.replace_self(Text(closer['marker']))
-            return
+            return True
 
         try:
             if reader.remain.startswith('('):
@@ -114,7 +116,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
         return True
 
     @backtrack_onerror
-    def parse_link_destination(self, document, reader):
+    def parse_link_destination(self, document: Element, reader: TextReader) -> Tuple[str, str]:
         reader.step()
         destination = LinkDestinationParser().parse(document, reader)
         title = LinkTitleParser().parse(document, reader)
@@ -123,7 +125,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
         return destination, title
 
     @backtrack_onerror
-    def parse_link_label(self, document, reader, opener=None, closer=None):
+    def parse_link_label(self, document: Element, reader: TextReader, opener: Element = None, closer: Element = None) -> Tuple[object, str]:  # NOQA
         reader.step()
         refid = LinkLabelParser().parse(document, reader)
         if refid == '':
@@ -139,28 +141,28 @@ class LinkCloserProcessor(PatternInlineProcessor):
         else:
             return LABEL_NOT_MATCHED, None
 
-    def lookup_target(self, document, refid):
+    def lookup_target(self, document: Element, refid: str) -> nodes.target:
         while document.parent:
             document = document.parent
 
-        node_id = document.nameids.get(normalize_link_label(refid))
+        node_id = document.nameids.get(normalize_link_label(refid))  # type: ignore
         if node_id is None:
             return None
 
-        return document.ids.get(node_id)
+        return document.ids.get(node_id)  # type: ignore
 
 
 class LinkDestinationParser:
     pattern = re.compile(r'\s*<((?:[^ <>\n\\]|' + ESCAPED_CHARS + r'|\\)*)>', re.S)
 
-    def parse(self, document, reader):
+    def parse(self, document: Element, reader: TextReader) -> str:
         matched = reader.consume(self.pattern)
         if matched:
             return unescape(entitytrans._unescape(matched.group(1)))
         else:
             return self.parseBareLinkDestination(document, reader)
 
-    def parseBareLinkDestination(self, document, reader):
+    def parseBareLinkDestination(self, document: Element, reader: TextReader) -> str:
         assert reader.consume(re.compile(r'[ \n]*'))
 
         parens = 0
@@ -189,7 +191,7 @@ class LinkTitleParser:
                          r"'(" + ESCAPED_CHARS + r"|[^'])*'|" +
                          r"\((" + ESCAPED_CHARS + r"|[^)])*\))")
 
-    def parse(self, document, reader):
+    def parse(self, document: Element, reader: TextReader) -> str:
         matched = reader.consume(self.pattern)
         if matched:
             return unescape(entitytrans._unescape(matched.group(1)[1:-1]))
@@ -200,7 +202,7 @@ class LinkTitleParser:
 class LinkLabelParser:
     pattern = re.compile(r'(?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\){0,1000}\]')
 
-    def parse(self, document, reader):
+    def parse(self, document: Element, reader: TextReader) -> str:
         matched = reader.consume(self.pattern)
         if matched:
             return unescape(matched.group(0)[:-1])

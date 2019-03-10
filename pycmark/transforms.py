@@ -77,13 +77,13 @@ class SectionTreeConstructor(Transform):
     default_priority = 500
 
     def apply(self, **kwargs) -> None:
-        def is_container_node(node):
+        def is_container_node(node: Node) -> bool:
             return isinstance(node, (nodes.document, nodes.block_quote, nodes.list_item))
 
         for node in self.document.traverse(is_container_node):  # type: Element
             self.construct_section_tree(node)
 
-    def construct_section_tree(self, container):
+    def construct_section_tree(self, container: Element) -> None:
         current_depth = 0
         last_section = None
         for node in container[:]:
@@ -121,7 +121,7 @@ class LinkReferenceDefinitionDetector(Transform):
             self.parse_linkref_definition(node, reader)
 
     @backtrack_onerror
-    def parse_linkref_definition(self, node, reader):
+    def parse_linkref_definition(self, node: nodes.paragraph, reader: TextReader) -> None:
         targets = []
         while True:
             matched = reader.consume(self.pattern)
@@ -164,14 +164,14 @@ class InlineTransform(Transform):
     default_priority = 200
 
     def apply(self, **kwargs) -> None:
-        def is_text_container(node):
+        def is_text_container(node: Node) -> bool:
             return isinstance(node, TextElement) and not isinstance(node, FixedTextElement)
 
         parser = self.create_parser()
-        for node in self.document.traverse(is_text_container):  # type: List[Text]
+        for node in self.document.traverse(is_text_container):  # type: TextElement
             parser.parse(node)
 
-    def create_parser(self):
+    def create_parser(self) -> InlineParser:
         parser = InlineParser()
         for processor in self.document.settings.inline_processors:
             parser.add_processor(processor(parser))
@@ -222,7 +222,7 @@ class EmphasisConverter(Transform):
 
             self.deactivate_markers(node)
 
-    def find_opener(self, markers, closer):
+    def find_opener(self, markers: List[addnodes.emphasis], closer: addnodes.emphasis) -> addnodes.emphasis:
         pos = markers.index(closer)
         for opener in reversed(markers[:pos]):
             if opener['can_open'] is False:
@@ -237,7 +237,7 @@ class EmphasisConverter(Transform):
 
         return None
 
-    def deactivate_markers(self, node):
+    def deactivate_markers(self, node: Element) -> None:
         markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
         for delim in markers:
             marker = str(delim)

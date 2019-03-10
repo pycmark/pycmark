@@ -11,7 +11,9 @@
 
 import re
 from docutils import nodes
+from docutils.nodes import Element
 from pycmark.blockparser import PatternBlockProcessor
+from pycmark.readers import LineReader
 from pycmark.utils import OPENTAG, CLOSETAG
 
 STANDARD_HTML_TAGS = (
@@ -30,7 +32,7 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     closing_pattern = re.compile(r'^$')
 
-    def run(self, document, reader):
+    def run(self, document: Element, reader: LineReader) -> bool:
         source, lineno = reader.get_source_and_line()
         content = ''
         for line in reader:

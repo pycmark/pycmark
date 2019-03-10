@@ -10,11 +10,11 @@
 """
 
 import re
-from docutils.nodes import Text, TextElement
+from docutils.nodes import Element, Text, TextElement
 from functools import wraps
 from pycmark.addnodes import SparseText
 from pycmark.readers import TextReader
-from typing import List, cast
+from typing import Callable, List, cast
 
 
 class InlineParser:
@@ -81,9 +81,9 @@ class ParseError(Exception):
     pass
 
 
-def backtrack_onerror(func):
+def backtrack_onerror(func: Callable) -> Callable:
     @wraps(func)
-    def wrapper(self, document, reader, **kwargs):
+    def wrapper(self, document: Element, reader: TextReader, **kwargs) -> bool:
         new_reader = TextReader(reader.subject, reader.position)
         try:
             ret = func(self, document, new_reader, **kwargs)

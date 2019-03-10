@@ -20,14 +20,14 @@ class blankline(Element, Invisible):
 class emphasis(Element):
     """A node reprents a marker for emphasis and strong."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         length = self['curr_length']
         return self['marker'][:length]
 
-    def astext(self):
+    def astext(self) -> str:
         return str(self)
 
-    def shrink(self, n):
+    def shrink(self, n: int) -> None:
         if self['curr_length'] == n:
             self.parent.remove(self)
         else:
@@ -37,28 +37,28 @@ class emphasis(Element):
 class bracket(Element):
     """A node reprenents a square bracket (both opening and closing)."""
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self['marker']
 
-    def astext(self):
+    def astext(self) -> str:
         return str(self)
 
 
 class SparseText(Element):
     """A node represents a text."""
 
-    def __init__(self, text, start, end):
+    def __init__(self, text: str, start: int, end: int) -> None:
         super().__init__()
         self['text'] = text
         self.start = start
         self.end = end
 
-    def __str__(self):
+    def __str__(self) -> str:
         return self['text'][self.start:self.end]
 
-    def astext(self):
+    def astext(self) -> str:
         return str(self)
 
-    def spread(self, end=1, start=0):
+    def spread(self, end: int = 1, start: int = 0) -> None:
         self.start -= start
         self.end += end

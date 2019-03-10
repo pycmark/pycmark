@@ -10,6 +10,7 @@ https://hg.python.org/cpython/file/500d3d6f22ff/Lib/html/__init__.py
 from __future__ import unicode_literals
 import sys
 import re as _re
+from typing import Match
 
 __all__ = ['_unescape']
 
@@ -2308,8 +2309,8 @@ _invalid_codepoints = set([
 ])
 
 
-def _replace_charref(s):
-    s = s.group(1)
+def _replace_charref(matched: Match[str]) -> str:
+    s = matched.group(1)
     if s[0] == '#':
         # numeric charref
         if s[1] in 'xX':
@@ -2343,7 +2344,7 @@ _charref = _re.compile(r'&(#[0-9]+;?'
                        r'|[^\t\n\f <&#;]{1,32};?)')
 
 
-def _unescape(s):
+def _unescape(s: str) -> str:
     """
     Convert all named and numeric character references (e.g. &gt;, &#62;,
     &x3e;) in the string s to the corresponding unicode characters.

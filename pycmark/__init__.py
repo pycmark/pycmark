@@ -9,9 +9,11 @@
     :license: BSD, see LICENSE for details.
 """
 
+from docutils import nodes
 from docutils.parsers import Parser
+from docutils.transforms import Transform
 from pycmark.readers import LineReader
-from pycmark.blockparser import BlockParser
+from pycmark.blockparser import BlockParser, BlockProcessor
 from pycmark.blockparser.std_processors import (
     ThematicBreakProcessor,
     ATXHeadingProcessor,
@@ -36,6 +38,7 @@ from pycmark.blockparser.container_processors import (
     OrderedListProcessor,
     OneBasedOrderedListProcessor,
 )
+from pycmark.inlineparser import InlineProcessor
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
     EntityReferenceProcessor,
@@ -61,6 +64,7 @@ from pycmark.transforms import (
     BracketConverter,
     TextNodeConnector,
 )
+from typing import List, Type
 
 
 class CommonMarkParser(Parser):
@@ -68,7 +72,7 @@ class CommonMarkParser(Parser):
 
     supported = ('markdown', 'commonmark', 'md')
 
-    def get_block_processors(self):
+    def get_block_processors(self) -> List[Type[BlockProcessor]]:
         """Returns block processors. Overrided by subclasses."""
         return [
             ThematicBreakProcessor,
@@ -91,7 +95,7 @@ class CommonMarkParser(Parser):
             ParagraphProcessor,
         ]
 
-    def get_inline_processors(self):
+    def get_inline_processors(self) -> List[Type[InlineProcessor]]:
         """Returns inline processors. Overrided by subclasses."""
         return [
             BackslashEscapeProcessor,
@@ -105,7 +109,7 @@ class CommonMarkParser(Parser):
             RawHTMLProcessor,
         ]
 
-    def get_transforms(self):
+    def get_transforms(self) -> List[Type[Transform]]:
         return [
             TightListsDetector,
             TightListsCompactor,
@@ -119,7 +123,7 @@ class CommonMarkParser(Parser):
             TextNodeConnector,
         ]
 
-    def create_block_parser(self):
+    def create_block_parser(self) -> BlockParser:
         """Creates a block parser and returns it.
 
         Internally, ``get_block_processors()`` is called to create a parser.
@@ -130,7 +134,7 @@ class CommonMarkParser(Parser):
             parser.add_processor(processor(parser))
         return parser
 
-    def parse(self, inputtext, document):
+    def parse(self, inputtext: str, document: nodes.document) -> None:
         """Parses a text and build document."""
         document.settings.inline_processors = self.get_inline_processors()
         reader = LineReader(inputtext.splitlines(True), source=document['source'])

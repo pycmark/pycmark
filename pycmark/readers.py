@@ -12,6 +12,8 @@
 import re
 from typing import List, Match, Pattern, Tuple, TYPE_CHECKING, Union
 
+from pycmark.utils import expand_leading_tabs
+
 if TYPE_CHECKING:
     from pycmark.inlineparser.list_processors import ListProcessor
 
@@ -49,7 +51,8 @@ class LineReader:
     def fetch(self, relative: int = 0, **kwargs) -> str:
         """Returns an arbitrary line without moving the current line."""
         try:
-            return self.lines[self.lineno + relative - 1]
+            line = self.lines[self.lineno + relative - 1]
+            return expand_leading_tabs(line)
         except IndexError:
             raise IOError
 

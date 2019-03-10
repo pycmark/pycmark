@@ -16,6 +16,46 @@ def test_empty_text():
     assert_node(result, [nodes.document, ()])
 
 
+def test_example_1():
+    result = publish("\tfoo\tbaz\t\tbim")
+    assert_node(result, [nodes.document, nodes.literal_block, "foo\tbaz\t\tbim"])
+
+
+def test_example_2():
+    result = publish("  \tfoo\tbaz\t\tbim")
+    assert_node(result, [nodes.document, nodes.literal_block, "foo\tbaz\t\tbim"])
+
+
+def test_example_4():
+    text = ("  - foo\n"
+            "\n"
+            "\tbar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, ([nodes.paragraph, "foo"],
+                                                                              [nodes.paragraph, "bar"])])
+
+
+def test_example_5():
+    text = ("- foo\n"
+            "\n"
+            "\t\tbar\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, ([nodes.paragraph, "foo"],
+                                                                              [nodes.literal_block, "  bar\n"])])
+
+
+def test_example_9():
+    text = (" - foo\n"
+            "   - bar\n"
+            "\t - baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, ("foo",
+                                                                              nodes.bullet_list)])
+    assert_node(result[0][0][1], [nodes.bullet_list, nodes.list_item, ("bar",
+                                                                       nodes.bullet_list)])
+    assert_node(result[0][0][1][0][1], [nodes.bullet_list, nodes.list_item, "baz"])
+
+
 def test_example_13():
     text = ("***\n"
             "---\n"

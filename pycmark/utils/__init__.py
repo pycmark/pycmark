@@ -16,6 +16,7 @@ from docutils.nodes import Element, Node
 # common regexp
 ESCAPED_CHARS = r'\\[!"#$%&\'()*+,./:;<=>?@[\\\]^_`{|}~-]'
 escaped_chars_pattern = re.compile(ESCAPED_CHARS)
+leading_spaces_pattern = re.compile(r'^\s*')
 
 # HTML regexp
 TAGNAME = r'[a-zA-Z][a-zA-Z0-9-]*'
@@ -33,6 +34,15 @@ CLOSETAG = "</" + TAGNAME + r"\s*>"
 
 def unescape(text: str) -> str:
     return escaped_chars_pattern.sub(lambda m: m.group(0)[1], text)
+
+
+def expand_leading_tabs(text: str, tabstop: int = 4) -> str:
+    matched = leading_spaces_pattern.match(text)
+    if '\t' in matched.group(0):
+        expanded = matched.group(0).expandtabs(tabstop)
+        text = leading_spaces_pattern.sub(expanded, text)
+
+    return text
 
 
 def normalize_link_label(label: str) -> str:

@@ -56,8 +56,8 @@ class ATXHeadingProcessor(PatternBlockProcessor):
 # 4.4 Indented code blocks
 class IndentedCodeBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = False
-    pattern = re.compile(r'^(    | {0,3}\t)(.*\n?)$')
-    followings = re.compile(r'^((?:    | {0,3}\t)(.*\n?)|\s*)$')
+    pattern = re.compile(r'^    (.*\n?)$')
+    followings = re.compile(r'^(    (.*\n?)|\s*)$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
         source, lineno = reader.get_source_and_line()

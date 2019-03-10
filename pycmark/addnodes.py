@@ -9,7 +9,6 @@
     :license: BSD, see LICENSE for details.
 """
 
-from docutils import nodes
 from docutils.nodes import Element, Invisible
 
 
@@ -49,7 +48,7 @@ class SparseText(Element):
     """A node represents a text."""
 
     def __init__(self, text, start, end):
-        nodes.Element.__init__(self)
+        super().__init__()
         self['text'] = text
         self.start = start
         self.end = end

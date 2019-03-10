@@ -150,7 +150,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
         return document.ids.get(node_id)
 
 
-class LinkDestinationParser(object):
+class LinkDestinationParser:
     pattern = re.compile(r'\s*<((?:[^ <>\n\\]|' + ESCAPED_CHARS + r'|\\)*)>', re.S)
 
     def parse(self, document, reader):
@@ -184,7 +184,7 @@ class LinkDestinationParser(object):
         return unescape(entitytrans._unescape(reader[start:end]))
 
 
-class LinkTitleParser(object):
+class LinkTitleParser:
     pattern = re.compile(r'\s*("(' + ESCAPED_CHARS + r'|[^"])*"|' +
                          r"'(" + ESCAPED_CHARS + r"|[^'])*'|" +
                          r"\((" + ESCAPED_CHARS + r"|[^)])*\))")
@@ -197,7 +197,7 @@ class LinkTitleParser(object):
             return None
 
 
-class LinkLabelParser(object):
+class LinkLabelParser:
     pattern = re.compile(r'(?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\){0,1000}\]')
 
     def parse(self, document, reader):

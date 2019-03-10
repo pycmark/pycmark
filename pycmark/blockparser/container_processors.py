@@ -110,7 +110,7 @@ class BulletListProcessor(ListProcessor):
                 # themantic break detected
                 return False
             else:
-                return super(BulletListProcessor, self).is_next_list_item(reader, marker)
+                return super().is_next_list_item(reader, marker)
         except IOError:
             return False
 

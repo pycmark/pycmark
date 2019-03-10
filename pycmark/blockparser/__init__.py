@@ -15,7 +15,7 @@ from pycmark.readers import LineReader
 from typing import List
 
 
-class BlockParser(object):
+class BlockParser:
     """A parser for block elements."""
     def __init__(self) -> None:
         self.processors: List["BlockProcessor"] = []
@@ -42,7 +42,7 @@ class BlockParser(object):
         return False
 
 
-class BlockProcessor(object):
+class BlockProcessor:
     #: This processor can interrupt a paragraph
     paragraph_interruptable = False
 

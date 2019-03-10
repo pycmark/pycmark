@@ -16,7 +16,7 @@ if TYPE_CHECKING:
     from pycmark.inlineparser.list_processors import ListProcessor
 
 
-class LineReader(object):
+class LineReader:
     """A line based reader for text."""
 
     def __init__(self, lines: List[str], source: str = None, lineno: int = 0) -> None:
@@ -147,7 +147,7 @@ class ListItemReader(LineReaderDecorator):
         self.pattern = re.compile('^ {%d}' % indent)
         self.begining_lineno = reader.lineno + 1
         self.processor = processor
-        super(ListItemReader, self).__init__(reader)
+        super().__init__(reader)
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
         if kwargs.get('lazy'):
@@ -172,7 +172,7 @@ class ListItemReader(LineReaderDecorator):
             raise IOError
 
 
-class TextReader(object):
+class TextReader:
     """A character based reader."""
 
     def __init__(self, text: str, position: int = 0) -> None:

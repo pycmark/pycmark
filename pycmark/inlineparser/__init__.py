@@ -17,7 +17,7 @@ from pycmark.readers import TextReader
 from typing import List, cast
 
 
-class InlineParser(object):
+class InlineParser:
     """A parser for inline elements."""
 
     def __init__(self) -> None:
@@ -55,7 +55,7 @@ class InlineParser(object):
         return document
 
 
-class InlineProcessor(object):
+class InlineProcessor:
     def __init__(self, parser: InlineParser) -> None:
         self.parser = parser
 

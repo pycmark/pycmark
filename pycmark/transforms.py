@@ -10,6 +10,7 @@
 """
 
 import re
+import typing
 from docutils import nodes
 from docutils.transforms import Transform
 from pycmark import addnodes
@@ -17,6 +18,10 @@ from pycmark.readers import TextReader
 from pycmark.inlineparser import InlineParser, backtrack_onerror
 from pycmark.inlineparser.link_processors import LinkDestinationParser, LinkTitleParser
 from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
+from typing import List, cast
+
+if typing.TYPE_CHECKING:
+    from typing import Any  # NOQA
 
 
 class BlanklineFilter(Transform):
@@ -30,8 +35,8 @@ class BlanklineFilter(Transform):
 class TightListsDetector(Transform):
     default_priority = BlanklineFilter.default_priority - 1  # must be eariler than BlanklineFilter
 
-    def apply(self):
-        # type: () -> None
+    def apply(self, **kwargs):
+        # type: (Any) -> None
         self.detect(self.document)
 
     def detect(self, document):
@@ -44,14 +49,15 @@ class TightListsDetector(Transform):
             # type: (nodes.Element) -> bool
             return any(isinstance(subnode, addnodes.blankline) for subnode in node)
 
-        for node in document.traverse(is_list_node):
-            if any(has_loose_element(item) for item in node):
+        for node in document.traverse(is_list_node):  # type: nodes.Element
+            children = cast(List[nodes.list_item], node)
+            if any(has_loose_element(item) for item in children):
                 node['tight'] = False
             else:
                 node['tight'] = True
 
             # detect loose lists in list_items
-            for list_item in node:
+            for list_item in children:
                 self.detect(list_item)
 
 

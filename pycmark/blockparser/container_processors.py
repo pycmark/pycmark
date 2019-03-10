@@ -15,6 +15,7 @@ from docutils import nodes
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import BlockQuoteReader, ListItemReader
+from typing import List, cast
 
 if typing.TYPE_CHECKING:
     from typing import Any  # NOQA
@@ -47,7 +48,7 @@ class ListProcessor(BlockProcessor):
             return bool(self.first_item_pattern.match(reader.next_line))
 
     def run(self, document, reader):
-        # type: (nodes.Node, LineReader) -> bool
+        # type: (nodes.document, LineReader) -> bool
         marker = self.first_item_pattern.match(reader.next_line).group(2)
         list_node = self.create_list_node(marker)
         document += list_node
@@ -61,9 +62,10 @@ class ListProcessor(BlockProcessor):
                 break
 
         # blank lines at tail of last list_item should be recognized as a part of outside of list
-        for node in reversed(list_node[-1]):
+        last_item = cast(List[nodes.Element], list_node[-1])
+        for node in reversed(last_item):
             if isinstance(node, addnodes.blankline):
-                list_node[-1].remove(node)
+                last_item.remove(node)
                 document += node
             else:
                 break
@@ -94,7 +96,7 @@ class ListProcessor(BlockProcessor):
             return False
 
     def create_list_node(self, marker):
-        # type: (str) -> nodes.Node
+        # type: (str) -> nodes.Element
         raise NotImplementedError
 
     def is_same_marker_type(self, marker, candidate):
@@ -109,7 +111,7 @@ class BulletListProcessor(ListProcessor):
     next_item_pattern = re.compile('^( *)([-+*])( +|$)(.*)')
 
     def create_list_node(self, marker):
-        # type: (str) -> nodes.Node
+        # type: (str) -> nodes.Element
         return nodes.bullet_list(bullet=marker)
 
     def is_next_list_item(self, reader, marker):
@@ -142,7 +144,7 @@ class OrderedListProcessor(ListProcessor):
     next_item_pattern = re.compile('^( *)(\d{1,9}[.)])( +|$)(.*)')
 
     def create_list_node(self, marker):
-        # type: (str) -> nodes.Node
+        # type: (str) -> nodes.Element
         return nodes.enumerated_list(start=int(marker[:-1]), enumtype="arabic", suffix=marker[-1])
 
     def is_same_marker_type(self, marker, candidate):

@@ -27,7 +27,7 @@ class LineReader(object):
         self.lineno = lineno  # lineno is 1 origin
 
     def __getitem__(self, key):
-        # type: (Union[int, slice]) -> str
+        # type: (int) -> str
         """Returns arbitrary line or lines."""
         return self.lines[key]
 
@@ -101,7 +101,7 @@ class LineReaderDecorator(LineReader):
         self.reader = reader
 
     def __getitem__(self, key):
-        # type: (Union[int, slice]) -> str
+        # type: (int) -> str
         return self.reader[key]
 
     @property

@@ -10,13 +10,13 @@
 """
 
 import re
+from typing import List
 
 from docutils.nodes import Element, Node
 
 # common regexp
 ESCAPED_CHARS = r'\\[!"#$%&\'()*+,./:;<=>?@[\\\]^_`{|}~-]'
 escaped_chars_pattern = re.compile(ESCAPED_CHARS)
-leading_spaces_pattern = re.compile(r'^\s*')
 
 # HTML regexp
 TAGNAME = r'[a-zA-Z][a-zA-Z0-9-]*'
@@ -36,9 +36,10 @@ def unescape(text: str) -> str:
     return escaped_chars_pattern.sub(lambda m: m.group(0)[1], text)
 
 
-def expand_leading_tabs(text: str, tabstop: int = 4) -> str:
+def expand_leading_tabs(text: str, markers: List[str] = [], tabstop: int = 4) -> str:
+    leading_spaces_pattern = re.compile(r'^\s*%s\s*' % r'\s*'.join(markers))
     matched = leading_spaces_pattern.match(text)
-    if '\t' in matched.group(0):
+    if matched and '\t' in matched.group(0):
         expanded = matched.group(0).expandtabs(tabstop)
         text = leading_spaces_pattern.sub(expanded, text)
 

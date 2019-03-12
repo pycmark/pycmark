@@ -52,7 +52,7 @@ class LineReader:
         """Returns an arbitrary line without moving the current line."""
         try:
             line = self.lines[self.lineno + relative - 1]
-            return expand_leading_tabs(line)
+            return expand_leading_tabs(line, kwargs.get('markers', []))
         except IndexError:
             raise IOError
 
@@ -123,7 +123,8 @@ class BlockQuoteReader(LineReaderDecorator):
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
         """Returns a line without quote markers."""
-        line = self.reader.fetch(relative, lazy=kwargs.get('lazy'))
+        markers = ['>'] + kwargs.get('markers', [])
+        line = self.reader.fetch(relative, lazy=kwargs.get('lazy'), markers=markers)
         if self.pattern.match(line):
             return self.pattern.sub('', line)
         elif kwargs.get('lazy') and line.strip():

@@ -34,12 +34,12 @@ class ThematicBreakProcessor(PatternBlockProcessor):
 # 4.2 ATX headings
 class ATXHeadingProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    pattern = re.compile(r'^ {0,3}(#{1,6})\s(.*)$')
+    pattern = re.compile(r'^ {0,3}(#{1,6})(\s.*)$')
     trailing_hashes = re.compile(r'\s+#+\s*$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
         marker, title = self.pattern.match(reader.readline()).groups()
-        title = self.trailing_hashes.sub('', title.strip())
+        title = self.trailing_hashes.sub('', title).strip()
         title_node = nodes.title(title, title)
         title_node.source, title_node.line = reader.get_source_and_line()
         document += nodes.section('', title_node, depth=len(marker))

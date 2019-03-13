@@ -145,7 +145,7 @@ class ListItemReader(LineReaderDecorator):
     def __init__(self, reader: LineReader, indent: int, processor: "ListProcessor") -> None:
         self.indent = indent
         self.pattern = re.compile('^ {%d}' % indent)
-        self.begining_lineno = reader.lineno + 1
+        self.beginning_lineno = reader.lineno + 1
         self.processor = processor
         super().__init__(reader)
 
@@ -156,7 +156,7 @@ class ListItemReader(LineReaderDecorator):
             reader = self.reader
 
         line = self.reader.fetch(relative, **kwargs)
-        if self.lineno + relative == self.begining_lineno:
+        if self.lineno + relative == self.beginning_lineno:
             # remove a list marker and indents when the beginning line
             return line[self.indent:]
         elif self.pattern.match(line):

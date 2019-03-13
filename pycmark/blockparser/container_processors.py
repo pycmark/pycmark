@@ -120,7 +120,7 @@ class BulletListProcessor(ListProcessor):
         return marker == candidate
 
 
-class NonEmptyBulletListProcessor(ListProcessor):
+class NonEmptyBulletListProcessor(BulletListProcessor):
     # The non-empty bullet list can interrupt paragraphs
     paragraph_interruptable = True
     first_item_pattern = re.compile(r'^( {0,3})([-+*])( +)(?=\S)(.*)')

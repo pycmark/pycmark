@@ -146,12 +146,40 @@ class LazyLineReader(LineReaderDecorator):
 class ListItemReader(LineReaderDecorator):
     """A reader for list items."""
 
-    def __init__(self, reader: LineReader, indent: int, processor: "ListProcessor") -> None:
-        self.indent = indent
-        self.pattern = re.compile('^ {%d}' % indent)
+    def __init__(self, reader: LineReader, markers: str, processor: "ListProcessor") -> None:
+        self.markers = markers
+        self.marker: str = None
+        self.indent: int = None
+        self.indent_pattern: Pattern = None
         self.beginning_lineno = reader.lineno + 1
         self.processor = processor
         super().__init__(reader)
+
+        self.recognize_list_item()
+
+    def recognize_list_item(self) -> None:
+        first_line = self.reader.fetch(1, markers=[self.markers])
+        matched = re.match(r'^(\s*(%s)\s*)(.*)' % self.markers, first_line)
+        if matched is None:
+            raise IOError
+        else:
+            self.marker = matched.group(2)
+
+            prefix = matched.group(1)
+            spaces_after_marker = len(prefix) - len(prefix.rstrip())
+            remain = matched.group(3)
+            if 1 <= spaces_after_marker <= 4 and len(remain) > 0:
+                # the case a list_item having small indents
+                indent = len(prefix)
+            else:
+                # the case a list_item having much indents (>= 4) or nothing (the line is marker only)
+                indent = len(prefix.rstrip()) + 1
+
+            self.set_indent(indent)
+
+    def set_indent(self, indent: int) -> None:
+        self.indent = indent
+        self.indent_pattern = re.compile('^ {%d}' % indent)
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
         if kwargs.get('lazy'):
@@ -159,12 +187,18 @@ class ListItemReader(LineReaderDecorator):
         else:
             reader = self.reader
 
-        line = self.reader.fetch(relative, **kwargs)
-        if self.lineno + relative == self.beginning_lineno:
+        if self.is_beginning_line(relative):
+            # skip over a list marker on the beginning line
+            markers = [self.markers] + kwargs.pop('markers', [])
+            line = self.reader.fetch(relative, markers=markers, **kwargs)
+        else:
+            line = self.reader.fetch(relative, **kwargs)
+
+        if self.is_beginning_line(relative):
             # remove a list marker and indents when the beginning line
             return line[self.indent:]
-        elif self.pattern.match(line):
-            return self.pattern.sub('', line)
+        elif self.indent_pattern.match(line):
+            return self.indent_pattern.sub('', line)
         elif self.processor.match(reader, in_list=True):
             # next list item found
             raise IOError
@@ -174,6 +208,9 @@ class ListItemReader(LineReaderDecorator):
             return line
         else:
             raise IOError
+
+    def is_beginning_line(self, relative: int) -> bool:
+        return self.lineno + relative == self.beginning_lineno
 
 
 class TextReader:

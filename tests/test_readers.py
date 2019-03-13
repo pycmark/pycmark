@@ -150,7 +150,7 @@ def test_ListItemReader():
             "  sed do eiusmod tempor incididunt \n"
             "ut labore et dolore magna aliqua.")
     reader = LineReader(text.splitlines(True))
-    list_reader = ListItemReader(reader, 2, BlockProcessor(None))
+    list_reader = ListItemReader(reader, '-', BlockProcessor(None))
     assert list_reader.readline() == "Lorem ipsum dolor sit amet, \n"
 
     # reached next item
@@ -160,7 +160,7 @@ def test_ListItemReader():
     except IOError:
         pass
 
-    list_reader = ListItemReader(reader, 2, BlockProcessor(None))
+    list_reader = ListItemReader(reader, '-', BlockProcessor(None))
     assert list_reader.readline() == "consectetur adipiscing elit, \n"
     assert list_reader.readline() == "\n"
     assert list_reader.readline() == "sed do eiusmod tempor incididunt \n"
@@ -181,7 +181,7 @@ def test_nested_line_readers():
             "continued here.\n")
     reader = LineReader(text.splitlines(True))
     reader = BlockQuoteReader(reader)
-    reader = ListItemReader(reader, 3, BlockProcessor(None))
+    reader = ListItemReader(reader, r'1\.', BlockProcessor(None))
     reader = BlockQuoteReader(reader)
     reader = LazyLineReader(reader)
     assert reader.readline() == 'Blockquote\n'

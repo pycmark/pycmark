@@ -49,6 +49,11 @@ def test_example_6():
     assert_node(result, [nodes.document, nodes.block_quote, nodes.literal_block, "  foo\n"])
 
 
+def test_example_7():
+    result = publish("-\t\tfoo\n")
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, nodes.literal_block, "  foo\n"])
+
+
 def test_example_9():
     text = (" - foo\n"
             "   - bar\n"

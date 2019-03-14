@@ -133,6 +133,24 @@ class BlockQuoteReader(LineReaderDecorator):
             raise IOError
 
 
+class FencedCodeBlockReader(LineReaderDecorator):
+    """A reader for fenced code blocks."""
+
+    def __init__(self, reader: LineReader, indent: int, marker: str) -> None:
+        super().__init__(reader)
+        self.closing_pattern = re.compile(r'^ {0,3}%s+\s*$' % marker)
+        self.indent_pattern = re.compile(r'^ {0,%d}' % indent)
+
+    def fetch(self, relative: int = 0, **kwargs) -> str:
+        """Returns a line without indents."""
+        line = self.reader.fetch(relative, **kwargs)
+        if self.closing_pattern.match(line):
+            self.reader.step()
+            raise IOError
+        else:
+            return self.indent_pattern.sub('', line)
+
+
 class LazyLineReader(LineReaderDecorator):
     """A reader supports laziness paragraphs."""
 

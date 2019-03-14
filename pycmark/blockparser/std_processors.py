@@ -16,7 +16,7 @@ from docutils.nodes import Element, Node
 
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
-from pycmark.readers import LazyLineReader, LineReader
+from pycmark.readers import FencedCodeBlockReader, LazyLineReader, LineReader
 from pycmark.utils import entitytrans
 
 
@@ -87,19 +87,10 @@ class FencedCodeBlockProcessor(PatternBlockProcessor):
     pattern = re.compile(r'^( {0,3})(`{3,}|~{3,})([^`]*)$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
-        def unindent(text: str, length: int) -> str:
-            return re.sub(r'^ {0,%d}' % length, '', text)
-
         source, lineno = reader.get_source_and_line()
 
-        code = ''
         indent, marker, language = self.pattern.match(reader.readline()).groups()
-        closing_pattern = re.compile(r'^ {0,3}%s+\s*$' % marker)
-        for line in reader:
-            if closing_pattern.match(line):
-                break
-            else:
-                code += unindent(line, len(indent))
+        code = ''.join(FencedCodeBlockReader(reader, len(indent), marker))
 
         literal_block = nodes.literal_block(code, code, classes=['code'])
         literal_block.source = source

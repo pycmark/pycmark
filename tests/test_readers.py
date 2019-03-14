@@ -11,7 +11,8 @@ import re
 
 from pycmark.blockparser import BlockProcessor
 from pycmark.readers import (
-    LineReader, BlockQuoteReader, ListItemReader, LazyLineReader, TextReader
+    LineReader, BlockQuoteReader, FencedCodeBlockReader, ListItemReader,
+    LazyLineReader, TextReader
 )
 
 
@@ -114,6 +115,34 @@ def test_BlockQuoteReader():
     assert reader.readline() == '\n'
     assert reader.readline() == "sed do eiusmod tempor incididunt \n"
     assert reader.readline() == "ut labore et dolore magna aliqua."
+
+
+def test_FencedCodeBlockReader():
+    text = ("Lorem ipsum dolor sit amet, \n"
+            "   consectetur adipiscing elit, \n"
+            "    sed do eiusmod tempor incididunt \n"
+            "    ```\n"
+            "        ut labore et dolore magna aliqua.\n"
+            "   ```\n"
+            "Ut enim ad minim veniam, quis nostrud")
+
+    reader = LineReader(text.splitlines(True), source='dummy.md')
+    codeblock_reader = FencedCodeBlockReader(reader, 0, '```')
+    assert codeblock_reader.readline() == "Lorem ipsum dolor sit amet, \n"
+    assert codeblock_reader.readline() == "   consectetur adipiscing elit, \n"
+    assert codeblock_reader.readline() == "    sed do eiusmod tempor incididunt \n"
+    assert codeblock_reader.readline() == "    ```\n"
+    assert codeblock_reader.readline() == "        ut labore et dolore magna aliqua.\n"
+    assert codeblock_reader.eof()
+
+    reader = LineReader(text.splitlines(True), source='dummy.md')
+    codeblock_reader = FencedCodeBlockReader(reader, 3, '```')
+    assert codeblock_reader.readline() == "Lorem ipsum dolor sit amet, \n"
+    assert codeblock_reader.readline() == "consectetur adipiscing elit, \n"
+    assert codeblock_reader.readline() == " sed do eiusmod tempor incididunt \n"
+    assert codeblock_reader.readline() == " ```\n"
+    assert codeblock_reader.readline() == "     ut labore et dolore magna aliqua.\n"
+    assert codeblock_reader.eof()
 
 
 def test_LazyLineReader():

@@ -37,7 +37,8 @@ from pycmark.blockparser.std_processors import (
     ATXHeadingProcessor,
     IndentedCodeBlockProcessor,
     BlankLineProcessor,
-    FencedCodeBlockProcessor,
+    BacktickFencedCodeBlockProcessor,
+    TildeFencedCodeBlockProcessor,
     ParagraphProcessor,
 )
 from pycmark.inlineparser import InlineProcessor
@@ -81,7 +82,8 @@ class CommonMarkParser(Parser):
             ATXHeadingProcessor,
             IndentedCodeBlockProcessor,
             BlankLineProcessor,
-            FencedCodeBlockProcessor,
+            BacktickFencedCodeBlockProcessor,
+            TildeFencedCodeBlockProcessor,
             ScriptHTMLBlockProcessor,
             CommentHTMLBlockProcessor,
             ProcessingInstructionHTMLBlockProcessor,

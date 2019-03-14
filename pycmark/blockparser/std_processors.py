@@ -82,26 +82,31 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
 
 
 # 4.5 Fenced code blocks
-class FencedCodeBlockProcessor(PatternBlockProcessor):
+class BacktickFencedCodeBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
-    pattern = re.compile(r'^( {0,3})(`{3,}|~{3,})([^`]*)$')
+    pattern = re.compile(r'^( {0,3})(`{3,})([^`]*)$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
         source, lineno = reader.get_source_and_line()
 
-        indent, marker, language = self.pattern.match(reader.readline()).groups()
+        indent, marker, info = self.pattern.match(reader.readline()).groups()
         code = ''.join(FencedCodeBlockReader(reader, len(indent), marker))
 
         literal_block = nodes.literal_block(code, code, classes=['code'])
         literal_block.source = source
         literal_block.line = lineno + 1  # lineno points previous line
-        if language and language.strip():
-            language = entitytrans._unescape(language.strip())
+        if info.strip():
+            language = entitytrans._unescape(info.split()[0].strip())
             literal_block['language'] = language
             literal_block['classes'].append('language-%s' % language.split()[0])
         document += literal_block
 
         return True
+
+
+class TildeFencedCodeBlockProcessor(BacktickFencedCodeBlockProcessor):
+    paragraph_interruptable = True
+    pattern = re.compile(r'^( {0,3})(~{3,})(.*)$')
 
 
 # 4.3 Setext headings

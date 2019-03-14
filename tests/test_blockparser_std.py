@@ -655,6 +655,14 @@ def test_example_114():
                                                            "\nfoo")])
 
 
+def test_example_114_2():
+    text = ("~~~ aa ``` ~~~\n"
+            "foo\n"
+            "~~~\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.literal_block, "foo\n"])
+
+
 def test_example_115():
     text = ("```\n"
             "``` aaa\n"

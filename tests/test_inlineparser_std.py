@@ -45,6 +45,14 @@ def test_example_291():
                                                            "[foo]: /url \"not a reference\"")])
 
 
+def test_example_301():
+    text = ("``` foo\\+bar\n"
+            "foo\n"
+            "```\n")
+    result = publish(text)
+    assert_node(result[0], nodes.literal_block, classes=['code', 'language-foo+bar'])
+
+
 def test_example_302():
     text = ("&nbsp; &amp; &copy; &AElig; &Dcaron;\n"
             "&frac34; &HilbertSpace; &DifferentialD;\n"

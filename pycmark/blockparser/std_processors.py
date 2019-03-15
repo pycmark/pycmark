@@ -19,7 +19,7 @@ from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import (
     FencedCodeBlockReader, IndentedCodeBlockReader, LazyLineReader, LineReader
 )
-from pycmark.utils import entitytrans
+from pycmark.utils import entitytrans, unescape
 
 
 # 4.1 Thematic breaks
@@ -88,7 +88,7 @@ class BacktickFencedCodeBlockProcessor(PatternBlockProcessor):
         literal_block.source = source
         literal_block.line = lineno + 1  # lineno points previous line
         if info.strip():
-            language = entitytrans._unescape(info.split()[0].strip())
+            language = unescape(entitytrans._unescape(info.split()[0].strip()))
             literal_block['language'] = language
             literal_block['classes'].append('language-%s' % language.split()[0])
         document += literal_block

@@ -52,7 +52,7 @@ class TightListsDetector(Transform):
             return isinstance(node, (nodes.bullet_list, nodes.enumerated_list))
 
         def has_loose_element(node: Element) -> bool:
-            return any(isinstance(subnode, addnodes.blankline) for subnode in node)
+            return any(isinstance(subnode, addnodes.blankline) for subnode in node[1:])
 
         for node in document.traverse(is_list_node):  # type: Element
             children = cast(List[nodes.list_item], node)

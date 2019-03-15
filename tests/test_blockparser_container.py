@@ -343,7 +343,7 @@ def test_example_241():
             "-\n"
             "      baz\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "foo"],
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "foo"],
                                                              [nodes.list_item, nodes.literal_block, "bar\n"],
                                                              [nodes.list_item, nodes.literal_block, "baz\n"])])
 
@@ -352,7 +352,7 @@ def test_example_242():
     text = ("-   \n"
             "  foo\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, nodes.paragraph, "foo"])
+    assert_node(result, [nodes.document, nodes.bullet_list, nodes.list_item, "foo"])
 
 
 def test_example_243():
@@ -369,19 +369,19 @@ def test_example_245():
             "-   \n"
             "- bar\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, nodes.paragraph, "foo"],
+    assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "foo"],
                                                              nodes.list_item,
-                                                             [nodes.list_item, nodes.paragraph, "bar"])])
+                                                             [nodes.list_item, "bar"])])
 
 
-def test_example_244():
+def test_example_246():
     text = ("1. foo\n"
             "2.\n"
             "3. bar\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.enumerated_list, ([nodes.list_item, nodes.paragraph, "foo"],
+    assert_node(result, [nodes.document, nodes.enumerated_list, ([nodes.list_item, "foo"],
                                                                  nodes.list_item,
-                                                                 [nodes.list_item, nodes.paragraph, "bar"])])
+                                                                 [nodes.list_item, "bar"])])
 
 
 def test_example_247():

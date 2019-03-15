@@ -39,7 +39,7 @@ class BackslashEscapeProcessor(PatternInlineProcessor):
 
 # 6.2 Entity and numeric character references
 class EntityReferenceProcessor(PatternInlineProcessor):
-    pattern = re.compile(r'&(?:\w{1,32}|#\d+|#X[0-9A-Fa-f]+);')
+    pattern = re.compile(r'&(?:\w{1,32}|#\d+|#[xX][0-9A-Fa-f]+);')
 
     def run(self, document: Element, reader: TextReader) -> bool:
         text = reader.consume(self.pattern).group(0)

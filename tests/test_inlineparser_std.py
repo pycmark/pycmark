@@ -69,18 +69,23 @@ def test_example_303():
 
 
 def test_example_304():
+    result = publish("&#X22; &#XD06; &#xcab;")
+    assert_node(result, [nodes.document, nodes.paragraph, '" ആ ಫ'])
+
+
+def test_example_305():
     text = ("&nbsp &x; &#; &#x;\n"
             "&ThisIsNotDefined; &hi?;")
     result = publish(text)
     assert_node(result, [nodes.document, nodes.paragraph, text])
 
 
-def test_example_305():
+def test_example_306():
     result = publish("&copy")
     assert_node(result, [nodes.document, nodes.paragraph, "&copy"])
 
 
-def test_example_306():
+def test_example_307():
     result = publish("&MadeUpEntity;")
     assert_node(result, [nodes.document, nodes.paragraph, "&MadeUpEntity;"])
 

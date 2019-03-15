@@ -146,12 +146,17 @@ class LinkReferenceDefinitionDetector(Transform):
                 destination = LinkDestinationParser().parse(node, reader)
                 if destination == '':
                     break
+                position = reader.position
                 title = LinkTitleParser().parse(node, reader)
                 eol = reader.consume(re.compile('\\s*(\n|$)'))
                 if eol is None:
-                    break
+                    # unknown text remains; no title?
+                    reader.position = position
+                    if reader.consume(re.compile('\\s*(\n|$)')):
+                        target = nodes.target('', names=[label], refuri=destination)
+                else:
+                    target = nodes.target('', names=[label], refuri=destination, title=title)
 
-                target = nodes.target('', names=[label], refuri=destination, title=title)
                 if label not in self.document.nameids:
                     self.document.note_explicit_target(target)
                 else:

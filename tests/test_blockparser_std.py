@@ -849,7 +849,8 @@ def test_example_175():
     text = ('[foo]: /url\n'
             '"title" ok\n')
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, '[foo]: /url\n"title" ok'])
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, '"title" ok'])])
 
 
 def test_example_176():

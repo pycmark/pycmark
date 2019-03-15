@@ -56,10 +56,18 @@ class ListProcessor(BlockProcessor):
         while True:
             list_item = nodes.list_item()
             list_node += list_item
-            self.parser.parse(self.get_item_reader(reader), list_item)
 
-            if not self.is_next_list_item(reader, item_reader.marker):
-                break
+            item_reader = self.get_item_reader(reader)
+            self.consume_blanklines(item_reader, list_item)
+            if len(list_item) >= 2:
+                # the list item starts with two or more blank lines...
+                if not self.is_next_list_item(reader, item_reader.marker):
+                    # non list item after blank lines breaks the list
+                    break
+            else:
+                self.parser.parse(item_reader, list_item)
+                if not self.is_next_list_item(reader, item_reader.marker):
+                    break
 
         # blank lines at tail of last list_item should be recognized as a part of outside of list
         last_item = cast(List[Element], list_node[-1])
@@ -83,6 +91,15 @@ class ListProcessor(BlockProcessor):
                 return True
         except IOError:
             return False
+
+    def consume_blanklines(self, reader: LineReader, list_item: nodes.list_item) -> None:
+        """Skip over blank lines at beginning of the list item."""
+        try:
+            while reader.next_line.strip() == '':
+                reader.step()
+                list_item += addnodes.blankline()
+        except IOError:
+            pass
 
     def create_list_node(self, marker: str) -> Element:
         raise NotImplementedError

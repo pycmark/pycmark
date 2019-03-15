@@ -217,11 +217,11 @@ class ListItemReader(LineReaderDecorator):
             return line[self.indent:]
         elif self.indent_pattern.match(line):
             return self.indent_pattern.sub('', line)
+        elif line.strip() == '':
+            return '\n'
         elif self.processor.match(reader, in_list=True):
             # next list item found
             raise IOError
-        elif line.strip() == '':
-            return '\n'
         elif kwargs.get('lazy') and line.strip():
             return line
         else:

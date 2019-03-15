@@ -356,6 +356,15 @@ def test_example_242():
 
 
 def test_example_243():
+    text = ("-   \n"
+            "\n"
+            "  foo\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.bullet_list, nodes.list_item],
+                                          [nodes.paragraph, "foo"])])
+
+
+def test_example_245():
     text = ("- foo\n"
             "-   \n"
             "- bar\n")

@@ -4,6 +4,9 @@ dist: xenial
 cache: pip
 python: 3.7
 install:
-  - pip install -U pip setuptools
-  - pip install .[test]
-script: tox
+  - pip install -U pip setuptools tox
+script:
+  - tox
+  - python setup.py install
+  - git clone -b 0.28 https://github.com/commonmark/CommonMark
+  - (cd CommonMark; python test/spec_tests.py --prog ../tests/bin/md2html)

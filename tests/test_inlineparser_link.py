@@ -767,7 +767,7 @@ def test_example_544():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, nodes.image],
                                           nodes.target)])
-    assert_node(result[0][0], uri="train.jpg", alt="foo *bar*", title="train & tracks")
+    assert_node(result[0][0], uri="train.jpg", alt="foo bar", title="train & tracks")
 
 
 def test_example_545():
@@ -789,7 +789,7 @@ def test_example_547():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, nodes.image],
                                           nodes.target)])
-    assert_node(result[0][0], uri="train.jpg", alt="foo *bar*", title="train & tracks")
+    assert_node(result[0][0], uri="train.jpg", alt="foo bar", title="train & tracks")
 
 
 def test_example_548():
@@ -799,7 +799,7 @@ def test_example_548():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, nodes.image],
                                           nodes.target)])
-    assert_node(result[0][0], uri="train.jpg", alt="foo *bar*", title="train & tracks")
+    assert_node(result[0][0], uri="train.jpg", alt="foo bar", title="train & tracks")
 
 
 def test_example_549():

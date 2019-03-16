@@ -209,6 +209,12 @@ class SparseTextConverter(Transform):
 class EmphasisConverter(Transform):
     default_priority = 900
 
+    def __init__(self, document: Element, startnode: Node = None) -> None:
+        # override __init__() to accept any Element node as ``document``.
+        self.document = document  # type: ignore
+        self.startnode = startnode
+        self.language = None
+
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(TextElement):
             while True:

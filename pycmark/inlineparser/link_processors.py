@@ -97,7 +97,9 @@ class LinkCloserProcessor(PatternInlineProcessor):
 
         node: Element = None
         if opener['marker'] == '![':
+            from pycmark.transforms import EmphasisConverter  # lazy loading
             para = transplant_nodes(document, nodes.paragraph(), start=opener, end=closer)
+            EmphasisConverter(para).apply()
             node = nodes.image('', uri=destination, alt=para.astext())
             if title:
                 node['title'] = title

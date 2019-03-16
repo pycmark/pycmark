@@ -74,7 +74,8 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
                 reader.step(-1)
                 break
 
-        code = re.sub('^\n*(.*\n)\n*$', '\\1', code)  # strip blank lines
+        code = re.sub('^\n+', '', code)  # strip blank lines
+        code = re.sub('\n+$', '\n', code)  # strip blank lines
         document += nodes.literal_block(code, code, classes=['code'])
         document[-1].source = source
         document[-1].line = lineno + 1  # lineno points previous line

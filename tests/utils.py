@@ -11,6 +11,7 @@ from docutils.core import publish_doctree
 from docutils.readers.standalone import Reader
 
 from pycmark import CommonMarkParser
+from pycmark.transforms import LinebreakFilter
 
 
 class TestReader(Reader):
@@ -18,11 +19,18 @@ class TestReader(Reader):
         return []  # skip all of transforms!
 
 
+class TestParser(CommonMarkParser):
+    def get_transforms(self):
+        transforms = super().get_transforms()
+        transforms.remove(LinebreakFilter)
+        return transforms
+
+
 def publish(text):
     return publish_doctree(source=text,
                            source_path='dummy.md',
                            reader=TestReader(),
-                           parser=CommonMarkParser())
+                           parser=TestParser())
 
 
 # copied from sphinx/testing/util.py

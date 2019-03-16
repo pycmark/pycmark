@@ -16,7 +16,9 @@ from docutils.nodes import Element, Node
 
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
-from pycmark.readers import FencedCodeBlockReader, LazyLineReader, LineReader
+from pycmark.readers import (
+    FencedCodeBlockReader, IndentedCodeBlockReader, LazyLineReader, LineReader
+)
 from pycmark.utils import entitytrans
 
 
@@ -62,18 +64,7 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
     def run(self, document: Element, reader: LineReader) -> bool:
         source, lineno = reader.get_source_and_line()
 
-        code = ''
-        for line in reader:
-            matched = self.followings.match(line)
-            if matched:
-                if matched.group(2):
-                    code += matched.group(2)
-                else:
-                    code += "\n"
-            else:
-                reader.step(-1)
-                break
-
+        code = ''.join(IndentedCodeBlockReader(reader))
         code = re.sub('^\n+', '', code)  # strip blank lines
         code = re.sub('\n+$', '\n', code)  # strip blank lines
         document += nodes.literal_block(code, code, classes=['code'])

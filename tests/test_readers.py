@@ -11,8 +11,8 @@ import re
 
 from pycmark.blockparser import BlockProcessor
 from pycmark.readers import (
-    LineReader, BlockQuoteReader, FencedCodeBlockReader, ListItemReader,
-    LazyLineReader, TextReader
+    LineReader, BlockQuoteReader, FencedCodeBlockReader, IndentedCodeBlockReader,
+    ListItemReader, LazyLineReader, TextReader
 )
 
 
@@ -142,6 +142,20 @@ def test_FencedCodeBlockReader():
     assert codeblock_reader.readline() == " sed do eiusmod tempor incididunt \n"
     assert codeblock_reader.readline() == " ```\n"
     assert codeblock_reader.readline() == "     ut labore et dolore magna aliqua.\n"
+    assert codeblock_reader.eof()
+
+
+def test_IndentedCodeBlockReader():
+    text = ("    Lorem ipsum dolor sit amet, \n"
+            "       consectetur adipiscing elit, \n"
+            "\n"
+            "  sed do eiusmod tempor incididunt \n")
+
+    reader = LineReader(text.splitlines(True), source='dummy.md')
+    codeblock_reader = IndentedCodeBlockReader(reader)
+    assert codeblock_reader.readline() == "Lorem ipsum dolor sit amet, \n"
+    assert codeblock_reader.readline() == "   consectetur adipiscing elit, \n"
+    assert codeblock_reader.readline() == "\n"
     assert codeblock_reader.eof()
 
 

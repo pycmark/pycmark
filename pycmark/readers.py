@@ -133,6 +133,20 @@ class BlockQuoteReader(LineReaderDecorator):
             raise IOError
 
 
+class IndentedCodeBlockReader(LineReaderDecorator):
+    """A reader for indented code blocks."""
+
+    def fetch(self, relative: int = 0, **kwargs) -> str:
+        """Returns a line without indents."""
+        line = self.reader.fetch(relative, **kwargs)
+        if line.startswith('    '):
+            return line[4:]
+        elif line.strip() == '':
+            return '\n'
+        else:
+            raise IOError
+
+
 class FencedCodeBlockReader(LineReaderDecorator):
     """A reader for fenced code blocks."""
 

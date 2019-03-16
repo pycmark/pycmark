@@ -14,12 +14,13 @@ from typing import Tuple
 
 from docutils import nodes
 from docutils.nodes import Element, Text
+from docutils.nodes import fully_normalize_name
 
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
 from pycmark.readers import TextReader
 from pycmark.utils import entitytrans
-from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, normalize_link_label, transplant_nodes
+from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, transplant_nodes
 
 LABEL_NOT_MATCHED = object()
 
@@ -131,13 +132,13 @@ class LinkCloserProcessor(PatternInlineProcessor):
     @backtrack_onerror
     def parse_link_label(self, document: Element, reader: TextReader, opener: Element = None, closer: Element = None) -> Tuple[object, str]:  # NOQA
         reader.step()
-        refid = LinkLabelParser().parse(document, reader)
-        if refid == '':
+        refname = LinkLabelParser().parse(document, reader)
+        if refname == '':
             # collapsed reference link
             #     [...][]
-            refid = reader[opener['position']:closer['position']]
+            refname = reader[opener['position']:closer['position']]
 
-        target = self.lookup_target(document, refid)
+        target = self.lookup_target(document, refname)
         if target:
             destination = target.get('refuri')
             title = target.get('title')
@@ -145,11 +146,12 @@ class LinkCloserProcessor(PatternInlineProcessor):
         else:
             return LABEL_NOT_MATCHED, None
 
-    def lookup_target(self, document: Element, refid: str) -> nodes.target:
+    def lookup_target(self, document: Element, refname: str) -> nodes.target:
         while document.parent:
             document = document.parent
 
-        node_id = document.nameids.get(normalize_link_label(refid))  # type: ignore
+        refname = fully_normalize_name(refname)
+        node_id = document.nameids.get(refname)  # type: ignore
         if node_id is None:
             return None
 
@@ -209,6 +211,6 @@ class LinkLabelParser:
     def parse(self, document: Element, reader: TextReader) -> str:
         matched = reader.consume(self.pattern)
         if matched:
-            return unescape(matched.group(0)[:-1])
+            return matched.group(0)[:-1]
         else:
             return None

@@ -14,6 +14,7 @@ from typing import List, cast
 
 from docutils import nodes
 from docutils.nodes import Element, FixedTextElement, Node, Text, TextElement
+from docutils.nodes import fully_normalize_name
 from docutils.transforms import Transform
 
 from pycmark import addnodes
@@ -140,6 +141,7 @@ class LinkReferenceDefinitionDetector(Transform):
             if not matched:
                 break
             else:
+                name = fully_normalize_name(matched.group(1))
                 label = normalize_link_label(matched.group(1))
                 if label.strip() == '':
                     break
@@ -155,7 +157,7 @@ class LinkReferenceDefinitionDetector(Transform):
                     if reader.consume(re.compile('\\s*(\n|$)')):
                         target = nodes.target('', names=[label], refuri=destination)
                 else:
-                    target = nodes.target('', names=[label], refuri=destination, title=title)
+                    target = nodes.target('', names=[name], refuri=destination, title=title)
 
                 if label not in self.document.nameids:
                     self.document.note_explicit_target(target)

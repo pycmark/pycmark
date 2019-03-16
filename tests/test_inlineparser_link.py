@@ -475,9 +475,8 @@ def test_example_516():
             "\n"
             "[foo!]: /url\n")
     result = publish(text)
-    assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "bar"],
+    assert_node(result, [nodes.document, ([nodes.paragraph, "[bar][foo!]"],
                                           nodes.target)])
-    assert_node(result[0][0], refuri="/url")
 
 
 def test_example_517():

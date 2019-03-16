@@ -19,7 +19,7 @@ from docutils.nodes import Element, Text
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, UnmatchedTokenError, backtrack_onerror
 from pycmark.readers import TextReader
-from pycmark.utils import entitytrans
+from pycmark.utils import entitytrans, normalize_uri
 from pycmark.utils import OPENTAG, CLOSETAG, escaped_chars_pattern
 
 
@@ -127,7 +127,7 @@ class URIAutolinkProcessor(PatternInlineProcessor):
 
     def run(self, document: Element, reader: TextReader) -> bool:
         uri = reader.consume(self.pattern).group(1)
-        document += nodes.reference(uri, uri, refuri=uri)
+        document += nodes.reference(uri, uri, refuri=normalize_uri(uri))
         return True
 
 
@@ -138,7 +138,7 @@ class EmailAutolinkProcessor(PatternInlineProcessor):
 
     def run(self, document: Element, reader: TextReader) -> bool:
         uri = reader.consume(self.pattern).group(1)
-        document += nodes.reference(uri, uri, refuri='mailto:' + uri)
+        document += nodes.reference(uri, uri, refuri='mailto:' + normalize_uri(uri))
         return True
 
 

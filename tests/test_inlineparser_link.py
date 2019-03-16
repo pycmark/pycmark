@@ -109,27 +109,27 @@ def test_example_472():
 
 
 def test_example_473():
-    result = publish("[link](foo\bar)")
+    result = publish("[link](foo\\bar)")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
-    assert_node(result[0][0], refuri="foo\bar")
+    assert_node(result[0][0], refuri="foo%5Cbar")
 
 
 def test_example_474():
     result = publish("[link](foo%20b&auml;)")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
-    assert_node(result[0][0], refuri="foo%20bä")
+    assert_node(result[0][0], refuri="foo%20b%C3%A4")
 
 
 def test_example_474_2():
     result = publish("[link](<foo%20b&auml;>)")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
-    assert_node(result[0][0], refuri="foo%20bä")
+    assert_node(result[0][0], refuri="foo%20b%C3%A4")
 
 
 def test_example_475():
     result = publish("""[link]("title")""")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
-    assert_node(result[0][0], refuri='"title"')
+    assert_node(result[0][0], refuri='%22title%22')
 
 
 def test_example_476():
@@ -156,7 +156,7 @@ def test_example_477():
 def test_example_478():
     result = publish("""[link](/url\xa0"title")""")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
-    assert_node(result[0][0], refuri='/url\xa0"title"')
+    assert_node(result[0][0], refuri='/url%C2%A0%22title%22')
 
 
 def test_example_479():

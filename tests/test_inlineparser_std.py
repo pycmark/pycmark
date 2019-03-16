@@ -98,7 +98,7 @@ def test_example_308():
 def test_example_309():
     result = publish('[foo](/f&ouml;&ouml; "f&ouml;&ouml;")')
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "foo"])
-    assert_node(result[0][0], refuri="/föö", reftitle="föö")
+    assert_node(result[0][0], refuri="/f%C3%B6%C3%B6", reftitle="föö")
 
 
 def test_example_310():
@@ -108,7 +108,7 @@ def test_example_310():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
                                           nodes.target)])
-    assert_node(result[0][0], refuri="/föö", reftitle="föö")
+    assert_node(result[0][0], refuri="/f%C3%B6%C3%B6", reftitle="föö")
 
 
 def test_example_311():

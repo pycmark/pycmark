@@ -19,7 +19,7 @@ from docutils.nodes import fully_normalize_name
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
 from pycmark.readers import TextReader
-from pycmark.utils import entitytrans
+from pycmark.utils import entitytrans, normalize_uri
 from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, transplant_nodes
 
 LABEL_NOT_MATCHED = object()
@@ -164,9 +164,15 @@ class LinkDestinationParser:
     def parse(self, document: Element, reader: TextReader) -> str:
         matched = reader.consume(self.pattern)
         if matched:
-            return unescape(entitytrans._unescape(matched.group(1)))
+            return self.normalize_link_destination(matched.group(1))
         else:
             return self.parseBareLinkDestination(document, reader)
+
+    def normalize_link_destination(self, s: str) -> str:
+        s = entitytrans._unescape(s)
+        s = unescape(s)
+        s = normalize_uri(s)
+        return s
 
     def parseBareLinkDestination(self, document: Element, reader: TextReader) -> str:
         assert reader.consume(re.compile(r'[ \n]*'))
@@ -189,7 +195,7 @@ class LinkDestinationParser:
             reader.step()
 
         end = reader.position
-        return unescape(entitytrans._unescape(reader[start:end]))
+        return self.normalize_link_destination(reader[start:end])
 
 
 class LinkTitleParser:

@@ -774,8 +774,8 @@ def test_example_167():
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.target,
                                           [nodes.paragraph, nodes.reference, "foo"])])
-    assert_node(result[0], refuri="/url\\bar*baz", title='foo"bar\\baz')
-    assert_node(result[1][0], refuri="/url\\bar*baz", reftitle='foo"bar\\baz')
+    assert_node(result[0], refuri="/url%5Cbar*baz", title='foo"bar\\baz')
+    assert_node(result[1][0], refuri="/url%5Cbar*baz", reftitle='foo"bar\\baz')
 
 
 def test_example_168():
@@ -821,8 +821,8 @@ def test_example_171():
     result = publish(text)
     assert_node(result, [nodes.document, (nodes.target,
                                           [nodes.paragraph, nodes.reference, "αγω"])])
-    assert_node(result[0], refuri="/φου")
-    assert_node(result[1][0], refuri="/φου")
+    assert_node(result[0], refuri="/%CF%86%CE%BF%CF%85")
+    assert_node(result[1][0], refuri="/%CF%86%CE%BF%CF%85")
 
 
 def test_example_172():

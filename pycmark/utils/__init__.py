@@ -11,6 +11,7 @@
 
 import re
 from typing import List
+from urllib.parse import quote, unquote
 
 from docutils.nodes import Element, Node
 
@@ -34,6 +35,20 @@ CLOSETAG = "</" + TAGNAME + r"\s*>"
 
 def unescape(text: str) -> str:
     return escaped_chars_pattern.sub(lambda m: m.group(0)[1], text)
+
+
+def normalize_uri(s: str) -> str:
+    """Normalize URI."""
+    # https://tools.ietf.org/html/rfc3986.html
+    # https://tools.ietf.org/html/rfc5321.html
+    safe = ''.join([
+        ":?#",          # URI (rfc3986; 3)
+        "/",            # Path (rfc3986; 3.3)
+        "-._~",         # unreserved (rfc3986; 2.3)
+        "!$&'()*+,;=",  # sub-delims (rfc3986; 2.2)
+        "@",            # mail address (rfc5321; 4.1.2)
+    ])
+    return quote(unquote(s), safe=safe)
 
 
 def expand_leading_tabs(text: str, markers: List[str] = [], tabstop: int = 4) -> str:

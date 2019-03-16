@@ -31,6 +31,16 @@ class BlanklineFilter(Transform):
             node.parent.remove(node)
 
 
+class LinebreakFilter(Transform):
+    default_priority = 500
+
+    def apply(self, **kwargs) -> None:
+        for node in self.document.traverse(addnodes.linebreak):
+            self.document.reporter.warning("A hard line break detected, ignored.",
+                                           source=node.parent.source, line=node.parent.line)
+            node.replace_self(addnodes.SparseText('\n', 0, 1))
+
+
 class TightListsDetector(Transform):
     default_priority = BlanklineFilter.default_priority - 1  # must be eariler than BlanklineFilter
 

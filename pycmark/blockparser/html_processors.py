@@ -33,7 +33,7 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     closing_pattern = re.compile(r'^$')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         location = reader.get_source_and_line(incr=1)
         content = ''
         for line in reader:

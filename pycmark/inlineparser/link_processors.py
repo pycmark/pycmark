@@ -29,7 +29,7 @@ LABEL_NOT_MATCHED = object()
 class LinkOpenerProcessor(PatternInlineProcessor):
     pattern = re.compile(r'\!?\[')
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         marker = reader.consume(self.pattern).group(0)
         document += addnodes.bracket(marker=marker, can_open=True, active=True, position=reader.position)
         return True
@@ -38,14 +38,14 @@ class LinkOpenerProcessor(PatternInlineProcessor):
 class LinkCloserProcessor(PatternInlineProcessor):
     pattern = re.compile(r'\]')
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         reader.step(1)
         document += addnodes.bracket(marker="]", can_open=False, position=reader.position - 1)
-        self.process_link_or_image(document, reader)
+        self.process_link_or_image(reader, document)
         return True
 
     @backtrack_onerror
-    def process_link_or_image(self, document: Element, reader: TextReader) -> bool:
+    def process_link_or_image(self, reader: TextReader, document: Element) -> bool:
         brackets = list(n for n in document.children if isinstance(n, addnodes.bracket))
         openers = list(d for d in brackets if d['can_open'])
         if len(openers) == 0:
@@ -64,12 +64,12 @@ class LinkCloserProcessor(PatternInlineProcessor):
                 # link destination + link title (optional)
                 #     [...](<.+> ".+")
                 #     [...](.+ ".+")
-                destination, title = self.parse_link_destination(document, reader)
+                destination, title = self.parse_link_destination(reader, document)
             elif reader.remain.startswith('['):
                 # link label
                 #     [...][.+]
                 #     [...][]
-                destination, title = self.parse_link_label(document, reader, opener=opener, closer=closer)
+                destination, title = self.parse_link_label(reader, document, opener=opener, closer=closer)
             else:
                 destination = None
                 title = None
@@ -120,18 +120,18 @@ class LinkCloserProcessor(PatternInlineProcessor):
         return True
 
     @backtrack_onerror
-    def parse_link_destination(self, document: Element, reader: TextReader) -> Tuple[str, str]:
+    def parse_link_destination(self, reader: TextReader, document: Element) -> Tuple[str, str]:
         reader.step()
-        destination = LinkDestinationParser().parse(document, reader)
-        title = LinkTitleParser().parse(document, reader)
+        destination = LinkDestinationParser().parse(reader, document)
+        title = LinkTitleParser().parse(reader, document)
         assert reader.consume(re.compile(r'\s*\)'))
 
         return destination, title
 
     @backtrack_onerror
-    def parse_link_label(self, document: Element, reader: TextReader, opener: Element = None, closer: Element = None) -> Tuple[object, str]:  # NOQA
+    def parse_link_label(self, reader: TextReader, document: Element, opener: Element = None, closer: Element = None) -> Tuple[object, str]:  # NOQA
         reader.step()
-        refname = LinkLabelParser().parse(document, reader)
+        refname = LinkLabelParser().parse(reader, document)
         if refname == '':
             # collapsed reference link
             #     [...][]
@@ -160,12 +160,12 @@ class LinkCloserProcessor(PatternInlineProcessor):
 class LinkDestinationParser:
     pattern = re.compile(r'\s*<((?:[^ <>\n\\]|' + ESCAPED_CHARS + r'|\\)*)>', re.S)
 
-    def parse(self, document: Element, reader: TextReader) -> str:
+    def parse(self, reader: TextReader, document: Element) -> str:
         matched = reader.consume(self.pattern)
         if matched:
             return self.normalize_link_destination(matched.group(1))
         else:
-            return self.parseBareLinkDestination(document, reader)
+            return self.parseBareLinkDestination(reader, document)
 
     def normalize_link_destination(self, s: str) -> str:
         s = entitytrans._unescape(s)
@@ -173,7 +173,7 @@ class LinkDestinationParser:
         s = normalize_uri(s)
         return s
 
-    def parseBareLinkDestination(self, document: Element, reader: TextReader) -> str:
+    def parseBareLinkDestination(self, reader: TextReader, document: Element) -> str:
         assert reader.consume(re.compile(r'[ \n]*'))
 
         parens = 0
@@ -202,7 +202,7 @@ class LinkTitleParser:
                          r"'(" + ESCAPED_CHARS + r"|[^'])*'|" +
                          r"\((" + ESCAPED_CHARS + r"|[^)])*\))")
 
-    def parse(self, document: Element, reader: TextReader) -> str:
+    def parse(self, reader: TextReader, document: Element) -> str:
         matched = reader.consume(self.pattern)
         if matched:
             return unescape(entitytrans._unescape(matched.group(1)[1:-1]))
@@ -213,7 +213,7 @@ class LinkTitleParser:
 class LinkLabelParser:
     pattern = re.compile(r'(?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\){0,1000}\]')
 
-    def parse(self, document: Element, reader: TextReader) -> str:
+    def parse(self, reader: TextReader, document: Element) -> str:
         matched = reader.consume(self.pattern)
         if matched:
             return matched.group(0)[:-1]

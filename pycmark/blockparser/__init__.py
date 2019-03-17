@@ -31,7 +31,7 @@ class BlockParser:
         while not reader.eof():
             for _, processor in self.processors:
                 if processor.match(reader):
-                    if processor.run(document, reader):
+                    if processor.run(reader, document):
                         break
             else:
                 raise RuntimeError('Failed to parse')
@@ -57,7 +57,7 @@ class BlockProcessor:
     def match(self, reader: LineReader, **kwargs) -> bool:
         return False
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         return False
 
     def __lt__(self, other: Any) -> bool:

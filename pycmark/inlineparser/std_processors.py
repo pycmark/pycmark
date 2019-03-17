@@ -30,7 +30,7 @@ def is_punctuation(char: str) -> bool:
 class BackslashEscapeProcessor(PatternInlineProcessor):
     pattern = escaped_chars_pattern
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         document += addnodes.SparseText(reader.subject, reader.position + 1, reader.position + 2)
         reader.step(2)
         return True
@@ -40,7 +40,7 @@ class BackslashEscapeProcessor(PatternInlineProcessor):
 class EntityReferenceProcessor(PatternInlineProcessor):
     pattern = re.compile(r'&(?:\w{1,32}|#\d+|#[xX][0-9A-Fa-f]+);')
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         text = reader.consume(self.pattern).group(0)
         document += Text(entitytrans._unescape(text))
         return True
@@ -51,7 +51,7 @@ class CodeSpanProcessor(PatternInlineProcessor):
     pattern = re.compile(r'`+')
 
     @backtrack_onerror
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         marker = reader.consume(self.pattern).group(0)
 
         pattern = re.compile(marker + r"([^`]|$)")
@@ -78,7 +78,7 @@ class EmphasisProcessor(PatternInlineProcessor):
     pattern = re.compile(r'(\*+|_+)')
     whitespaces = re.compile(r'\s|0xa0')
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         if reader.position == 0:
             before_is_whitespace: Any = True
             before_is_punctuation: Any = False
@@ -124,7 +124,7 @@ class EmphasisProcessor(PatternInlineProcessor):
 class URIAutolinkProcessor(PatternInlineProcessor):
     pattern = re.compile(r'<([a-z][a-z0-9+.-]{1,31}:[^<>\x00-\x20]*)>', re.I)
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri=normalize_uri(uri))
         return True
@@ -135,7 +135,7 @@ class EmailAutolinkProcessor(PatternInlineProcessor):
                          r'(?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?'
                          r'(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*)>')
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         uri = reader.consume(self.pattern).group(1)
         document += nodes.reference(uri, uri, refuri='mailto:' + normalize_uri(uri))
         return True
@@ -151,7 +151,7 @@ class RawHTMLProcessor(PatternInlineProcessor):
                PROCESSING_INSTRUCTION + "|" + DECLARATION + "|" + CDATA + ")")
     pattern = re.compile(HTMLTAG)
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         html = reader.consume(self.pattern).group(0)
         document += nodes.raw(html, html, format='html')
         return True
@@ -161,7 +161,7 @@ class RawHTMLProcessor(PatternInlineProcessor):
 class HardLinebreakProcessor(PatternInlineProcessor):
     pattern = re.compile(r'( {2,}|\\)\n')
 
-    def run(self, document: Element, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: Element) -> bool:
         if not isinstance(document, nodes.paragraph):
             return False
         else:

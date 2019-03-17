@@ -61,14 +61,13 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
     followings = re.compile(r'^(    (.*\n?)|\s*)$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
-        source, lineno = reader.get_source_and_line()
+        location = reader.get_source_and_line(incr=1)
 
         code = ''.join(IndentedCodeBlockReader(reader))
         code = re.sub('^\n+', '', code)  # strip blank lines
         code = re.sub('\n+$', '\n', code)  # strip blank lines
         document += nodes.literal_block(code, code, classes=['code'])
-        document[-1].source = source
-        document[-1].line = lineno + 1  # lineno points previous line
+        location.set_source_info(document[-1])
         return True
 
 
@@ -78,14 +77,13 @@ class BacktickFencedCodeBlockProcessor(PatternBlockProcessor):
     pattern = re.compile(r'^( {0,3})(`{3,})([^`]*)$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
-        source, lineno = reader.get_source_and_line()
+        location = reader.get_source_and_line(incr=1)
 
         indent, marker, info = self.pattern.match(reader.readline()).groups()
         code = ''.join(FencedCodeBlockReader(reader, len(indent), marker))
 
         literal_block = nodes.literal_block(code, code, classes=['code'])
-        literal_block.source = source
-        literal_block.line = lineno + 1  # lineno points previous line
+        location.set_source_info(literal_block)
         if info.strip():
             language = unescape(entitytrans._unescape(info.split()[0].strip()))
             literal_block['language'] = language
@@ -110,17 +108,15 @@ class ParagraphProcessor(BlockProcessor):
         return True
 
     def run(self, document: Element, reader: LineReader) -> bool:
-        source, lineno = reader.get_source_and_line()
+        location = reader.get_source_and_line(incr=1)
         node = self.read(reader, setext_heading_allowed=True)
         if isinstance(node, nodes.section):
-            node[0].source = source
-            node[0].line = lineno + 1  # lineno points previous line
+            location.set_source_info(node[0])
             self.note_implicit_target(document, node)
         else:
             text = self.read(LazyLineReader(reader), node.rawsource).rawsource.strip()
             node = nodes.paragraph(text, text)
-            node.source = source
-            node.line = lineno + 1  # lineno points previous line
+            location.set_source_info(node)
 
         document += node
         return True

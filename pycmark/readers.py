@@ -9,12 +9,23 @@
 """
 
 import re
-from typing import List, Match, Pattern, Tuple, TYPE_CHECKING, Union
+from typing import List, Match, NamedTuple, Pattern, TYPE_CHECKING, Union
+
+from docutils.nodes import Node
 
 from pycmark.utils import expand_leading_tabs
 
 if TYPE_CHECKING:
     from pycmark.inlineparser.list_processors import ListProcessor
+
+
+SourceInfoBase = NamedTuple('SourceInfo', [('source', str), ('lineno', int)])
+
+
+class SourceInfo(SourceInfoBase):
+    def set_source_info(self, node: Node) -> None:
+        node.source = self.source
+        node.line = self.lineno
 
 
 class LineReader:
@@ -40,12 +51,9 @@ class LineReader:
         except IOError:
             raise StopIteration
 
-    def get_source_and_line(self, lineno: int = None) -> Tuple[str, int]:
+    def get_source_and_line(self, incr: int = 0) -> SourceInfo:
         """Returns source filename and current line number."""
-        if lineno is not None:
-            return self.source, lineno
-        else:
-            return self.source, self.lineno
+        return SourceInfo(self.source, self.lineno + incr)
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
         """Returns an arbitrary line without moving the current line."""
@@ -96,8 +104,8 @@ class LineReaderDecorator(LineReader):
     def lineno(self) -> int:  # type: ignore
         return self.reader.lineno
 
-    def get_source_and_line(self, lineno: int = None) -> Tuple[str, int]:
-        return self.reader.get_source_and_line(lineno)
+    def get_source_and_line(self, incr: int = 0) -> SourceInfo:
+        return self.reader.get_source_and_line(incr)
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
         raise NotImplementedError

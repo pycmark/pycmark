@@ -34,7 +34,7 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
     closing_pattern = re.compile(r'^$')
 
     def run(self, document: Element, reader: LineReader) -> bool:
-        source, lineno = reader.get_source_and_line()
+        location = reader.get_source_and_line(incr=1)
         content = ''
         for line in reader:
             content += line
@@ -43,8 +43,7 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
 
         content = re.sub('\n+$', '\n', content)  # strip multiple CRs on tail
         document += nodes.raw(content, content, format='html')
-        document[-1].source = source
-        document[-1].line = lineno + 1  # lineno points previous line
+        location.set_source_info(document[-1])
         return True
 
 

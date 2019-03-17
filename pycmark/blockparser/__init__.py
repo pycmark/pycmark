@@ -9,7 +9,7 @@
 """
 
 import re
-from typing import List
+from typing import Any, List, Tuple
 
 from docutils.nodes import Element
 
@@ -19,16 +19,17 @@ from pycmark.readers import LineReader
 class BlockParser:
     """A parser for block elements."""
     def __init__(self) -> None:
-        self.processors: List["BlockProcessor"] = []
+        self.processors: List[Tuple[int, "BlockProcessor"]] = []
 
     def add_processor(self, processor: "BlockProcessor") -> None:
         """Add a block processor to parser."""
-        self.processors.append(processor)
+        self.processors.append((processor.priority, processor))
+        self.processors.sort()
 
     def parse(self, reader: LineReader, document: Element) -> None:
         """Parses a text and build document."""
         while not reader.eof():
-            for processor in self.processors:
+            for _, processor in self.processors:
                 if processor.match(reader):
                     if processor.run(document, reader):
                         break
@@ -36,7 +37,7 @@ class BlockParser:
                 raise RuntimeError('Failed to parse')
 
     def is_interrupted(self, reader: LineReader) -> bool:
-        for processor in self.processors:
+        for _, processor in self.processors:
             if processor.paragraph_interruptable and processor.match(reader):
                 return True
 
@@ -44,6 +45,9 @@ class BlockParser:
 
 
 class BlockProcessor:
+    #: priority of processor (1-999)
+    priority = 500
+
     #: This processor can interrupt a paragraph
     paragraph_interruptable = False
 
@@ -55,6 +59,9 @@ class BlockProcessor:
 
     def run(self, document: Element, reader: LineReader) -> bool:
         return False
+
+    def __lt__(self, other: Any) -> bool:
+        return self.__class__.__name__ < other.__class__.__name__
 
 
 class PatternBlockProcessor(BlockProcessor):

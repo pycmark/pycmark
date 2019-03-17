@@ -23,6 +23,7 @@ from pycmark.utils import entitytrans, unescape
 
 # 4.1 Thematic breaks
 class ThematicBreakProcessor(PatternBlockProcessor):
+    priority = 200
     paragraph_interruptable = True
     pattern = re.compile(r'^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})\s*$')
 
@@ -104,6 +105,7 @@ class TildeFencedCodeBlockProcessor(BacktickFencedCodeBlockProcessor):
 # 4.7 Link reference definitions
 # 4.8 Paragraphs
 class ParagraphProcessor(BlockProcessor):
+    priority = 800
     setext_heading_underline = re.compile(r'^ {0,3}(=+|-+)\s*$')
 
     def match(self, reader: LineReader, **kwargs) -> bool:

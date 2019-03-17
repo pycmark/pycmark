@@ -50,6 +50,7 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
 
 # 4.6 HTML blocks; <script>, <pre>, <script>
 class ScriptHTMLBlockProcessor(BaseHTMLBlockProcessor):
+    priority = 400
     pattern = re.compile(r'^ {0,3}<(script|pre|style)( |>|$)', re.I)
     closing_pattern = re.compile(r'</(script|pre|style)>', re.I)
 

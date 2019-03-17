@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+with open('README.md') as f:
+    long_description = f.read()
+
 setup(
     name='pycmark',
     version='0.1.0',
@@ -8,8 +11,8 @@ setup(
     author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',
     description='CommonMark parser for docutils',
-    long_description='ComomnMark parser for docutils',
-    long_description_content_type='text/x-rst',
+    long_description=long_description,
+    long_description_content_type='text/markdown',
     zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',

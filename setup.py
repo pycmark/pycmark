@@ -26,6 +26,11 @@ setup(
         'Programming Language :: Python :: 3.7',
         'Topic :: Documentation',
     ],
+    entry_points={
+        'console_scripts': [
+            'md2html = pycmark.cli:md2html',
+        ]
+    },
     install_requires=[
         'docutils',
     ],

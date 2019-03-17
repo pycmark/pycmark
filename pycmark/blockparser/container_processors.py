@@ -26,8 +26,7 @@ class BlockQuoteProcessor(PatternBlockProcessor):
 
     def run(self, document: Element, reader: LineReader) -> bool:
         quote = nodes.block_quote()
-        quote.source, quote.line = reader.get_source_and_line()
-        quote.line += 1
+        quote.source, quote.line = reader.get_source_and_line(incr=1)
         document += quote
         self.parser.parse(BlockQuoteReader(reader), quote)
         return True

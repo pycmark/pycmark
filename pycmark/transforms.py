@@ -130,10 +130,10 @@ class LinkReferenceDefinitionDetector(Transform):
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(nodes.paragraph):
             reader = TextReader(cast(Text, node[0]))
-            self.parse_linkref_definition(node, reader)
+            self.parse_linkref_definition(reader, node)
 
     @backtrack_onerror
-    def parse_linkref_definition(self, node: nodes.paragraph, reader: TextReader) -> None:
+    def parse_linkref_definition(self, reader: TextReader, node: nodes.paragraph) -> None:
         targets = []
         while True:
             matched = reader.consume(self.pattern)
@@ -144,11 +144,11 @@ class LinkReferenceDefinitionDetector(Transform):
                 label = normalize_link_label(matched.group(1))
                 if label.strip() == '':
                     break
-                destination = LinkDestinationParser().parse(node, reader)
+                destination = LinkDestinationParser().parse(reader, node)
                 if destination == '':
                     break
                 position = reader.position
-                title = LinkTitleParser().parse(node, reader)
+                title = LinkTitleParser().parse(reader, node)
                 eol = reader.consume(re.compile('\\s*(\n|$)'))
                 if eol is None:
                     # unknown text remains; no title?

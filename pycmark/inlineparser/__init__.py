@@ -37,7 +37,7 @@ class InlineParser:
         while reader.remain:
             for processor in self.processors:
                 if processor.match(reader):
-                    if processor.run(document, reader) is True:
+                    if processor.run(reader, document) is True:
                         break
             else:
                 if len(document) > 0 and isinstance(document[-1], SparseText):
@@ -63,7 +63,7 @@ class InlineProcessor:
     def match(self, reader: TextReader) -> bool:
         return False
 
-    def run(self, document: TextElement, reader: TextReader) -> bool:
+    def run(self, reader: TextReader, document: TextElement) -> bool:
         return False
 
 
@@ -84,10 +84,10 @@ class ParseError(Exception):
 
 def backtrack_onerror(func: Callable) -> Callable:
     @wraps(func)
-    def wrapper(self, document: Element, reader: TextReader, **kwargs) -> bool:
+    def wrapper(self, reader: TextReader, document: Element, **kwargs) -> bool:
         new_reader = TextReader(reader.subject, reader.position)
         try:
-            ret = func(self, document, new_reader, **kwargs)
+            ret = func(self, new_reader, document, **kwargs)
             if ret:
                 reader.position = new_reader.position
             return ret

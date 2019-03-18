@@ -24,7 +24,7 @@ class BlockQuoteProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile('^ {0,3}> ?')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         quote = nodes.block_quote()
         quote.source, quote.line = reader.get_source_and_line(incr=1)
         document += quote
@@ -46,7 +46,7 @@ class ListProcessor(BlockProcessor):
         else:
             return bool(self.first_item_pattern.match(reader.next_line))
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         item_reader = self.get_item_reader(reader)
         list_node = self.create_list_node(item_reader.marker)
         document += list_node

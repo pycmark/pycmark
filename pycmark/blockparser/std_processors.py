@@ -27,7 +27,7 @@ class ThematicBreakProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile(r'^ {0,3}((\*\s*){3,}|(-\s*){3,}|(_\s*){3,})\s*$')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         reader.readline()
         document += nodes.transition()
         return True
@@ -39,7 +39,7 @@ class ATXHeadingProcessor(PatternBlockProcessor):
     pattern = re.compile(r'^ {0,3}(#{1,6})(\s.*)$')
     trailing_hashes = re.compile(r'\s+#+\s*$')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         marker, title = self.pattern.match(reader.readline()).groups()
         title = self.trailing_hashes.sub('', title).strip()
         title_node = nodes.title(title, title)
@@ -61,7 +61,7 @@ class IndentedCodeBlockProcessor(PatternBlockProcessor):
     pattern = re.compile(r'^    (.*\n?)$')
     followings = re.compile(r'^(    (.*\n?)|\s*)$')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         location = reader.get_source_and_line(incr=1)
 
         code = ''.join(IndentedCodeBlockReader(reader))
@@ -77,7 +77,7 @@ class BacktickFencedCodeBlockProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile(r'^( {0,3})(`{3,})([^`]*)$')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         location = reader.get_source_and_line(incr=1)
 
         indent, marker, info = self.pattern.match(reader.readline()).groups()
@@ -109,7 +109,7 @@ class ParagraphProcessor(BlockProcessor):
     def match(self, reader: LineReader, **kwargs) -> bool:
         return True
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         location = reader.get_source_and_line(incr=1)
         node = self.read(reader, setext_heading_allowed=True)
         if isinstance(node, nodes.section):
@@ -159,7 +159,7 @@ class BlankLineProcessor(PatternBlockProcessor):
     paragraph_interruptable = True
     pattern = re.compile(r'^\s*$')
 
-    def run(self, document: Element, reader: LineReader) -> bool:
+    def run(self, reader: LineReader, document: Element) -> bool:
         reader.readline()  # skip the line
         document += addnodes.blankline()
         return True

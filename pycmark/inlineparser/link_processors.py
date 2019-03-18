@@ -19,7 +19,7 @@ from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
 from pycmark.readers import TextReader
 from pycmark.utils import entitytrans, normalize_uri
-from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, unescape, transplant_nodes
+from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, get_root_document, unescape, transplant_nodes
 
 LABEL_NOT_MATCHED = object()
 
@@ -145,16 +145,15 @@ class LinkCloserProcessor(PatternInlineProcessor):
         else:
             return LABEL_NOT_MATCHED, None
 
-    def lookup_target(self, document: Element, refname: str) -> nodes.target:
-        while document.parent:
-            document = document.parent
+    def lookup_target(self, node: Element, refname: str) -> nodes.Element:
+        document = get_root_document(node)
 
         refname = fully_normalize_name(refname)
-        node_id = document.nameids.get(refname)  # type: ignore
+        node_id = document.nameids.get(refname)
         if node_id is None:
             return None
 
-        return document.ids.get(node_id)  # type: ignore
+        return document.ids.get(node_id)
 
 
 class LinkDestinationParser:

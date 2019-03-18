@@ -12,6 +12,7 @@ import re
 from typing import List
 from urllib.parse import quote, unquote
 
+from docutils import nodes
 from docutils.nodes import Element, Node
 
 # common regexp
@@ -64,6 +65,14 @@ def normalize_link_label(label: str) -> str:
     label = unescape(label)
     label = re.sub(r'\s+', '', label)
     return label.strip().casefold()
+
+
+def get_root_document(node: Node) -> nodes.document:
+    while node.parent:
+        node = node.parent
+
+    assert isinstance(node, nodes.document)
+    return node
 
 
 def transplant_nodes(parent: Element, new_parent: Element, start: Node, end: Node) -> Element:

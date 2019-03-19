@@ -78,10 +78,6 @@ class UnmatchedTokenError(Exception):
     pass
 
 
-class ParseError(Exception):
-    pass
-
-
 def backtrack_onerror(func: Callable) -> Callable:
     @wraps(func)
     def wrapper(self, reader: TextReader, document: Element, **kwargs) -> bool:

@@ -18,7 +18,7 @@ from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
 from pycmark.readers import (
     FencedCodeBlockReader, IndentedCodeBlockReader, LazyLineReader, LineReader
 )
-from pycmark.utils import entitytrans, unescape
+from pycmark.utils import entitytrans, get_root_document, unescape
 
 
 # 4.1 Thematic breaks
@@ -44,15 +44,11 @@ class ATXHeadingProcessor(PatternBlockProcessor):
         title = self.trailing_hashes.sub('', title).strip()
         title_node = nodes.title(title, title)
         title_node.source, title_node.line = reader.get_source_and_line()
-        document += nodes.section('', title_node, depth=len(marker))
-        self.note_implicit_target(document, document[-1])
+        section = nodes.section('', title_node, depth=len(marker))
+        get_root_document(document).note_implicit_target(section)
+
+        document += section
         return True
-
-    def note_implicit_target(self, document: Element, node: Node) -> None:
-        while document.parent:
-            document = document.parent
-
-        document.note_implicit_target(node)  # type: ignore
 
 
 # 4.4 Indented code blocks

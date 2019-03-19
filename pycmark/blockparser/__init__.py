@@ -37,9 +37,12 @@ class BlockParser:
                 raise RuntimeError('Failed to parse')
 
     def is_interrupted(self, reader: LineReader) -> bool:
-        for _, processor in self.processors:
-            if processor.paragraph_interruptable and processor.match(reader):
-                return True
+        try:
+            for _, processor in self.processors:
+                if processor.paragraph_interruptable and processor.match(reader):
+                    return True
+        except IOError:
+            pass
 
         return False
 

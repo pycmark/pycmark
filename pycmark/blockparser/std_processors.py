@@ -11,7 +11,7 @@
 import re
 
 from docutils import nodes
-from docutils.nodes import Element, Node
+from docutils.nodes import Element
 
 from pycmark import addnodes
 from pycmark.blockparser import BlockProcessor, PatternBlockProcessor
@@ -49,6 +49,47 @@ class ATXHeadingProcessor(PatternBlockProcessor):
 
         document += section
         return True
+
+
+# 4.3 Setext headings
+class SetextHeadingProcessor(BlockProcessor):
+    priority = 750
+    pattern = re.compile(r'^ {0,3}(=+|-+)\s*$')
+    section_level = {'=': 1, '-': 2}
+
+    def match(self, reader: LineReader, **kwargs) -> bool:
+        return True
+
+    def run(self, reader: LineReader, document: Element) -> bool:
+        location = reader.get_source_and_line(incr=1)
+
+        lines = []
+        underline = None
+        try:
+            for line in reader:
+                lines.append(line.lstrip())
+                if self.pattern.match(reader.next_line):
+                    underline = reader.readline()
+                    break
+                elif self.parser.is_interrupted(reader):
+                    break
+        except IOError:
+            pass
+
+        if underline is None:
+            # underline of heading not found. backtracking.
+            reader.step(-len(lines))
+            return False
+        else:
+            text = ''.join(lines).strip()
+            depth = self.section_level[underline.strip()[0]]
+            section = nodes.section(depth=depth)
+            section += nodes.title(text, text)
+            location.set_source_info(section[0])
+            get_root_document(document).note_implicit_target(section)
+
+            document += section
+            return True
 
 
 # 4.4 Indented code blocks
@@ -95,59 +136,29 @@ class TildeFencedCodeBlockProcessor(BacktickFencedCodeBlockProcessor):
     pattern = re.compile(r'^( {0,3})(~{3,})(.*)$')
 
 
-# 4.3 Setext headings
 # 4.7 Link reference definitions
 # 4.8 Paragraphs
 class ParagraphProcessor(BlockProcessor):
     priority = 800
-    setext_heading_underline = re.compile(r'^ {0,3}(=+|-+)\s*$')
 
     def match(self, reader: LineReader, **kwargs) -> bool:
         return True
 
     def run(self, reader: LineReader, document: Element) -> bool:
         location = reader.get_source_and_line(incr=1)
-        node = self.read(reader, setext_heading_allowed=True)
-        if isinstance(node, nodes.section):
-            location.set_source_info(node[0])
-            self.note_implicit_target(document, node)
-        else:
-            text = self.read(LazyLineReader(reader), node.rawsource).rawsource.strip()
-            node = nodes.paragraph(text, text)
-            location.set_source_info(node)
+        reader = LazyLineReader(reader)
 
-        document += node
-        return True
-
-    def read(self, reader: LineReader, text: str = '', setext_heading_allowed: bool = False) -> Element:
-        def get_depth(line: str) -> int:
-            if line.strip()[0] == '=':
-                return 1
-            else:
-                return 2
-
-        while not reader.eof():
-            try:
-                if text and setext_heading_allowed and self.setext_heading_underline.match(reader.next_line):
-                    line = reader.readline()
-                    section = nodes.section(depth=get_depth(line))
-                    section += nodes.title(text.strip(), text.strip())
-                    return section
-                elif self.parser.is_interrupted(reader):
-                    break
-
-                line = reader.readline()
-                text += line.lstrip()
-            except IOError:
+        text = ''
+        for line in reader:
+            text += line.lstrip()
+            if self.parser.is_interrupted(reader):
                 break
 
-        return nodes.paragraph(text, text)
+        node = nodes.paragraph(text.strip(), text.strip())
+        location.set_source_info(node)
+        document += node
 
-    def note_implicit_target(self, document: Element, node: Node) -> None:
-        while document.parent:
-            document = document.parent
-
-        document.note_implicit_target(node)  # type: ignore
+        return True
 
 
 # 4.9 Blank lines

@@ -34,6 +34,7 @@ from pycmark.blockparser.html_processors import (
 from pycmark.blockparser.std_processors import (
     ThematicBreakProcessor,
     ATXHeadingProcessor,
+    SetextHeadingProcessor,
     IndentedCodeBlockProcessor,
     BlankLineProcessor,
     BacktickFencedCodeBlockProcessor,
@@ -97,6 +98,7 @@ class CommonMarkParser(Parser):
             NonEmptyBulletListProcessor,
             OrderedListProcessor,
             OneBasedOrderedListProcessor,
+            SetextHeadingProcessor,
             ParagraphProcessor,
         ]
 

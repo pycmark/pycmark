@@ -134,7 +134,7 @@ class BlockQuoteReader(LineReaderDecorator):
         line = self.reader.fetch(relative, lazy=kwargs.get('lazy'), markers=markers)
         if self.pattern.match(line):
             return self.pattern.sub('', line)
-        elif kwargs.get('lazy') and line.strip():
+        elif kwargs.get('lazy') and line.lstrip():
             return line
         else:
             raise IOError
@@ -243,7 +243,7 @@ class ListItemReader(LineReaderDecorator):
         elif self.processor.match(reader, in_list=True):
             # next list item found
             raise IOError
-        elif kwargs.get('lazy') and line.strip():
+        elif kwargs.get('lazy') and line.lstrip():
             return line
         else:
             raise IOError

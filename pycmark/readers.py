@@ -130,8 +130,8 @@ class BlockQuoteReader(LineReaderDecorator):
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
         """Returns a line without quote markers."""
-        markers = ['>'] + kwargs.get('markers', [])
-        line = self.reader.fetch(relative, lazy=kwargs.get('lazy'), markers=markers)
+        kwargs.setdefault('markers', []).insert(0, '>')
+        line = self.reader.fetch(relative, **kwargs)
         if self.pattern.match(line):
             return self.pattern.sub('', line)
         elif kwargs.get('lazy') and line.lstrip():
@@ -176,10 +176,12 @@ class LazyLineReader(LineReaderDecorator):
     """A reader supports laziness paragraphs."""
 
     def fetch(self, relative: int = 0, **kwargs) -> str:
-        return self.reader.fetch(relative, lazy=True)
+        kwargs['lazy'] = True
+        return self.reader.fetch(relative, **kwargs)
 
     def eof(self, **kwargs) -> bool:
-        return self.reader.eof(lazy=True)
+        kwargs['lazy'] = True
+        return self.reader.eof(**kwargs)
 
 
 class ListItemReader(LineReaderDecorator):
@@ -228,11 +230,9 @@ class ListItemReader(LineReaderDecorator):
 
         if self.is_beginning_line(relative):
             # skip over a list marker on the beginning line
-            markers = [self.markers] + kwargs.pop('markers', [])
-            line = self.reader.fetch(relative, markers=markers, **kwargs)
-        else:
-            line = self.reader.fetch(relative, **kwargs)
+            kwargs.setdefault('markers', []).insert(0, self.markers)
 
+        line = self.reader.fetch(relative, **kwargs)
         if self.is_beginning_line(relative):
             # remove a list marker and indents when the beginning line
             return line[self.indent:]

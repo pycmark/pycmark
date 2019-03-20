@@ -22,7 +22,7 @@ escaped_chars_pattern = re.compile(ESCAPED_CHARS)
 # HTML regexp
 TAGNAME = r'[a-zA-Z][a-zA-Z0-9-]*'
 ATTRIBUTE_NAME = r'[a-zA-Z_:][a-zA-Z0-9_.:-]*'
-UNQUOTED_VALUE = r"[^ \"'=<>`]+"
+UNQUOTED_VALUE = r"[^\s\"'=<>`]+"
 SINGLE_QUOTED_VALUE = r"'[^']*'"
 DOUBLE_QUOTED_VALUE = r'"[^"]*"'
 ATTRIBUTE_VALUE = ("(?:" + UNQUOTED_VALUE + "|" + SINGLE_QUOTED_VALUE + "|" +

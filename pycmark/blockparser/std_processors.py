@@ -5,7 +5,7 @@
     Standard processor classes for BlockParser.
 
     :copyright: Copyright 2017-2019 by Takeshi KOMIYA
-    :license: BSD, see LICENSE for details.
+    :license: Apache License 2.0, see LICENSE for details.
 """
 
 import re

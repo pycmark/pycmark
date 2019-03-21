@@ -2,11 +2,25 @@ language: python
 sudo: false
 dist: xenial
 cache: pip
-python: 3.7
+env:
+  global:
+    - TEST='-v --durations 25'
+    - PYTHONFAULTHANDLER=x
+    - PYTHONWARNINGS=all
+matrix:
+  include:
+    - python: "3.7"
+      env: TOXENV=py37
+    - python: nightly
+      env: TOXENV=py38
+    - python: "3.7"
+      env: TOXENV=spec
+    - python: "3.7"
+      env: TOXENV=flake8
+    - python: "3.7"
+      env: TOXENV=mypy
 install:
-  - pip install -U pip setuptools tox
+  - pip install -U pip tox
+  - pip install .
 script:
-  - tox
-  - python setup.py install
-  - git clone -b 0.28 https://github.com/commonmark/CommonMark
-  - (cd CommonMark; python test/spec_tests.py --prog ../tests/bin/md2html)
+  - tox -- -v

@@ -2,7 +2,7 @@
     pycmark.addnodes
     ~~~~~~~~~~~~~~~~
 
-    Additiona docutils nodes for pycmark.
+    Additional docutils nodes for pycmark.
 
     :copyright: Copyright 2017-2019 by Takeshi KOMIYA
     :license: BSD, see LICENSE for details.

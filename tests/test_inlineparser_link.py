@@ -581,7 +581,7 @@ def test_example_527():
             """[foo]: /url "title"\n""")
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, ([nodes.reference, "foo"],
-                                                             " \n[]")],
+                                                             "\n[]")],
                                           nodes.target)])
     assert_node(result[0][0], refuri="/url", reftitle="title")
 

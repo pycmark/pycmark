@@ -803,3 +803,10 @@ def test_example_618():
 def test_example_619():
     result = publish("### foo  ")
     assert_node(result, [nodes.document, nodes.section, nodes.title, "foo"])
+
+
+def test_example_621():
+    text = ("foo \n"
+            " baz\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, "foo\nbaz"])

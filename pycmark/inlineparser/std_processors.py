@@ -168,3 +168,16 @@ class HardLinebreakProcessor(PatternInlineProcessor):
             reader.consume(self.pattern)
             document += addnodes.linebreak()
             return True
+
+
+# 6.10 Soft line breaks
+class SoftLinebreakProcessor(PatternInlineProcessor):
+    pattern = re.compile(r'\s(?=\n)')
+
+    def run(self, reader: TextReader, document: Element) -> bool:
+        if not isinstance(document, nodes.paragraph):
+            return False
+        else:
+            reader.consume(self.pattern)  # skip over a space at tail
+            document += addnodes.SparseText(reader.subject, reader.position, reader.position)
+            return True

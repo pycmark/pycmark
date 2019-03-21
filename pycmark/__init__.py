@@ -55,6 +55,7 @@ from pycmark.inlineparser.std_processors import (
     EmailAutolinkProcessor,
     RawHTMLProcessor,
     HardLinebreakProcessor,
+    SoftLinebreakProcessor,
 )
 from pycmark.readers import LineReader
 from pycmark.transforms import (
@@ -115,6 +116,7 @@ class CommonMarkParser(Parser):
             EmailAutolinkProcessor,
             RawHTMLProcessor,
             HardLinebreakProcessor,  # TODO: docutils does not support hardline break
+            SoftLinebreakProcessor,
         ]
 
     def get_transforms(self) -> List[Type[Transform]]:

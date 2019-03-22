@@ -10,7 +10,7 @@
 
 import re
 from functools import wraps
-from typing import Callable, List, cast
+from typing import Any, Callable, List, Tuple, cast
 
 from docutils.nodes import Element, Text, TextElement
 
@@ -22,11 +22,12 @@ class InlineParser:
     """A parser for inline elements."""
 
     def __init__(self) -> None:
-        self.processors: List["InlineProcessor"] = []
+        self.processors: List[Tuple[int, "InlineProcessor"]] = []
 
     def add_processor(self, processor: "InlineProcessor") -> None:
         """Add a inline processor to parser."""
-        self.processors.append(processor)
+        self.processors.append((processor.priority, processor))
+        self.processors.sort()
 
     def parse(self, document: TextElement) -> TextElement:
         """Parses a text and build TextElement."""
@@ -35,7 +36,7 @@ class InlineParser:
 
         reader = TextReader(cast(Text, document.pop()))
         while reader.remain:
-            for processor in self.processors:
+            for _, processor in self.processors:
                 if processor.match(reader):
                     if processor.run(reader, document) is True:
                         break
@@ -57,6 +58,9 @@ class InlineParser:
 
 
 class InlineProcessor:
+    #: priority of the processor (1-999)
+    priority = 500
+
     def __init__(self, parser: InlineParser) -> None:
         self.parser = parser
 
@@ -65,6 +69,9 @@ class InlineProcessor:
 
     def run(self, reader: TextReader, document: TextElement) -> bool:
         return False
+
+    def __lt__(self, other: Any) -> bool:
+        return self.__class__.__name__ < other.__class__.__name__
 
 
 class PatternInlineProcessor(InlineProcessor):

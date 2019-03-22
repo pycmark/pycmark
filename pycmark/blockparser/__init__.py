@@ -48,7 +48,7 @@ class BlockParser:
 
 
 class BlockProcessor:
-    #: priority of processor (1-999)
+    #: priority of the processor (1-999)
     priority = 500
 
     #: This processor can interrupt a paragraph

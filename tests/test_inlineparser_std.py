@@ -151,6 +151,11 @@ def test_example_318():
     assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "foo bar baz"])
 
 
+def test_example_319():
+    result = publish("`a\xa0\xa0b`")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "a\xa0\xa0b"])
+
+
 def test_example_321():
     result = publish(r"`foo\`bar`")
     assert_node(result, [nodes.document, nodes.paragraph, ([nodes.literal, "foo\\"],

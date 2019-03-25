@@ -58,7 +58,7 @@ class CodeSpanProcessor(PatternInlineProcessor):
         text = addnodes.SparseText(reader.remain, 0, 0)
         while reader.remain:
             if pattern.match(reader.remain):
-                code = re.sub(r'\s+', ' ', str(text), re.S).strip()
+                code = re.sub(r'[ \t\r\n]+', ' ', str(text), re.S).strip()
                 document += nodes.literal(code, code)
                 reader.step(len(marker))
                 return True

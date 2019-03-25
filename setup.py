@@ -41,6 +41,7 @@ setup(
             'flake8-import-order',
             'pytest',
             'mypy',
+            'html5lib',
         ],
     },
     platforms='any',

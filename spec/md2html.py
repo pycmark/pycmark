@@ -104,15 +104,20 @@ class TestCommonMarkParser(CommonMarkParser):
         return transforms
 
 
+def convert(source):
+    html = publish_string(source=source,
+                          source_path='dummy.md',
+                          reader=TestReader(),
+                          parser=TestCommonMarkParser(),
+                          writer=HTMLWriter(),
+                          settings_overrides={'embed_stylesheet': False,
+                                              'compact_lists': False,
+                                              'doctitle_xform': False,
+                                              'report_level': 999})
+    return html.decode('utf-8')
+
+
 if __name__ == '__main__':
-    result = publish_string(source=sys.stdin.read().encode('utf-8'),
-                            source_path='dummy.md',
-                            reader=TestReader(),
-                            parser=TestCommonMarkParser(),
-                            writer=HTMLWriter(),
-                            settings_overrides={'embed_stylesheet': False,
-                                                'compact_lists': False,
-                                                'doctitle_xform': False,
-                                                'report_level': 999})
+    result = convert(sys.stdin.read().encode('utf-8'))
     if result:
-        print(result.decode('utf-8'))
+        print(result)

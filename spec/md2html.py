@@ -24,6 +24,13 @@ class HTMLWriter(Writer):
 
 
 class SmartHTMLTranslator(HTMLTranslator):
+    special_characters = {
+        ord('&'): '&amp;',
+        ord('<'): '&lt;',
+        ord('"'): '&quot;',
+        ord('>'): '&gt;',
+    }
+
     def visit_section(self, node):
         self.section_level = node.get('depth', 1)
 

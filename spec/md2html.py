@@ -8,6 +8,7 @@ from docutils.core import publish_string
 from docutils.readers import standalone
 from docutils.transforms.misc import Transitions
 from docutils.writers.html5_polyglot import Writer, HTMLTranslator
+
 from pycmark import CommonMarkParser
 from pycmark.transforms import LinebreakFilter, SectionTreeConstructor
 
@@ -23,6 +24,21 @@ class HTMLWriter(Writer):
 
 
 class SmartHTMLTranslator(HTMLTranslator):
+    special_characters = {
+        ord('&'): '&amp;',
+        ord('<'): '&lt;',
+        ord('"'): '&quot;',
+        ord('>'): '&gt;',
+    }
+
+    def depart_Text(self, node):
+        pos = node.parent.index(node)
+        if isinstance(node.parent, nodes.list_item) and len(node.parent) > pos + 1:
+            self.body.append('\n')
+
+    def depart_paragraph(self, node):
+        self.body.append('</p>\n')
+
     def visit_section(self, node):
         self.section_level = node.get('depth', 1)
 
@@ -44,7 +60,7 @@ class SmartHTMLTranslator(HTMLTranslator):
     def visit_list_item(self, node):
         if len(node) == 0:
             self.body.append('<li>')
-        elif len(node) == 1 and isinstance(node[0], nodes.Text):
+        elif isinstance(node[0], nodes.Text):
             self.body.append('<li>')
         else:
             self.body.append('<li>\n')
@@ -83,7 +99,7 @@ class SmartHTMLTranslator(HTMLTranslator):
         self.body.append('<img %s />' % ' '.join(atts))
 
     def visit_linebreak(self, node):
-        self.body.append('<br />')
+        self.body.append('<br />\n')
 
     def depart_linebreak(self, node):
         pass
@@ -104,15 +120,20 @@ class TestCommonMarkParser(CommonMarkParser):
         return transforms
 
 
+def convert(source):
+    html = publish_string(source=source,
+                          source_path='dummy.md',
+                          reader=TestReader(),
+                          parser=TestCommonMarkParser(),
+                          writer=HTMLWriter(),
+                          settings_overrides={'embed_stylesheet': False,
+                                              'compact_lists': False,
+                                              'doctitle_xform': False,
+                                              'report_level': 999})
+    return html.decode('utf-8')
+
+
 if __name__ == '__main__':
-    result = publish_string(source=sys.stdin.read().encode('utf-8'),
-                            source_path='dummy.md',
-                            reader=TestReader(),
-                            parser=TestCommonMarkParser(),
-                            writer=HTMLWriter(),
-                            settings_overrides={'embed_stylesheet': False,
-                                                'compact_lists': False,
-                                                'doctitle_xform': False,
-                                                'report_level': 999})
+    result = convert(sys.stdin.read().encode('utf-8'))
     if result:
-        print(result.decode('utf-8'))
+        print(result)

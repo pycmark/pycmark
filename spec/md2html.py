@@ -83,7 +83,7 @@ class SmartHTMLTranslator(HTMLTranslator):
         self.body.append('<img %s />' % ' '.join(atts))
 
     def visit_linebreak(self, node):
-        self.body.append('<br />')
+        self.body.append('<br />\n')
 
     def depart_linebreak(self, node):
         pass

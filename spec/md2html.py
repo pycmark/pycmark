@@ -31,6 +31,14 @@ class SmartHTMLTranslator(HTMLTranslator):
         ord('>'): '&gt;',
     }
 
+    def depart_Text(self, node):
+        pos = node.parent.index(node)
+        if isinstance(node.parent, nodes.list_item) and len(node.parent) > pos + 1:
+            self.body.append('\n')
+
+    def depart_paragraph(self, node):
+        self.body.append('</p>\n')
+
     def visit_section(self, node):
         self.section_level = node.get('depth', 1)
 
@@ -52,7 +60,7 @@ class SmartHTMLTranslator(HTMLTranslator):
     def visit_list_item(self, node):
         if len(node) == 0:
             self.body.append('<li>')
-        elif len(node) == 1 and isinstance(node[0], nodes.Text):
+        elif isinstance(node[0], nodes.Text):
             self.body.append('<li>')
         else:
             self.body.append('<li>\n')

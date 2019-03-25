@@ -34,4 +34,4 @@ def fetch_commonmark_spec():
         source = example.find('.//pre/code[@class="language-markdown"]')
         output = example.find('.//pre/code[@class="language-html"]')
 
-        yield (example_id, elem2code(source), elem2code(output))
+        yield (example_id, elem2code(source) + '\n', elem2code(output))

@@ -116,7 +116,8 @@ class EmphasisProcessor(PatternInlineProcessor):
             can_close = right_flanking
 
         document += addnodes.emphasis(marker=marker, can_open=can_open, can_close=can_close,
-                                      orig_length=len(marker), curr_length=len(marker))
+                                      orig_length=len(marker), curr_length=len(marker),
+                                      interior=can_open and can_close)
         return True
 
 

@@ -364,6 +364,11 @@ def test_example_389():
                                                                            [nodes.emphasis, "bar"])])
 
 
+def test_example_391_2():
+    result = publish("*foo**bar*")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.emphasis, "foo**bar"])
+
+
 def test_example_392():
     result = publish("***foo** bar*")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.emphasis, ([nodes.strong, "foo"],

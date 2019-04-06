@@ -24,7 +24,7 @@ from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
 
 
 class BlanklineFilter(Transform):
-    default_priority = 500
+    default_priority = 200
 
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.blankline):
@@ -32,7 +32,7 @@ class BlanklineFilter(Transform):
 
 
 class LinebreakFilter(Transform):
-    default_priority = 500
+    default_priority = 200
 
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.linebreak):
@@ -42,7 +42,7 @@ class LinebreakFilter(Transform):
 
 
 class TightListsDetector(Transform):
-    default_priority = BlanklineFilter.default_priority - 1  # must be eariler than BlanklineFilter
+    default_priority = BlanklineFilter.default_priority - 10
 
     def apply(self, **kwargs) -> None:
         self.detect(self.document)
@@ -67,7 +67,7 @@ class TightListsDetector(Transform):
 
 
 class TightListsCompactor(Transform):
-    default_priority = 999
+    default_priority = 300
 
     def apply(self, **kwargs) -> None:
         def is_tight_list(node: Node) -> bool:
@@ -86,7 +86,7 @@ class TightListsCompactor(Transform):
 
 
 class SectionTreeConstructor(Transform):
-    default_priority = 500
+    default_priority = 200
 
     def apply(self, **kwargs) -> None:
         def is_container_node(node: Node) -> bool:
@@ -179,7 +179,7 @@ class LinkReferenceDefinitionDetector(Transform):
 
 
 class InlineTransform(Transform):
-    default_priority = 200
+    default_priority = 150
 
     def apply(self, **kwargs) -> None:
         def is_text_container(node: Node) -> bool:
@@ -198,7 +198,7 @@ class InlineTransform(Transform):
 
 
 class SparseTextConverter(Transform):
-    default_priority = 900
+    default_priority = 250
 
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.SparseText):
@@ -208,7 +208,7 @@ class SparseTextConverter(Transform):
 
 
 class EmphasisConverter(Transform):
-    default_priority = 900
+    default_priority = 250
 
     def __init__(self, document: Element, startnode: Node = None) -> None:
         # override __init__() to accept any Element node as ``document``.
@@ -269,7 +269,7 @@ class EmphasisConverter(Transform):
 
 
 class BracketConverter(Transform):
-    default_priority = 900
+    default_priority = 250
 
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(addnodes.bracket):
@@ -277,7 +277,7 @@ class BracketConverter(Transform):
 
 
 class TextNodeConnector(Transform):
-    default_priority = 950  # must be executed after SparseTextConverter
+    default_priority = SparseTextConverter.default_priority + 10
 
     def apply(self, **kwargs) -> None:
         for node in self.document.traverse(TextElement):

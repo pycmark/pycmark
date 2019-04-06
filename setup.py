@@ -7,13 +7,11 @@ setup(
     name='pycmark',
     version='0.9.3',
     url='https://github.com/tk0miya/pycmark',
-    license='Apache License 2.0',
     author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',
     description='CommonMark parser for docutils',
     long_description=long_description,
     long_description_content_type='text/markdown',
-    zip_safe=False,
     classifiers=[
         'Development Status :: 3 - Alpha',
         'Environment :: Console',
@@ -44,6 +42,5 @@ setup(
             'html5lib',
         ],
     },
-    platforms='any',
     packages=find_packages(),
 )

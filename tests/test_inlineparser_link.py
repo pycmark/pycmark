@@ -161,8 +161,19 @@ def test_example_478():
 
 def test_example_478_2():
     result = publish(r"[link](<foo\>)")
-    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
-    assert_node(result[0][0], refuri="%3Cfoo%3E")
+    assert_node(result, [nodes.document, nodes.paragraph, "[link](<foo>)"])
+
+
+def test_example_478_3():
+    text = ("[a](<b)c\n"
+            "[a](<b)c>\n"
+            "[a](<b>c)\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("[a](<b)c\n"
+                                                           "[a](<b)c>\n"
+                                                           "[a](",
+                                                           [nodes.raw, "<b>"],
+                                                           "c)")])
 
 
 def test_example_479():

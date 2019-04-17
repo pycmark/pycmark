@@ -160,9 +160,12 @@ class LinkDestinationParser:
     pattern = re.compile(r'\s*<((?:[^<>\n\\]|' + ESCAPED_CHARS + r')*)>', re.S)
 
     def parse(self, reader: TextReader, document: Element) -> str:
-        matched = reader.consume(self.pattern)
-        if matched:
-            return self.normalize_link_destination(matched.group(1))
+        if re.match(r'^\s*<', reader.remain):
+            matched = reader.consume(self.pattern)
+            if not matched:
+                return ''
+            else:
+                return self.normalize_link_destination(matched.group(1))
         else:
             return self.parseBareLinkDestination(reader, document)
 

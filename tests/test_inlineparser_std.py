@@ -64,7 +64,7 @@ def test_example_302():
 
 def test_example_303():
     result = publish("&#35; &#1234; &#992; &#98765432; &#0;")
-    assert_node(result, [nodes.document, nodes.paragraph, "# Ӓ Ϡ � �"])
+    assert_node(result, [nodes.document, nodes.paragraph, "# Ӓ Ϡ &#98765432; �"])
 
 
 def test_example_304():

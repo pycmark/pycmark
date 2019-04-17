@@ -253,6 +253,9 @@ class EmphasisConverter(Transform):
                 continue
             elif opener['marker'][0] != closer['marker'][0]:
                 continue
+            elif (opener['interior'] and opener['orig_length'] % 3 == 0 and
+                  closer['interior'] and closer['orig_length'] % 3 == 0):
+                return opener
             else:
                 odd_match = ((closer['interior'] or opener['interior']) and
                              (opener['orig_length'] + closer['orig_length']) % 3 == 0)

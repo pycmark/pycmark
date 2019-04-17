@@ -425,6 +425,13 @@ def test_example_398():
     assert_node(result, [nodes.document, nodes.paragraph, "**** is not an empty strong emphasis"])
 
 
+def test_example_404():
+    result = publish("foo***bar***baz")
+    assert_node(result, [nodes.document, nodes.paragraph, ("foo",
+                                                           [nodes.emphasis, nodes.strong, "bar"],
+                                                           "baz")])
+
+
 def test_example_413():
     result = publish("foo ***")
     assert_node(result, [nodes.document, nodes.paragraph, "foo ***"])

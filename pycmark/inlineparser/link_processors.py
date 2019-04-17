@@ -13,13 +13,14 @@ from typing import Tuple
 
 from docutils import nodes
 from docutils.nodes import Element, Text
-from docutils.nodes import fully_normalize_name
 
 from pycmark import addnodes
 from pycmark.inlineparser import PatternInlineProcessor, backtrack_onerror
 from pycmark.readers import TextReader
 from pycmark.utils import entitytrans, normalize_uri
-from pycmark.utils import ESCAPED_CHARS, escaped_chars_pattern, get_root_document, unescape, transplant_nodes
+from pycmark.utils import (
+    ESCAPED_CHARS, escaped_chars_pattern, get_root_document, normalize_link_label, unescape, transplant_nodes
+)
 
 LABEL_NOT_MATCHED = object()
 
@@ -148,7 +149,7 @@ class LinkCloserProcessor(PatternInlineProcessor):
     def lookup_target(self, node: Element, refname: str) -> nodes.Element:
         document = get_root_document(node)
 
-        refname = fully_normalize_name(refname)
+        refname = normalize_link_label(refname)
         node_id = document.nameids.get(refname)
         if node_id is None:
             return None
@@ -177,6 +178,9 @@ class LinkDestinationParser:
 
     def parseBareLinkDestination(self, reader: TextReader, document: Element) -> str:
         assert reader.consume(re.compile(r'[ \n]*'))
+
+        if reader.remain == '':  # must be empty line!
+            return None
 
         parens = 0
         start = reader.position

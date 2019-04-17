@@ -940,3 +940,15 @@ def test_example_181():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
                                           [nodes.block_quote, ()])])
+
+
+def test_example_184():
+    text = ("[foo]: /url\n"
+            "bar\n"
+            "===\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.section, ([nodes.title, "bar"],
+                                                           [nodes.paragraph, nodes.reference, "foo"])])])
+    assert_node(result[0], refuri="/url")

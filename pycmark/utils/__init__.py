@@ -62,8 +62,7 @@ def expand_leading_tabs(text: str, markers: List[str] = [], tabstop: int = 4) ->
 
 
 def normalize_link_label(label: str) -> str:
-    label = unescape(label)
-    label = re.sub(r'\s+', '', label)
+    label = re.sub(r'\s+', ' ', label)
     return label.strip().casefold()
 
 

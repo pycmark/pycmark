@@ -159,6 +159,12 @@ def test_example_478():
     assert_node(result[0][0], refuri='/url%C2%A0%22title%22')
 
 
+def test_example_478_2():
+    result = publish(r"[link](<foo\>)")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="%3Cfoo%3E")
+
+
 def test_example_479():
     text = '[link](/url "title "and" title")'
     result = publish(text)

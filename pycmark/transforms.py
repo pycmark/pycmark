@@ -144,8 +144,9 @@ class LinkReferenceDefinitionDetector(Transform):
                 label = normalize_link_label(matched.group(1))
                 if label.strip() == '':
                     break
+                position = reader.position
                 destination = LinkDestinationParser().parse(reader, node)
-                if destination == '':
+                if destination == '' and position == reader.position:
                     break
                 whitespace = reader.consume(re.compile('([ \t]+|(?=\n|$))'))
                 if whitespace is None:

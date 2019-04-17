@@ -813,6 +813,16 @@ def test_example_169():
     assert_node(result[0][0], refuri="first")
 
 
+def test_example_169_2():
+    text = ("[foo]: <>\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[1][0], refuri="")
+
+
 def test_example_170():
     text = ("[FOO]: /url\n"
             "\n"

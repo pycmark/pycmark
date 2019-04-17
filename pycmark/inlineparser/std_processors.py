@@ -58,7 +58,8 @@ class CodeSpanProcessor(PatternInlineProcessor):
         text = addnodes.SparseText(reader.remain, 0, 0)
         while reader.remain:
             if pattern.match(reader.remain):
-                code = re.sub(r'[ \t\r\n]+', ' ', str(text), re.S).strip()
+                code = re.sub(r'[\r\n]', ' ', str(text), re.S)
+                code = self.trim_single_space(code)
                 document += nodes.literal(code, code)
                 reader.step(len(marker))
                 return True
@@ -71,6 +72,9 @@ class CodeSpanProcessor(PatternInlineProcessor):
                 reader.step()
         else:
             raise UnmatchedTokenError(marker)
+
+    def trim_single_space(self, s: str) -> str:
+        return re.sub('^ (.+) $', r'\1', s)
 
 
 # 6.4 Emphasis and strong emphasis

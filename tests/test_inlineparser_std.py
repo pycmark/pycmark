@@ -136,19 +136,19 @@ def test_example_314():
 
 def test_example_315():
     result = publish("`` foo ` bar  ``")
-    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "foo ` bar"])
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "foo ` bar "])
 
 
 def test_example_316():
-    result = publish("` `` `")
-    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "``"])
+    result = publish("`  ``  `")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, " `` "])
 
 
 def test_example_318():
-    text = ("`foo   bar\n"
-            "  baz`\n")
+    text = ("`foo   bar \n"
+            "baz`\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "foo bar baz"])
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "foo   bar  baz"])
 
 
 def test_example_319():
@@ -173,6 +173,16 @@ def test_example_323():
     assert_node(result, [nodes.document, nodes.paragraph, ("[not a ",
                                                            [nodes.literal, "link](/foo"],
                                                            ")")])
+
+
+def test_example_322_2():
+    result = publish("` a`")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, " a"])
+
+
+def test_example_323_2():
+    result = publish("` b `")
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "b"])
 
 
 def test_example_324():
@@ -227,6 +237,15 @@ def test_example_333():
 def test_example_334():
     result = publish("*\xa0a\xa0*")
     assert_node(result, [nodes.document, nodes.paragraph, "*\xa0a\xa0*"])
+
+
+def test_example_334_2():
+    text = ("` `\n"
+            "`  `\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ([nodes.literal, "\xa0"],
+                                                           "\n",
+                                                           [nodes.literal, "  "])])
 
 
 def test_example_335():
@@ -789,7 +808,7 @@ def test_example_611():
     text = ("`code  \n"
             "span`\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "code span"])
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.literal, "code   span"])
 
 
 # TODO: add test for HTML tags (Example 614 and 615)

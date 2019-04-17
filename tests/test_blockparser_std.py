@@ -707,7 +707,7 @@ def test_example_161():
 
 def test_example_162():
     text = ("[Foo bar]:\n"
-            "<my%20url>\n"
+            "<my url>\n"
             "'title'\n"
             "\n"
             "[Foo bar]\n")

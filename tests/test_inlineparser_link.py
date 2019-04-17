@@ -43,7 +43,8 @@ def test_example_463():
 def test_example_464():
     text = "[link](</my uri>)"
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text])
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/my%20uri")
 
 
 def test_example_465():

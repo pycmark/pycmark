@@ -580,8 +580,7 @@ def test_example_271():
     assert_node(result, [nodes.document, nodes.bullet_list, ([nodes.list_item, "a"],
                                                              [nodes.list_item, "b"],
                                                              [nodes.list_item, "c"],
-                                                             [nodes.list_item, "d"],
-                                                             [nodes.list_item, "e"],
+                                                             [nodes.list_item, "d\n- e"],
                                                              [nodes.list_item, "f"],
                                                              [nodes.list_item, "g"],
                                                              [nodes.list_item, "h"],
@@ -595,9 +594,9 @@ def test_example_274():
             "\n"
             "    3. c\n")
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.enumerated_list, ([nodes.list_item, nodes.paragraph, "a"],
-                                                                 [nodes.list_item, nodes.paragraph, "b"],
-                                                                 [nodes.list_item, nodes.paragraph, "c"])])
+    assert_node(result, [nodes.document, ([nodes.enumerated_list, ([nodes.list_item, nodes.paragraph, "a"],
+                                                                   [nodes.list_item, nodes.paragraph, "b"])],
+                                          [nodes.literal_block, "3. c\n"])])
 
 
 def test_example_275():

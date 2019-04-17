@@ -110,7 +110,7 @@ class ListProcessor(BlockProcessor):
 class BulletListProcessor(ListProcessor):
     paragraph_interruptable = False
     first_item_pattern = re.compile(r'^( {0,3}[-+*])([ \t]+.*|$)')
-    next_item_pattern = re.compile(r'^( *[-+*])([ \t]+.*|$)')
+    next_item_pattern = re.compile(r'^( {0,3}[-+*])([ \t]+.*|$)')
     markers = r'[-+*]'
 
     def create_list_node(self, marker: str) -> Element:
@@ -142,7 +142,7 @@ class NonEmptyBulletListProcessor(BulletListProcessor):
 class OrderedListProcessor(ListProcessor):
     paragraph_interruptable = False
     first_item_pattern = re.compile(r'^( {0,3}\d{1,9}[.)])([ \t]+.*|$)')
-    next_item_pattern = re.compile(r'^( *\d{1,9}[.)])([ \t]+.*|$)')
+    next_item_pattern = re.compile(r'^( {0,3}\d{1,9}[.)])([ \t]+.*|$)')
     markers = r'\d{1,9}[.)]'
 
     def create_list_node(self, marker: str) -> Element:

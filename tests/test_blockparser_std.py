@@ -788,6 +788,17 @@ def test_example_168():
     assert_node(result[0][0], refuri="url")
 
 
+def test_example_168_2():
+    text = ("[foo]: <bar>(baz)\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, ("[foo]: ",
+                                                             [nodes.raw, "<bar>"],
+                                                             "(baz)")],
+                                          [nodes.paragraph, "[foo]"])])
+
+
 def test_example_169():
     text = ("[foo]\n"
             "\n"

@@ -147,6 +147,9 @@ class LinkReferenceDefinitionDetector(Transform):
                 destination = LinkDestinationParser().parse(reader, node)
                 if destination == '':
                     break
+                whitespace = reader.consume(re.compile('([ \t]+|(?=\n|$))'))
+                if whitespace is None:
+                    break
                 position = reader.position
                 title = LinkTitleParser().parse(reader, node)
                 eol = reader.consume(re.compile('\\s*(\n|$)'))

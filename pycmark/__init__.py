@@ -19,59 +19,59 @@ from pycmark.blockparser.container_processors import (
     BlockQuoteProcessor,
     BulletListProcessor,
     NonEmptyBulletListProcessor,
-    OrderedListProcessor,
     OneBasedOrderedListProcessor,
+    OrderedListProcessor,
 )
 from pycmark.blockparser.html_processors import (
-    ScriptHTMLBlockProcessor,
-    CommentHTMLBlockProcessor,
-    ProcessingInstructionHTMLBlockProcessor,
-    DeclarationHTMLBlockProcessor,
     CdataHTMLBlockProcessor,
-    StandardTagsHTMLBlockProcessor,
+    CommentHTMLBlockProcessor,
     CompleteTagsHTMLBlockProcessor,
+    DeclarationHTMLBlockProcessor,
+    ProcessingInstructionHTMLBlockProcessor,
+    ScriptHTMLBlockProcessor,
+    StandardTagsHTMLBlockProcessor,
 )
 from pycmark.blockparser.link_processors import (
     LinkReferenceDefinitionProcessor
 )
 from pycmark.blockparser.std_processors import (
-    ThematicBreakProcessor,
     ATXHeadingProcessor,
-    SetextHeadingProcessor,
-    IndentedCodeBlockProcessor,
-    BlankLineProcessor,
     BacktickFencedCodeBlockProcessor,
-    TildeFencedCodeBlockProcessor,
+    BlankLineProcessor,
+    IndentedCodeBlockProcessor,
     ParagraphProcessor,
+    SetextHeadingProcessor,
+    ThematicBreakProcessor,
+    TildeFencedCodeBlockProcessor,
 )
 from pycmark.inlineparser import InlineProcessor
 from pycmark.inlineparser.link_processors import (
-    LinkOpenerProcessor,
     LinkCloserProcessor,
+    LinkOpenerProcessor,
 )
 from pycmark.inlineparser.std_processors import (
     BackslashEscapeProcessor,
-    EntityReferenceProcessor,
     CodeSpanProcessor,
-    EmphasisProcessor,
-    URIAutolinkProcessor,
     EmailAutolinkProcessor,
-    RawHTMLProcessor,
+    EmphasisProcessor,
+    EntityReferenceProcessor,
     HardLinebreakProcessor,
+    RawHTMLProcessor,
     SoftLinebreakProcessor,
+    URIAutolinkProcessor,
 )
 from pycmark.readers import LineReader
 from pycmark.transforms import (
-    TightListsDetector,
-    TightListsCompactor,
     BlanklineFilter,
+    BracketConverter,
+    EmphasisConverter,
+    InlineTransform,
     LinebreakFilter,
     SectionTreeConstructor,
-    InlineTransform,
     SparseTextConverter,
-    EmphasisConverter,
-    BracketConverter,
     TextNodeConnector,
+    TightListsCompactor,
+    TightListsDetector,
 )
 
 
@@ -83,57 +83,57 @@ class CommonMarkParser(Parser):
     def get_block_processors(self) -> List[Type[BlockProcessor]]:
         """Returns block processors. Overrided by subclasses."""
         return [
-            ThematicBreakProcessor,
             ATXHeadingProcessor,
-            IndentedCodeBlockProcessor,
-            BlankLineProcessor,
             BacktickFencedCodeBlockProcessor,
-            TildeFencedCodeBlockProcessor,
-            ScriptHTMLBlockProcessor,
-            CommentHTMLBlockProcessor,
-            ProcessingInstructionHTMLBlockProcessor,
-            DeclarationHTMLBlockProcessor,
-            CdataHTMLBlockProcessor,
-            StandardTagsHTMLBlockProcessor,
-            CompleteTagsHTMLBlockProcessor,
+            BlankLineProcessor,
             BlockQuoteProcessor,
             BulletListProcessor,
-            NonEmptyBulletListProcessor,
-            OrderedListProcessor,
-            OneBasedOrderedListProcessor,
-            SetextHeadingProcessor,
+            CdataHTMLBlockProcessor,
+            CommentHTMLBlockProcessor,
+            CompleteTagsHTMLBlockProcessor,
+            DeclarationHTMLBlockProcessor,
+            IndentedCodeBlockProcessor,
             LinkReferenceDefinitionProcessor,
+            NonEmptyBulletListProcessor,
+            OneBasedOrderedListProcessor,
+            OrderedListProcessor,
             ParagraphProcessor,
+            ProcessingInstructionHTMLBlockProcessor,
+            ScriptHTMLBlockProcessor,
+            SetextHeadingProcessor,
+            StandardTagsHTMLBlockProcessor,
+            ThematicBreakProcessor,
+            TildeFencedCodeBlockProcessor,
         ]
 
     def get_inline_processors(self) -> List[Type[InlineProcessor]]:
         """Returns inline processors. Overrided by subclasses."""
         return [
             BackslashEscapeProcessor,
-            EntityReferenceProcessor,
             CodeSpanProcessor,
-            EmphasisProcessor,
-            LinkOpenerProcessor,
-            LinkCloserProcessor,
-            URIAutolinkProcessor,
             EmailAutolinkProcessor,
+            EmphasisProcessor,
+            EntityReferenceProcessor,
+            HardLinebreakProcessor,
+            LinkCloserProcessor,
+            LinkOpenerProcessor,
             RawHTMLProcessor,
-            HardLinebreakProcessor,  # TODO: docutils does not support hardline break
             SoftLinebreakProcessor,
+            URIAutolinkProcessor,
         ]
 
     def get_transforms(self) -> List[Type[Transform]]:
         return [
-            TightListsDetector,
-            TightListsCompactor,
             BlanklineFilter,
+            BracketConverter,
+            EmphasisConverter,
+            InlineTransform,
             LinebreakFilter,
             SectionTreeConstructor,
-            InlineTransform,
             SparseTextConverter,
-            EmphasisConverter,
-            BracketConverter,
             TextNodeConnector,
+            TightListsCompactor,
+            TightListsDetector,
         ]
 
     def create_block_parser(self) -> BlockParser:

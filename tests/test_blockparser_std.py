@@ -707,7 +707,7 @@ def test_example_161():
 
 def test_example_162():
     text = ("[Foo bar]:\n"
-            "<my%20url>\n"
+            "<my url>\n"
             "'title'\n"
             "\n"
             "[Foo bar]\n")
@@ -788,6 +788,17 @@ def test_example_168():
     assert_node(result[0][0], refuri="url")
 
 
+def test_example_168_2():
+    text = ("[foo]: <bar>(baz)\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, ([nodes.paragraph, ("[foo]: ",
+                                                             [nodes.raw, "<bar>"],
+                                                             "(baz)")],
+                                          [nodes.paragraph, "[foo]"])])
+
+
 def test_example_169():
     text = ("[foo]\n"
             "\n"
@@ -800,6 +811,16 @@ def test_example_169():
     assert_node(result[1], refuri="first")
     assert_node(result[2], refuri="second")
     assert_node(result[0][0], refuri="first")
+
+
+def test_example_169_2():
+    text = ("[foo]: <>\n"
+            "\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.paragraph, nodes.reference, "foo"])])
+    assert_node(result[1][0], refuri="")
 
 
 def test_example_170():
@@ -919,3 +940,15 @@ def test_example_181():
     result = publish(text)
     assert_node(result, [nodes.document, ([nodes.paragraph, nodes.reference, "foo"],
                                           [nodes.block_quote, ()])])
+
+
+def test_example_184():
+    text = ("[foo]: /url\n"
+            "bar\n"
+            "===\n"
+            "[foo]\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, (nodes.target,
+                                          [nodes.section, ([nodes.title, "bar"],
+                                                           [nodes.paragraph, nodes.reference, "foo"])])])
+    assert_node(result[0], refuri="/url")

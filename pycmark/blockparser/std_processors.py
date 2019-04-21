@@ -136,7 +136,6 @@ class TildeFencedCodeBlockProcessor(BacktickFencedCodeBlockProcessor):
     pattern = re.compile(r'^( {0,3})(~{3,})(.*)$')
 
 
-# 4.7 Link reference definitions
 # 4.8 Paragraphs
 class ParagraphProcessor(BlockProcessor):
     priority = 800

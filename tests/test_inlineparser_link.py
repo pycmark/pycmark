@@ -43,7 +43,8 @@ def test_example_463():
 def test_example_464():
     text = "[link](</my uri>)"
     result = publish(text)
-    assert_node(result, [nodes.document, nodes.paragraph, text])
+    assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
+    assert_node(result[0][0], refuri="/my%20uri")
 
 
 def test_example_465():
@@ -156,6 +157,23 @@ def test_example_478():
     result = publish("""[link](/url\xa0"title")""")
     assert_node(result, [nodes.document, nodes.paragraph, nodes.reference, "link"])
     assert_node(result[0][0], refuri='/url%C2%A0%22title%22')
+
+
+def test_example_478_2():
+    result = publish(r"[link](<foo\>)")
+    assert_node(result, [nodes.document, nodes.paragraph, "[link](<foo>)"])
+
+
+def test_example_478_3():
+    text = ("[a](<b)c\n"
+            "[a](<b)c>\n"
+            "[a](<b>c)\n")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.paragraph, ("[a](<b)c\n"
+                                                           "[a](<b)c>\n"
+                                                           "[a](",
+                                                           [nodes.raw, "<b>"],
+                                                           "c)")])
 
 
 def test_example_479():

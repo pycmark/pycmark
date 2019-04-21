@@ -8,19 +8,15 @@
     :license: Apache License 2.0, see LICENSE for details.
 """
 
-import re
 from typing import List, cast
 
 from docutils import nodes
 from docutils.nodes import Element, FixedTextElement, Node, Text, TextElement
-from docutils.nodes import fully_normalize_name
 from docutils.transforms import Transform
 
 from pycmark import addnodes
-from pycmark.inlineparser import InlineParser, backtrack_onerror
-from pycmark.inlineparser.link_processors import LinkDestinationParser, LinkTitleParser
-from pycmark.readers import TextReader
-from pycmark.utils import ESCAPED_CHARS, normalize_link_label, transplant_nodes
+from pycmark.inlineparser import InlineParser
+from pycmark.utils import transplant_nodes
 
 
 class BlanklineFilter(Transform):
@@ -123,61 +119,6 @@ class SectionTreeConstructor(Transform):
                     last_section += node
 
 
-class LinkReferenceDefinitionDetector(Transform):
-    default_priority = 100
-    pattern = re.compile(r'\s*\[((?:[^\[\]\\]|' + ESCAPED_CHARS + r'|\\)+)\]:')
-
-    def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(nodes.paragraph):
-            reader = TextReader(cast(Text, node[0]))
-            self.parse_linkref_definition(reader, node)
-
-    @backtrack_onerror
-    def parse_linkref_definition(self, reader: TextReader, node: nodes.paragraph) -> None:
-        targets = []
-        while True:
-            matched = reader.consume(self.pattern)
-            if not matched:
-                break
-            else:
-                name = fully_normalize_name(matched.group(1))
-                label = normalize_link_label(matched.group(1))
-                if label.strip() == '':
-                    break
-                destination = LinkDestinationParser().parse(reader, node)
-                if destination == '':
-                    break
-                position = reader.position
-                title = LinkTitleParser().parse(reader, node)
-                eol = reader.consume(re.compile('\\s*(\n|$)'))
-                if eol is None:
-                    # unknown text remains; no title?
-                    reader.position = position
-                    if reader.consume(re.compile('\\s*(\n|$)')):
-                        target = nodes.target('', names=[label], refuri=destination)
-                else:
-                    target = nodes.target('', names=[name], refuri=destination, title=title)
-
-                if label not in self.document.nameids:
-                    self.document.note_explicit_target(target)
-                else:
-                    self.document.reporter.warning('Duplicate explicit target name: "%s"' % label,
-                                                   source=node.source, line=node.line)
-                targets.append(target)
-
-        if targets:
-            # insert found targets before the paragraph
-            pos = node.parent.index(node)
-            for target in reversed(targets):
-                node.parent.insert(pos, target)
-
-            if reader.remain:
-                node.pop(0)
-                node.insert(0, Text(reader.remain))
-            else:
-                node.parent.remove(node)
-
-
 class InlineTransform(Transform):
     default_priority = 150
 
@@ -253,6 +194,9 @@ class EmphasisConverter(Transform):
                 continue
             elif opener['marker'][0] != closer['marker'][0]:
                 continue
+            elif (opener['interior'] and opener['orig_length'] % 3 == 0 and
+                  closer['interior'] and closer['orig_length'] % 3 == 0):
+                return opener
             else:
                 odd_match = ((closer['interior'] or opener['interior']) and
                              (opener['orig_length'] + closer['orig_length']) % 3 == 0)

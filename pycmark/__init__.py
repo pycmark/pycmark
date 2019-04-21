@@ -31,6 +31,9 @@ from pycmark.blockparser.html_processors import (
     StandardTagsHTMLBlockProcessor,
     CompleteTagsHTMLBlockProcessor,
 )
+from pycmark.blockparser.link_processors import (
+    LinkReferenceDefinitionProcessor
+)
 from pycmark.blockparser.std_processors import (
     ThematicBreakProcessor,
     ATXHeadingProcessor,
@@ -64,7 +67,6 @@ from pycmark.transforms import (
     BlanklineFilter,
     LinebreakFilter,
     SectionTreeConstructor,
-    LinkReferenceDefinitionDetector,
     InlineTransform,
     SparseTextConverter,
     EmphasisConverter,
@@ -100,6 +102,7 @@ class CommonMarkParser(Parser):
             OrderedListProcessor,
             OneBasedOrderedListProcessor,
             SetextHeadingProcessor,
+            LinkReferenceDefinitionProcessor,
             ParagraphProcessor,
         ]
 
@@ -126,7 +129,6 @@ class CommonMarkParser(Parser):
             BlanklineFilter,
             LinebreakFilter,
             SectionTreeConstructor,
-            LinkReferenceDefinitionDetector,
             InlineTransform,
             SparseTextConverter,
             EmphasisConverter,

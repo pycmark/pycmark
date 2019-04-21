@@ -9,7 +9,7 @@
 """
 
 import re
-from typing import List, Match, NamedTuple, Pattern, TYPE_CHECKING, Union
+from typing import List, Match, NamedTuple, Pattern, TYPE_CHECKING, Tuple, Union
 
 from docutils.nodes import Node
 
@@ -275,3 +275,39 @@ class TextReader:
             self.step(len(matched.group(0)))
 
         return matched
+
+
+class MultiLineReader(LineReaderDecorator):
+    """A special reader for block elements across mutliple lines.
+
+    This provides a feature both LineReader and TextReader.
+    """
+
+    def __init__(self, reader: LineReader) -> None:
+        super().__init__(reader)
+        self.text_reader = TextReader('')  # dummy
+
+    def fetch(self, relative: int = 0, **kwargs) -> str:
+        return self.reader.fetch(relative, **kwargs)
+
+    def step(self, n: int = 1) -> None:
+        super().step(n)
+        self.text_reader = TextReader(self.fetch(0))
+
+    def consume(self, pattern: Pattern) -> Match:
+        return self.text_reader.consume(pattern)
+
+    def rewind(self, position: Tuple[int, int]) -> None:
+        self.step(position[0] - self.lineno)
+        self.text_reader.position = position[1]
+
+    def eol(self) -> bool:
+        return self.remain == "\n"
+
+    @property
+    def remain(self) -> str:
+        return self.text_reader.remain
+
+    @property
+    def position(self) -> Tuple[int, int]:
+        return (self.lineno, self.text_reader.position)

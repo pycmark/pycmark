@@ -10,7 +10,7 @@ A [CommonMark](https://commonmark.org/) parser for docutils.
   * All syntax are implemented as module
   * Developers can customize syntax via adding/removing the modules
 * Compatibility
-  * Passed all spec of CommonMark.
+  * Passed all spec of [CommonMark 0.29](https://spec.commonmark.org/0.29/).
   * But docutils can't represent following document structure. Therefor they are disabled by default
     * Hard line break
     * deeper headings appeared before shallow one

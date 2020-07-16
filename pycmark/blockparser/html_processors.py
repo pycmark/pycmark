@@ -47,11 +47,11 @@ class BaseHTMLBlockProcessor(PatternBlockProcessor):
         return True
 
 
-# 4.6 HTML blocks; <script>, <pre>, <script>
+# 4.6 HTML blocks; <script>, <pre>, <script>, <textarea>
 class ScriptHTMLBlockProcessor(BaseHTMLBlockProcessor):
     priority = 400
-    pattern = re.compile(r'^ {0,3}<(script|pre|style)( |>|$)', re.I)
-    closing_pattern = re.compile(r'</(script|pre|style)>', re.I)
+    pattern = re.compile(r'^ {0,3}<(script|pre|style|textarea)( |>|$)', re.I)
+    closing_pattern = re.compile(r'</(script|pre|style|textarea)>', re.I)
 
 
 # 4.6 HTML blocks; <!-- ... -->

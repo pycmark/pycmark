@@ -141,6 +141,18 @@ def test_example_138():
                                           [nodes.paragraph, "okay"])])
 
 
+def test_example_138_2():
+    text = ("""<textarea>\n"""
+            """\n"""
+            """*foo*\n"""
+            """\n"""
+            """_bar_\n"""
+            """\n"""
+            """</textarea>\n""")
+    result = publish(text)
+    assert_node(result, [nodes.document, nodes.raw])
+
+
 def test_example_141():
     text = ("""> <div>\n"""
             """> foo\n"""

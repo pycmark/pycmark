@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     from pycmark.inlineparser.list_processors import ListProcessor
 
 
-SourceInfoBase = NamedTuple('SourceInfo', [('source', str), ('lineno', int)])
+SourceInfoBase = NamedTuple('SourceInfoBase', [('source', str), ('lineno', int)])
 
 
 class SourceInfo(SourceInfoBase):

@@ -1,0 +1,30 @@
+name: Testing
+
+on: [push, pull_request]
+
+jobs:
+  ubuntu:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: [3.6, 3.7, 3.8, 3.9, 3.10-dev]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up Python ${{ matrix.python }}
+      uses: actions/setup-python@v2
+      if: "!endsWith(matrix.python-version, '-dev')"
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Set up Python ${{ matrix.python }} (deadsnakes)
+      uses: deadsnakes/action@v2.0.1
+      if: "endsWith(matrix.python-version, '-dev')"
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Check Python version
+      run: python --version
+    - name: Install dependencies
+      run: pip install -U tox tox-gh-actions
+    - name: Run Tox
+      run: tox -- -vv

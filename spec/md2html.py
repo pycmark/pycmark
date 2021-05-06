@@ -31,6 +31,10 @@ class SmartHTMLTranslator(HTMLTranslator):
         ord('>'): '&gt;',
     }
 
+    def __init__(self, document):
+        super().__init__(document)
+        self.initial_header_level = 1
+
     def depart_Text(self, node):
         pos = node.parent.index(node)
         if isinstance(node.parent, nodes.list_item) and len(node.parent) > pos + 1:

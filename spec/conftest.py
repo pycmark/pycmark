@@ -25,7 +25,7 @@ def fetch_commonmark_spec():
         code = code.replace("→", "\t")
         return code
 
-    with urlopen("https://spec.commonmark.org/0.29/") as f:
+    with urlopen("https://spec.commonmark.org/0.30/") as f:
         document = html5lib.parse(f, transport_encoding=f.info().get_content_charset(),  # type: ignore
                                   namespaceHTMLElements=False)
 

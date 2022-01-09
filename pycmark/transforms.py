@@ -209,7 +209,7 @@ class EmphasisConverter(Transform):
         markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
         for delim in markers:
             marker = str(delim)
-            delim.replace_self(Text(marker, marker))
+            delim.replace_self(Text(marker))
 
 
 class BracketConverter(Transform):
@@ -231,6 +231,6 @@ class TextNodeConnector(Transform):
                     text = node[pos] + node[pos + 1]  # type: ignore
                     node.remove(node[pos + 1])
                     node.remove(node[pos])
-                    node.insert(pos, Text(text, text))
+                    node.insert(pos, Text(text))
                 else:
                     pos += 1

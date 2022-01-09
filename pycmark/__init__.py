@@ -13,6 +13,7 @@ from typing import List, Type
 from docutils import nodes, parsers
 from docutils.transforms import Transform
 
+import pycmark.utils.compat  # Patch docutils  # NOQA
 from pycmark.blockparser import BlockParser, BlockProcessor
 from pycmark.blockparser.container_processors import (
     BlockQuoteProcessor,

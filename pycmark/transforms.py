@@ -23,7 +23,7 @@ class BlanklineFilter(Transform):
     default_priority = 200
 
     def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(addnodes.blankline):
+        for node in list(self.document.findall(addnodes.blankline)):
             node.parent.remove(node)
 
 
@@ -31,7 +31,7 @@ class LinebreakFilter(Transform):
     default_priority = 200
 
     def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(addnodes.linebreak):
+        for node in list(self.document.findall(addnodes.linebreak)):
             self.document.reporter.warning("A hard line break detected, ignored.",
                                            source=node.parent.source, line=node.parent.line)
             node.replace_self(addnodes.SparseText('\n', 0, 1))
@@ -50,7 +50,7 @@ class TightListsDetector(Transform):
         def has_loose_element(node: Element) -> bool:
             return any(isinstance(subnode, addnodes.blankline) for subnode in node[1:])
 
-        for node in document.traverse(is_list_node):  # type: Element
+        for node in document.findall(is_list_node):  # type: Element
             children = cast(List[nodes.list_item], node)
             if any(has_loose_element(item) for item in children):
                 node['tight'] = False
@@ -70,7 +70,7 @@ class TightListsCompactor(Transform):
             return (isinstance(node, (nodes.bullet_list, nodes.enumerated_list)) and
                     node['tight'] is True)
 
-        for list_node in self.document.traverse(is_tight_list):  # type: List[Element]
+        for list_node in list(self.document.findall(is_tight_list)):  # type: List[Element]
             for list_item in list_node:
                 for para in list_item[:]:
                     pos = list_item.index(para)
@@ -88,7 +88,7 @@ class SectionTreeConstructor(Transform):
         def is_container_node(node: Node) -> bool:
             return isinstance(node, (nodes.document, nodes.block_quote, nodes.list_item))
 
-        for node in self.document.traverse(is_container_node):  # type: Element
+        for node in list(self.document.findall(is_container_node)):  # type: Element
             self.construct_section_tree(node)
 
     def construct_section_tree(self, container: Element) -> None:
@@ -127,7 +127,7 @@ class InlineTransform(Transform):
             return isinstance(node, TextElement) and not isinstance(node, FixedTextElement)
 
         parser = self.create_parser()
-        for node in self.document.traverse(is_text_container):  # type: TextElement
+        for node in list(self.document.findall(is_text_container)):  # type: TextElement
             parser.parse(node)
 
     def create_parser(self) -> InlineParser:
@@ -142,7 +142,7 @@ class SparseTextConverter(Transform):
     default_priority = 250
 
     def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(addnodes.SparseText):
+        for node in list(self.document.findall(addnodes.SparseText)):
             pos = node.parent.index(node)
             node.parent.remove(node)
             node.parent.insert(pos, Text(str(node)))
@@ -158,7 +158,7 @@ class EmphasisConverter(Transform):
         self.language = None
 
     def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(TextElement):
+        for node in list(self.document.findall(TextElement)):
             while True:
                 markers = list(n for n in node.children if isinstance(n, addnodes.emphasis))
                 closers = list(d for d in markers if d['can_close'])
@@ -216,7 +216,7 @@ class BracketConverter(Transform):
     default_priority = 250
 
     def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(addnodes.bracket):
+        for node in list(self.document.findall(addnodes.bracket)):
             node.replace_self(Text(node['marker']))
 
 
@@ -224,7 +224,7 @@ class TextNodeConnector(Transform):
     default_priority = SparseTextConverter.default_priority + 10
 
     def apply(self, **kwargs) -> None:
-        for node in self.document.traverse(TextElement):
+        for node in list(self.document.findall(TextElement)):
             pos = 0
             while len(node) > pos + 1:
                 if isinstance(node[pos], Text) and isinstance(node[pos + 1], Text):

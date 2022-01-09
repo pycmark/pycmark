@@ -10,8 +10,7 @@
 
 from typing import List, Type
 
-from docutils import nodes
-from docutils.parsers import Parser
+from docutils import nodes, parsers
 from docutils.transforms import Transform
 
 from pycmark.blockparser import BlockParser, BlockProcessor
@@ -75,7 +74,7 @@ from pycmark.transforms import (
 )
 
 
-class CommonMarkParser(Parser):
+class Parser(parsers.Parser):
     """CommonMark parser for docutils."""
 
     supported = ('markdown', 'commonmark', 'md')

@@ -5,7 +5,7 @@ with open('README.md') as f:
 
 setup(
     name='pycmark',
-    version='0.9.5',
+    version='0.9.6',
     url='https://github.com/tk0miya/pycmark',
     author='Takeshi KOMIYA',
     author_email='i.tkomiya@gmail.com',

@@ -9,7 +9,7 @@ from docutils.readers import standalone
 from docutils.transforms.misc import Transitions
 from docutils.writers.html5_polyglot import Writer, HTMLTranslator
 
-from pycmark import CommonMarkParser
+from pycmark import Parser
 from pycmark.transforms import LinebreakFilter, SectionTreeConstructor
 
 
@@ -116,7 +116,7 @@ class TestReader(standalone.Reader):
         return transforms
 
 
-class TestCommonMarkParser(CommonMarkParser):
+class TestCommonMarkParser(Parser):
     def get_transforms(self):
         transforms = super().get_transforms()
         transforms.remove(LinebreakFilter)

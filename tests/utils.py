@@ -9,7 +9,7 @@
 from docutils.core import publish_doctree
 from docutils.readers.standalone import Reader
 
-from pycmark import CommonMarkParser
+from pycmark import Parser
 from pycmark.transforms import LinebreakFilter
 
 from sphinx import assert_node  # NOQA
@@ -20,7 +20,7 @@ class TestReader(Reader):
         return []  # skip all of transforms!
 
 
-class TestParser(CommonMarkParser):
+class TestParser(Parser):
     def get_transforms(self):
         transforms = super().get_transforms()
         transforms.remove(LinebreakFilter)

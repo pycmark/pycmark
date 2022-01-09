@@ -10,8 +10,8 @@
 
 from docutils.core import publish_cmdline
 
-from pycmark import CommonMarkParser
+from pycmark import Parser
 
 
 def md2html() -> None:
-    publish_cmdline(parser=CommonMarkParser(), writer_name='html5')
+    publish_cmdline(parser=Parser(), writer_name='html5')
